@@ -271,12 +271,12 @@ theorem markov_reciprocal_interval_factorial_bound
   by_cases hleft : x ≤ 1 / ((2 * L) * (m : ℝ))
   · apply htransport 1 (by norm_num)
     intro t ht
-    constructor <;> dsimp
+    constructor
     · nlinarith [hx.1, ht.1]
     · nlinarith [ht.2]
   · apply htransport (-1) (by norm_num)
     intro t ht
-    constructor <;> dsimp
+    constructor
     · nlinarith [ht.2]
     · nlinarith [hx.2, ht.1]
 
