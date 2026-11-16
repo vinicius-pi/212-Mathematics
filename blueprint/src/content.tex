@@ -221,6 +221,14 @@ For every $P \in \R[X]$, $B \in \R$, and measurable $E \subseteq \R$, the set
 $\{t \in E : |P(t)| \le B\}$ is measurable.
 \end{lemma}
 
+\begin{lemma}[Closed polynomial good sets]
+\label{lem:remez-closed-good-set}
+\lean{RhAstraSynthesis.TargetStatements.isClosed_polynomial_good_set}
+\leanok
+For every $P \in \R[X]$, $B \in \R$, and closed $E \subseteq \R$, the set
+$\{t \in E : |P(t)| \le B\}$ is closed.
+\end{lemma}
+
 \begin{proposition}[Measurable equioscillation Remez inequality]
 \label{thm:open-remez}
 \uses{thm:chebyshev-exp}
