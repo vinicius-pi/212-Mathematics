@@ -14,6 +14,7 @@ import RhAstraSynthesis.VaughanIdentity
 import RhAstraSynthesis.FixedDensityMellin
 import RhAstraSynthesis.MarkovChebyshevGeneral
 import RhAstraSynthesis.MarkovInterior
+import RhAstraSynthesis.RemezInequality
 import RhAstraSynthesis.FractionalGridBounds
 import RhAstraSynthesis.StieltjesTailBridge
 import RhAstraSynthesis.TentOperatorObstruction
@@ -36,6 +37,9 @@ abbrev bernsteinVanDerCorputSchaake := @RhAstraSynthesis.van_der_corput_schaake
 abbrev markovInteriorDerivative := @RhAstraSynthesis.markov_interior_derivative_abs_le
 abbrev markovIterateInteriorBound := @RhAstraSynthesis.markov_iterate_derivative_interior_le
 abbrev markovInteriorIntervalTransfer := @RhAstraSynthesis.markov_interior_interval_transfer
+abbrev remezInequality := @RhAstraSynthesis.remez_inequality
+abbrev remezExponentialInequality := @RhAstraSynthesis.remez_exponential_inequality
+abbrev remezMarkovInteriorBound := @RhAstraSynthesis.remez_markov_interior_derivative_bound
 abbrev chebyshevExteriorBound := @RhAstraSynthesis.chebyshev_exterior_eval_abs_le
 abbrev reciprocalEndpointMarkov := @RhAstraSynthesis.markov_reciprocal_endpoint_factorial_bound
 abbrev reciprocalGoodMeasure := @RhAstraSynthesis.polynomial_reciprocal_good_measure
@@ -75,6 +79,9 @@ abbrev negMinorNotPosSemidef := @RhAstraSynthesis.not_posSemidef_of_neg_two_by_t
 #print axioms markovInteriorDerivative
 #print axioms markovIterateInteriorBound
 #print axioms markovInteriorIntervalTransfer
+#print axioms remezInequality
+#print axioms remezExponentialInequality
+#print axioms remezMarkovInteriorBound
 #print axioms chebyshevExteriorBound
 #print axioms reciprocalEndpointMarkov
 #print axioms reciprocalGoodMeasure

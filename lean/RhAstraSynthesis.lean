@@ -14,6 +14,7 @@ import RhAstraSynthesis.MarkovAffineTransport
 import RhAstraSynthesis.MarkovChebyshevEndpoint
 import RhAstraSynthesis.MarkovChebyshevGeneral
 import RhAstraSynthesis.MarkovInterior
+import RhAstraSynthesis.RemezInequality
 import RhAstraSynthesis.ReciprocalSharpnessWitness
 import RhAstraSynthesis.FractionalGridBounds
 
@@ -50,13 +51,13 @@ import RhAstraSynthesis.MainTheorems
 import RhAstraSynthesis.TargetStatements
 
 /-!
-  Canonical Lean 4 root module for `RhAstraSynthesis`, aggregating 43 submodules
+  Canonical Lean 4 root module for `RhAstraSynthesis`, aggregating 44 submodules
   (see `RhAstraSynthesis.MainTheorems` and `RhAstraSynthesis.TargetStatements`
   for the headline theorem index and executable non-vacuity witnesses):
 
   I. Polynomial Approximation, Bernstein & Markov–Remez Bounds
      - Reciprocal- and fractional-grid `{n^(-α)}` measure reductions,
-     - Bernstein / Van der Corput–Schaake inequality and A. A. Markov's 1889 interior bound,
+     - Bernstein / Van der Corput–Schaake inequality, A. A. Markov's 1889 interior bound, and the full measurable equioscillation Remez inequality,
      - Markov–Chebyshev endpoint/exterior/affine derivative bounds and exponential Remez envelopes,
      - Explicit cubic (`2m^3`) and `1/√n` (`2m^(5/2)`) sharpness witnesses.
 

@@ -73,6 +73,17 @@ theorem log_decay_tail_integrable
       |∫ t in Ioi K, G t / t| ≤ C / (δ * (Real.log K) ^ δ) :=
   RhAstraSynthesis.log_decay_integrable_and_tail_bound hGm hC hδ hK hG
 
+/-- Measurable equioscillation Remez inequality on any compact interval `[a, b]`. -/
+theorem remez_inequality (P : _root_.Polynomial ℝ) (n : ℕ) {a b B : ℝ}
+    (hab : a < b) (hB : 0 ≤ B) (hdeg : P.natDegree ≤ n)
+    {E : Set ℝ} (hEm : MeasurableSet E) (hEsub : E ⊆ Set.Icc a b)
+    (he_pos : 0 < MeasureTheory.volume.real E) (hEbnd : ∀ t ∈ E, |P.eval t| ≤ B)
+    {x : ℝ} (hx : x ∈ Set.Icc a b) :
+    |P.eval x| ≤
+      (_root_.Polynomial.Chebyshev.T ℝ n).eval
+        (2 * (b - a) / MeasureTheory.volume.real E - 1) * B :=
+  RhAstraSynthesis.remez_inequality P n hab hB hdeg hEm hEsub he_pos hEbnd hx
+
 end FrozenTargets
 
 /-- Polynomial sublevel sets remain measurable after restriction to a measurable set. -/
@@ -186,5 +197,19 @@ end NonVacuityWitnesses
 #print axioms harmonic_moebius_bound
 #print axioms tent_mellin_nonvanishing
 #print axioms log_decay_tail_integrable
+
+example :
+    |(_root_.Polynomial.X : _root_.Polynomial ℝ).eval (2 : ℝ)| ≤
+      (_root_.Polynomial.Chebyshev.T ℝ 1).eval
+        (2 * ((2 : ℝ) - 0) / MeasureTheory.volume.real (Set.Icc (0 : ℝ) 1) - 1) * 1 :=
+  remez_inequality _root_.Polynomial.X 1 (by norm_num) (by norm_num)
+    (by simp) measurableSet_Icc (Set.Icc_subset_Icc_right (by norm_num))
+    (by rw [Real.volume_real_Icc_of_le (by norm_num)]; norm_num)
+    (fun t ht => by
+      simp only [_root_.Polynomial.eval_X]
+      exact abs_le.mpr ⟨by linarith [ht.1], by linarith [ht.2]⟩)
+    ⟨by norm_num, by norm_num⟩
+
+#print axioms remez_inequality
 
 end RhAstraSynthesis.TargetStatements

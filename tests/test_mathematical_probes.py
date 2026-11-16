@@ -294,6 +294,55 @@ class MathematicalProbesTests(unittest.TestCase):
             d_at_u = 2 * L * m * poly_eval(dc4, x)
             self.assertLessEqual(abs(d_at_u), (2 * L * m) * Fraction(m * m))
 
+    def test_measurable_remez_and_markov_derivative(self):
+        # Exact Chebyshev polynomials T_n on multi-interval / disconnected E subset [a, b]
+        def cheb_eval(n, x):
+            if n == 0:
+                return 1.0
+            if n == 1:
+                return x
+            t0, t1 = 1.0, x
+            for _ in range(2, n + 1):
+                t0, t1 = t1, 2.0 * x * t1 - t0
+            return t1
+
+        # E = [0, 0.4] union [1.6, 2.0] subset [0, 2], |E| = 0.8, 2|I|/|E| - 1 = 4.0
+        a, b = 0.0, 2.0
+        e_len = 0.8
+        y_arg = 2.0 * (b - a) / e_len - 1.0
+        self.assertAlmostEqual(y_arg, 4.0, places=12)
+
+        def eval_poly(coeffs, x):
+            acc = 0.0
+            for c in reversed(coeffs):
+                acc = acc * x + c
+            return acc
+
+        def deriv_coeffs(coeffs):
+            return [i * coeffs[i] for i in range(1, len(coeffs))]
+
+        samples_e = [i * 0.001 for i in range(401)] + [1.6 + i * 0.001 for i in range(401)]
+        samples_i = [i * 0.002 for i in range(1001)]
+        test_polys = [
+            [1.0, -2.0, 1.5],
+            [0.5, -1.0, 0.25, 0.75],
+            [1.0, 0.0, -3.0, 0.5, 0.4],
+        ]
+        for coeffs in test_polys:
+            n = len(coeffs) - 1
+            B = max(abs(eval_poly(coeffs, t)) for t in samples_e)
+            remez_bound = cheb_eval(n, y_arg) * B
+            for x in samples_i:
+                self.assertLessEqual(abs(eval_poly(coeffs, x)), remez_bound + 1e-9)
+            cur = coeffs
+            markov_prod = 1.0
+            for s in range(1, n + 1):
+                markov_prod *= (n - (s - 1)) ** 2
+                cur = deriv_coeffs(cur)
+                deriv_bound = ((2.0 / (b - a)) ** s) * markov_prod * remez_bound
+                for x in samples_i:
+                    self.assertLessEqual(abs(eval_poly(cur, x)), deriv_bound + 1e-8)
+
 
 if __name__ == "__main__":
     unittest.main()

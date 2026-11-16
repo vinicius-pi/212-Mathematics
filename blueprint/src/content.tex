@@ -1,6 +1,6 @@
 \section{Chebyshev Extremal Bounds, Interior Markov, and Discrete Grids}
 
-We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). Unless otherwise noted, all theorems below are formalized across 17 modules of \texttt{RhAstraSynthesis} and verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}.
+We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). Unless otherwise noted, all theorems below are formalized across 18 modules of \texttt{RhAstraSynthesis} and verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}.
 
 \subsection{Bernstein--Van der Corput--Schaake and A. A. Markov's Interior Theorem}
 
@@ -237,18 +237,52 @@ For every $P \in \R[X]$, $B \in \R$, and compact $E \subseteq \R$, the set
 $\{t \in E : |P(t)| \le B\}$ is compact.
 \end{lemma}
 
-\begin{proposition}[Measurable equioscillation Remez inequality]
+\begin{theorem}[Measurable equioscillation Remez inequality]
 \label{thm:open-remez}
-\uses{thm:chebyshev-exp}
-\notready
-For every compact interval $I \subset \R$ and measurable subset $E \subseteq I$ of positive measure, establish the full equioscillation Remez bound~\cite{yomdin2009} $\|P\|_I \le T_m(2|I|/|E| - 1)\|P\|_E$ in Mathlib, generalizing Theorem~\ref{thm:chebyshev-exp} beyond reciprocal-lattice subintervals.
-\end{proposition}
+\lean{RhAstraSynthesis.remez_inequality}
+\uses{lem:remez-compact-good-set}
+\leanok
+For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X]$ with $\deg P \le n$, and measurable subset $E \subseteq [a, b]$ of positive Lebesgue measure $|E| > 0$ on which $|P(t)| \le B$ ($B \ge 0$), every $x \in [a, b]$ satisfies
+\[
+|P(x)| \le T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
+\]
+\end{theorem}
+
+\begin{proof}
+Inner regularity of Lebesgue measure reduces $E$ to a compact subset $K \subseteq E$ with $|K| > 0$ via \texttt{MeasurableSet.exists\_isCompact\_diff\_lt}, and monotone continuity of $T_n$ on $[1, \infty)$ passes to the limit $|K| \uparrow |E|$. For any $x \in (a, b]$, applying the right-endpoint case to $[a, x]$ and $K \cap [a, x]$ (whenever $|K \cap [a, x]| > 0$, using monotonicity of $y \mapsto T_n(y)$) and symmetrically reflecting $t \mapsto -t$ on $[-b, -x]$ when $|K \cap [x, b]| > 0$ reduces the bound on $[a, b]$ to establishing the right-endpoint inequality at $x = b$. For the right-endpoint step on $[a, b]$ with $|K| = e > 0$ and $Y = 2(b-a)/e - 1 \ge 1$: continuity and Lipschitz regularity of $x \mapsto |K \cap [a, x]|$ choose ordered nodes $x_0 < \dots < x_n$ in $K$ satisfying
+\[
+|K \cap [a, x_k]| = \frac{t_k + 1}{2}\,e, \qquad t_k = -\cos\!\left(\frac{k\pi}{n}\right) \quad (0 \le k \le n).
+\]
+By additivity on intervals, $x_j - x_i \ge |K \cap [a, x_j]| - |K \cap [a, x_i]| = \frac{e}{2}(t_j - t_i)$ and $b - x_i \le (b - a) - |K \cap [a, x_i]| = \frac{e}{2}(Y - t_i)$. Expanding $P(b)$ in Lagrange interpolation on $\{x_k\}$ gives
+\[
+|P(b)| \le B \sum_{k=0}^n \prod_{i \ne k} \frac{b - x_i}{|x_k - x_i|}
+\le B \sum_{k=0}^n \prod_{i \ne k} \frac{Y - t_i}{|t_k - t_i|}
+= B \sum_{k=0}^n T_n(t_k)\,\ell_k^{\mathrm{Cheb}}(Y)
+= T_n(Y)\,B,
+\]
+since $(-1)^{n-k}\prod_{i \ne k}(t_k - t_i) > 0$ and $T_n(t_k) = (-1)^{n-k}$.
+\end{proof}
+
+\begin{theorem}[Exponential Remez and combined Markov interior derivative bound]
+\label{thm:remez-exp-markov}
+\lean{RhAstraSynthesis.remez_exponential_inequality, RhAstraSynthesis.remez_markov_interior_derivative_bound}
+\uses{thm:open-remez, thm:chebyshev-exp, thm:markov-interior}
+\leanok
+Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on a measurable set $E \subseteq [a, b]$ ($a < b$, $B \ge 0$). If $|E| \ge (b - a)/(1 + 1/L)$ for some $L > 0$, then $|P(x)| \le \exp(2n/\sqrt{L})\,B$ for all $x \in [a, b]$. Moreover, whenever $|E| > 0$, every $s \in \N$ and $x \in [a, b]$ satisfy
+\[
+|P^{(s)}(x)| \le \left(\frac{2}{b - a}\right)^s \left(\prod_{j=0}^{s-1}(n - j)^2\right) T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
+\]
+\end{theorem}
+
+\begin{proof}
+The hypothesis $|E| \ge (b-a)/(1+1/L)$ forces $1 \le 2(b-a)/|E| - 1 \le 1 + 2/L$, so combining Theorem~\ref{thm:open-remez} with monotonicity of $T_n$ on $[1, \infty)$ and Theorem~\ref{thm:chebyshev-exp} gives the exponential bound. For derivatives, $Q(u) = P\bigl(\frac{b-a}{2}u + \frac{a+b}{2}\bigr)$ satisfies $\deg Q \le n$ and $|Q(u)| \le T_n(2(b-a)/|E| - 1) B$ on $[-1, 1]$ by Theorem~\ref{thm:open-remez}; applying Theorem~\ref{thm:markov-interior} to $Q$ and rescaling by $((b-a)/2)^{-s}$ finishes the proof.
+\end{proof}
 
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
 \label{thm:open-gevrey-alpha}
-\uses{thm:markov-interior, thm:fractional-sharpness, thm:open-remez}
+\uses{thm:markov-interior, thm:fractional-sharpness, thm:remez-exp-markov}
 \notready
-Combine Theorems~\ref{thm:markov-interior} and~\ref{thm:fractional-sharpness} with Proposition~\ref{thm:open-remez} to deduce uniform Gevrey-$\alpha$ remainder bounds $\Gamma(\alpha p + 1) n^{-\alpha p}$ on arbitrary compact disks $\{|z| \le r\}$ for sequences sampled at $\{n^{-\alpha}\}$ ($\alpha \in (0, 1]$).
+Combine Theorems~\ref{thm:markov-interior}, \ref{thm:fractional-sharpness}, and~\ref{thm:remez-exp-markov} to deduce uniform Gevrey-$\alpha$ remainder bounds $\Gamma(\alpha p + 1) n^{-\alpha p}$ on arbitrary compact disks $\{|z| \le r\}$ for sequences sampled at $\{n^{-\alpha}\}$ ($\alpha \in (0, 1]$).
 \end{proposition}
 
 \begin{proposition}[Unconditional PNT input and $s=3/4$ Euler-product transfer~\cite{titchmarsh1986}]

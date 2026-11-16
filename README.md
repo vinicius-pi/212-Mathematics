@@ -2,7 +2,7 @@
 
 Machine-verified Lean 4 formalizations (`leanprover/lean4:v4.34.0`, pinned `mathlib@5ed2965256430c3649e86755f9576b54eca72435`) across polynomial approximation, coprime Möbius convolutions, Mellin multipliers for $-\zeta'/\zeta$, and analytic obstructions, accompanied by a Rocq `9.0` finite-rational cross-check.
 
-All 43 submodules compile with zero `sorry` under `lake build` and `leanchecker`, depend solely on `[propext, Classical.choice, Quot.sound]`, ban `native_decide` and `Lean.ofReduceBool`, and pair exported theorem signatures with executable non-vacuity witnesses in [`TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean). Dependency graphs and proof sketches appear in the [Blueprint PDF](blueprint/src/print.pdf) (`blueprint/src/content.tex`).
+All 44 submodules compile with zero `sorry` under `lake build` and `leanchecker`, depend solely on `[propext, Classical.choice, Quot.sound]`, ban `native_decide` and `Lean.ofReduceBool`, and pair exported theorem signatures with executable non-vacuity witnesses in [`TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean). Dependency graphs and proof sketches appear in the [Blueprint PDF](blueprint/src/print.pdf) (`blueprint/src/content.tex`).
 
 ## Headline Theorems
 
@@ -17,6 +17,7 @@ All 43 submodules compile with zero `sorry` under `lake build` and `leanchecker`
 | Exterior Chebyshev growth & endpoint Markov | `chebyshevExteriorBound`, `reciprocalEndpointMarkov` | $\|P(x)\| \le B\,T_m(\|x\|)$ ($\|x\| \ge 1$); $\|P^{(s)}(0)\|/s! \le M(4L)^s m^{3s}/(2s)!$ |
 | Reciprocal-grid good-set measure | `reciprocalGoodMeasure` | $\|P(1/n)\| \le B \;(\forall n \ge 1) \implies \|\{t \in [0, 1/k] : \|P(t)\| \le B\}\| \ge \frac{1}{k+m}$ |
 | Remez–Chebyshev exponential envelope | `remezChebyshevEnvelope` | $T_m(2(Lm)^{-1}/e - 1) \le \exp(2m/\sqrt{L})$ |
+| Measurable equioscillation Remez & Markov derivative | `remezInequality`, `remezExponentialInequality`, `remezMarkovInteriorBound` | $\|P(x)\| \le T_n(2(b-a)/\|E\| - 1) B$; $\|P^{(s)}(x)\| \le \bigl(\frac{2}{b-a}\bigr)^s \bigl(\prod_{j<s}(n-j)^2\bigr) T_n(2(b-a)/\|E\|-1) B$ |
 | Affine Markov scaling & Gevrey factorial | `markovAffineTransfer`, `gevreyFactorialBound` | Factor $(2k)^s$ on $[0, 1/k]$; $(3k)!/(2k)! \le 8^k k!$ |
 | Cubic sharpness witness on $\{1/n\}$ | `cubicSharpnessBound` | $\|P_{m,m}(1/n)\| \le 1$, $\deg P_{m,m} \le 2m$, $\|P_{m,m}'(0)\| \ge 2m^3 > m^2$ |
 | Fractional $\{n^{-\alpha}\}$ envelope & $n^{-1/2}$ witness | `fractionalRemezEnvelope`, `sqrtSharpnessDerivative` | $T_m(2(Lm)^{-\alpha}/e - 1) \le \exp(2m\sqrt{\alpha/L})$; $\|Q_{m,m}'(0)\| \ge 2m^{5/2}$ |
@@ -46,7 +47,7 @@ All 43 submodules compile with zero `sorry` under `lake build` and `leanchecker`
 
 ## Repository Layout
 
-- [`lean/RhAstraSynthesis.lean`](lean/RhAstraSynthesis.lean) — Root import ordered by mathematical branch (`43` submodules).
+- [`lean/RhAstraSynthesis.lean`](lean/RhAstraSynthesis.lean) — Root import ordered by mathematical branch (`44` submodules).
 - [`lean/RhAstraSynthesis/MainTheorems.lean`](lean/RhAstraSynthesis/MainTheorems.lean) — Theorem index with `#print axioms` checks.
 - [`lean/RhAstraSynthesis/TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean) — Frozen statement interfaces with executable non-vacuity `example` witnesses.
 - [`rocq/`](rocq/) — Independent Rocq `9.0` companion proving the finite rational signed-square envelope and sharpness counterexample (`rocqchk`).
