@@ -75,6 +75,23 @@ theorem log_decay_tail_integrable
 
 end FrozenTargets
 
+/-- Polynomial sublevel sets remain measurable after restriction to a measurable set. -/
+theorem measurable_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
+    {E : Set ℝ} (hE : MeasurableSet E) :
+    MeasurableSet {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
+  hE.inter (measurableSet_le P.continuous.abs.measurable measurable_const)
+
+/-- The good set for the nonconstant polynomial `X` on `[-1, 1]` is measurable. -/
+example : MeasurableSet
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1} :=
+  measurable_polynomial_good_set Polynomial.X 1 measurableSet_Icc
+
+example : (1 / 2 : ℝ) ∈
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1} := by
+  norm_num
+
+#print axioms measurable_polynomial_good_set
+
 section NonVacuityWitnesses
 
 /-- Non-trivial polynomial `P(x) = x` of degree `1` satisfies the Markov interior hypotheses at `x = 1`. -/
