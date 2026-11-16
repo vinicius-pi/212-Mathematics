@@ -74,7 +74,7 @@ theorem moebius_harmonic_abs_le_one (N : ℕ) (hN : 1 ≤ N) :
         (div_le_one hnR).2 (le_of_lt (by exact_mod_cast Nat.mod_lt N hnpos))
       have hmu : |(ArithmeticFunction.moebius n : ℝ)| ≤ 1 := by
         exact_mod_cast (ArithmeticFunction.abs_moebius_le_one (n := n))
-      simp only [if_neg hone, abs_mul, abs_of_nonneg hr0]
+      simp only [hone, ↓reduceIte, abs_mul, abs_of_nonneg hr0]
       calc
         _ ≤ 1 * (((N % n : ℕ) : ℝ) / (n : ℝ)) :=
           mul_le_mul_of_nonneg_right hmu hr0
@@ -115,8 +115,5 @@ theorem moebius_harmonic_abs_le_one (N : ℕ) (hN : 1 ≤ N) :
     sub_pos.mpr (lt_of_not_ge hfail)
   have hpos := mul_pos hNpos hgt
   nlinarith
-
-#print axioms moebius_floor_identity
-#print axioms moebius_harmonic_abs_le_one
 
 end RhAstraSynthesis

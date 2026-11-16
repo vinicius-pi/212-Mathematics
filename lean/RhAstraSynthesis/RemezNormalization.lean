@@ -73,7 +73,4 @@ theorem polynomial_reciprocal_remez_argument
     hrealL hrealm hmeasure'
   simpa only [Nat.cast_mul] using result
 
-#print axioms remez_argument_of_measure
-#print axioms polynomial_reciprocal_remez_argument
-
 end RhAstraSynthesis

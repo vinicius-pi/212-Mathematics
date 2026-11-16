@@ -116,14 +116,4 @@ theorem uniform_modulus_error_envelope {A1 tau_d fd_div_d Y Ad : ℝ}
     _ ≤ (fd_div_d ^ 2 * Y) * (A1 * tau_d) ^ 2 := mul_le_mul_of_nonneg_left hsq hcoeff
     _ = fd_div_d ^ 2 * A1 ^ 2 * tau_d ^ 2 * Y := by ring
 
-#print axioms local_filter_complement
-#print axioms local_filter_bounds
-#print axioms coprime_density_r_pos
-#print axioms coprime_density_r_le_one
-#print axioms coprime_density_r_bounds
-#print axioms quadratic_split_envelope
-#print axioms weighted_quadratic_split_envelope
-#print axioms high_scale_three_fourths_weight_bound
-#print axioms uniform_modulus_error_envelope
-
 end RhAstraSynthesis

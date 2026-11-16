@@ -79,7 +79,3 @@ theorem multiplier_ne_zero (s : ℂ) (h0 : 0 < s.re) (h1 : s.re < 1) :
     (mul_ne_zero hs0 (sub_ne_zero.mpr hs1))
 
 end TentMultiplier
-#print axioms TentMultiplier.power_gap
-#print axioms TentMultiplier.reciprocal_power_gap
-#print axioms TentMultiplier.numerator_ne_zero
-#print axioms TentMultiplier.multiplier_ne_zero

@@ -88,10 +88,4 @@ theorem markov_affine_interval_bound_transfer
   rw [hEval, abs_mul, abs_of_nonneg hscale]
   exact mul_le_mul_of_nonneg_left (hbound _ hmem') hscale
 
-#print axioms iterate_derivative_comp_const_slope
-#print axioms iterate_derivative_affine_comp
-#print axioms iterate_derivative_affine_eval
-#print axioms markov_affine_interval_image
-#print axioms markov_affine_interval_bound_transfer
-
 end RhAstraSynthesis

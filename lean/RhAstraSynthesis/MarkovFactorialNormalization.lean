@@ -223,16 +223,6 @@ example : markovOddDenom 0 = 1 := by norm_num [markovOddDenom]
 example : markovOddDenom 1 = 1 := by norm_num [markovOddDenom, Finset.prod_range_succ]
 example : markovOddDenom 2 = 3 := by norm_num [markovOddDenom, Finset.prod_range_succ]
 
-#print axioms markovOddDenom_pos
-#print axioms markov_odd_factorial_identity
-#print axioms markov_normalized_product_le_degree_power
-#print axioms markov_scaled_coefficient_le
-#print axioms markov_sampling_factorial_cross_bound
-#print axioms markov_remez_cubic_scale
-#print axioms markov_remez_factorial_cross_bound
-#print axioms markov_remez_factorial_bound
-#print axioms markov_pointwise_from_exact_bound
-
 /-- The odd and even double-factorial product equals `(2*s)!`,
 including `s = 0` where `(2*s - 1)` is truncated subtraction in `ℕ`. -/
 theorem markov_factorial_double_factorial (s : ℕ) :
@@ -292,9 +282,5 @@ theorem markov_factored_bound_transfer
         (((2*s-1).doubleFactorial : ℝ) * (s.factorial : ℝ)))) :
     D ≤ M * (((4*L)^s * m^(3*s)) / ((2*s).factorial : ℝ)) := by
   simpa only [markov_factorial_scaling] using hclassical
-
-#print axioms markov_factorial_double_factorial
-#print axioms markov_factorial_scaling
-#print axioms markov_factored_bound_transfer
 
 end RhAstraSynthesis

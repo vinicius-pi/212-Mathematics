@@ -360,13 +360,4 @@ theorem sqrtSharpnessWitness_derivative_at_zero (m : ℕ) (hm : 1 ≤ m) :
     linarith [hge_witness, hrpow_eq]
   exact ⟨habs, hge_witness, hgt_sq⟩
 
-#print axioms one_add_rpow_le_one_add_mul
-#print axioms fractional_gap_pos
-#print axioms fractional_gap_antitone
-#print axioms fractional_gap_sum_telescope
-#print axioms fractional_remez_chebyshev_envelope
-#print axioms sqrtSharpnessWitness_natDegree_le
-#print axioms sqrtSharpnessWitness_eval_inv_sqrt_abs_le_one
-#print axioms sqrtSharpnessWitness_derivative_at_zero
-
 end RhAstraSynthesis

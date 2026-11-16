@@ -168,6 +168,3 @@ theorem actual_calibration_of_moment_identity
 
 end DensityCalibration
 
-#print axioms DensityCalibration.polynomial_ratio_bounds
-#print axioms DensityCalibration.calibrated_mean
-#print axioms DensityCalibration.actual_calibration_of_moment_identity

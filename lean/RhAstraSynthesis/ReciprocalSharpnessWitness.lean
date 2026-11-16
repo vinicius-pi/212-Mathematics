@@ -259,13 +259,4 @@ theorem reciprocalSharpnessWitness_cubic_lower_bound (m : ℕ) (hm : 1 ≤ m) :
     nlinarith [sq_nonneg ((m : ℝ) - 1)]
   exact ⟨lt_of_lt_of_le hsq hcubic, hcubic⟩
 
-#print axioms reciprocalAnnihilator_natDegree_le
-#print axioms shiftedChebyshevFactor_natDegree_le
-#print axioms reciprocalSharpnessWitness_natDegree_le
-#print axioms reciprocalAnnihilator_eval_reciprocal_abs_le_one
-#print axioms reciprocalSharpnessWitness_eval_reciprocal_abs_le_one
-#print axioms reciprocalSharpnessWitness_derivative_eval_zero
-#print axioms reciprocalSharpnessWitness_derivative_abs_at_zero
-#print axioms reciprocalSharpnessWitness_cubic_lower_bound
-
 end RhAstraSynthesis

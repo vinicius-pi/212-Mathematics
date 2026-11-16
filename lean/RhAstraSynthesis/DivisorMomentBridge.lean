@@ -113,12 +113,4 @@ theorem euler_factor_ge_three_lt_two (p : ℕ) (hp : 3 ≤ p) (r : ℝ)
   have hinv := inv_strictAnti₀ (by norm_num : (0 : ℝ) < 1 / 2) hden
   simpa using hinv
 
-#print axioms tau_sq_le_d4_exponent_mul
-#print axioms tau_sq_le_choose_three
-#print axioms two_rpow_neg_three_fourths_lt_three_fifths
-#print axioms euler_factor_two_unrestricted_lt
-#print axioms euler_factor_two_weighted_lt_two
-#print axioms prime_ge_three_rpow_neg_three_fourths_lt_half
-#print axioms euler_factor_ge_three_lt_two
-
 end RhAstraSynthesis

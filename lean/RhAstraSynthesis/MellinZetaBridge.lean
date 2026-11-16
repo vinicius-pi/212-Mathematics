@@ -129,7 +129,4 @@ theorem coprime_signed_square_commRing {R : Type*} [_root_.CommRing R]
                   rw [← Finset.mul_sum]
                   ring
 
-#print axioms coprime_product_eq_signed_square
-#print axioms coprime_signed_square_commRing
-
 end RhAstraSynthesis

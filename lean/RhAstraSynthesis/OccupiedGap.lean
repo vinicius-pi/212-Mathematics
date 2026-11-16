@@ -72,7 +72,7 @@ theorem occupied_gap_has_derivative_root
 
 /-- A point belongs to at most one positive-index reciprocal open gap. -/
 theorem reciprocal_gap_index_unique
-    (i j : ℕ) (hi : 0 < i) (hj : 0 < j) (x : ℝ)
+    (i j : ℕ) (_hi : 0 < i) (_hj : 0 < j) (x : ℝ)
     (hxi : x ∈ Ioo (1 / (↑(i+1) : ℝ)) (1 / (i : ℝ)))
     (hxj : x ∈ Ioo (1 / (↑(j+1) : ℝ)) (1 / (j : ℝ))) :
     i = j := by
@@ -87,13 +87,8 @@ theorem reciprocal_gap_index_unique
   · have h := ordered j i hji
     linarith [hxj.1, hxi.2]
 
-#print axioms interval_overshoot_has_derivative_root
-#print axioms occupied_gap_has_derivative_root
-#print axioms reciprocal_gap_index_unique
-
 /-- Every finite family of occupied positive-index gaps has at most
-deg(P)-1 members. The constant case is included, rather than hidden
-behind an assumption that the derivative is nonzero. -/
+`P.natDegree - 1` members (including constant polynomials). -/
 theorem occupied_gaps_finset_card_le
     (P : Polynomial ℝ) (B : ℝ) (hB : 0 < B)
     (hsample : ∀ n : ℕ, 0 < n → |P.eval (1 / (n : ℝ))| ≤ B)
@@ -128,7 +123,7 @@ theorem occupied_gaps_finset_card_le
     have hc (j : ℕ) (hj : j ∈ S) :
         c j ∈ Ioo (1 / (↑(j+1) : ℝ)) (1 / (j : ℝ)) ∧
           P.derivative.eval (c j) = 0 := by
-      simpa only [c, dif_pos hj] using Classical.choose_spec (hex j hj)
+      simpa only [c, hj, ↓reduceDIte] using Classical.choose_spec (hex j hj)
     have hcard : S.card ≤ P.derivative.roots.toFinset.card := by
       apply Finset.card_le_card_of_injOn c
       · intro j hj
@@ -140,8 +135,6 @@ theorem occupied_gaps_finset_card_le
     exact hcard.trans
       ((Multiset.toFinset_card_le _).trans
         ((Polynomial.card_roots' _).trans (Polynomial.natDegree_derivative_le P)))
-
-#print axioms occupied_gaps_finset_card_le
 
 /-- All occupied gaps form a finite set, even though the sample sequence
 has no finite cutoff. Its cardinality is bounded by the derivative degree. -/
@@ -168,7 +161,5 @@ theorem occupied_gaps_finite_card_le
     exact Set.Finite.mem_toFinset hfinite
   · exact occupied_gaps_finset_card_le P B hB hsample _
       (fun j hj => (Set.Finite.mem_toFinset hfinite).mp hj)
-
-#print axioms occupied_gaps_finite_card_le
 
 end RhAstraSynthesis

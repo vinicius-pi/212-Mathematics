@@ -129,6 +129,4 @@ theorem weightedG_eq_signed_square (N : ℕ) (w : ℕ → ℝ) :
           exact triple_square s (fun d => (ArithmeticFunction.moebius d : ℝ))
             (fun d a => if d ∣ a then w a else 0)
 
-#print axioms weightedG_eq_signed_square
-
 end CoprimeMobiusSigned

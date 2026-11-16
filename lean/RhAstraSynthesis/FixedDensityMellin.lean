@@ -161,8 +161,3 @@ theorem centeredPrimePower_hasMellin_measure (s : ℂ) (hs : 1 < s.re) :
 
 end FixedDensityMellin
 
-#print axioms FixedDensityMellin.mixtureLaw_probability
-#print axioms FixedDensityMellin.momentFactor_eq_measureMoment
-#print axioms FixedDensityMellin.actualDensity_hasMellin
-#print axioms FixedDensityMellin.centeredPrimePower_hasMellin
-#print axioms FixedDensityMellin.centeredPrimePower_hasMellin_measure

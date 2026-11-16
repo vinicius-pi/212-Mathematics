@@ -51,9 +51,9 @@ import RhAstraSynthesis.MainTheorems
 import RhAstraSynthesis.TargetStatements
 
 /-!
-  Canonical Lean 4 root module for `RhAstraSynthesis`, aggregating 44 submodules
+  Root module for `RhAstraSynthesis`, importing all 44 submodules
   (see `RhAstraSynthesis.MainTheorems` and `RhAstraSynthesis.TargetStatements`
-  for the headline theorem index and executable non-vacuity witnesses):
+  for the headline theorem index and concrete examples):
 
   I. Polynomial Approximation, Bernstein & Markov–Remez Bounds
      - Reciprocal- and fractional-grid `{n^(-α)}` measure reductions,

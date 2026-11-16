@@ -21,12 +21,11 @@ import RhAstraSynthesis.TentOperatorObstruction
 import RhAstraSynthesis.ParityAndPickObstructions
 
 /-!
-# RhAstraSynthesis — Headline Theorems
+# Headline Theorems
 
-Single mathematician-facing index across Sections I–III of the library.
-All declarations depend exclusively on `[propext, Classical.choice, Quot.sound]`.
-See `RhAstraSynthesis.TargetStatements` for frozen interface signatures and
-executable non-vacuity witnesses.
+Single index of main results across Sections I–III of `RhAstraSynthesis`.
+All declarations use only `[propext, Classical.choice, Quot.sound]`;
+see `RhAstraSynthesis.TargetStatements` for self-contained signatures and examples.
 -/
 
 namespace RhAstraSynthesis.MainTheorems

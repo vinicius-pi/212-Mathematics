@@ -105,8 +105,4 @@ theorem Goriginal_eq_G (N : ℕ) : Goriginal N = G N := by
 theorem Goriginal_eq_Gproduct (N : ℕ) : Goriginal N = Gproduct N :=
   (Goriginal_eq_G N).trans (G_eq_Gproduct N)
 
-#print axioms G_eq_Gproduct
-#print axioms Goriginal_eq_G
-#print axioms Goriginal_eq_Gproduct
-
 end CoprimeMobius

@@ -37,7 +37,8 @@ theorem filtered_mobius_prime_power (d p : ℕ) (hp : p.Prime) (k : ℕ) (hk : k
     by_cases hpd : p ∣ d
     · simp [filteredMobiusValue, hcop, hpd]
     · simp [filteredMobiusValue, hcop, hpd, CoprimeMobius.f,
-        ArithmeticFunction.moebius_apply_prime hp, hr] <;> ring
+        ArithmeticFunction.moebius_apply_prime hp, hr]
+      ring
   · simp [filteredMobiusValue, CoprimeMobius.f,
       ArithmeticFunction.moebius_apply_prime_pow hp hk, hk1]
 
@@ -61,7 +62,7 @@ theorem actual_coprime_kernel_prime_power (d p : ℕ) (hp : p.Prime) (k : ℕ) (
           rw [hf1, hfp]
           by_cases hpd : p ∣ d
           · simp [hpd]
-          · simp only [if_neg hpd]
+          · simp only [hpd, ↓reduceIte]
             have hden : (p : ℝ) + 1 ≠ 0 := by positivity
             field_simp [hden]
             ring
@@ -69,7 +70,7 @@ theorem actual_coprime_kernel_prime_power (d p : ℕ) (hp : p.Prime) (k : ℕ) (
           rw [Finset.sum_range_succ]
           have hz : filteredMobiusValue d (p ^ (j + 1 + 1)) = 0 := by
             rw [filtered_mobius_prime_power d p hp (j + 1 + 1) (by omega)]
-            simp [show j + 1 + 1 ≠ 1 by omega]
+            simp
           rw [hz, add_zero]
           exact ih
 
@@ -143,12 +144,9 @@ private theorem isMultiplicative_filteredMobiusAF (d : ℕ) :
     simp only [filteredMobiusValue, Nat.coprime_mul_iff_left]
     by_cases ha : a.Coprime d
     · by_cases hb : b.Coprime d
-      · rw [if_pos (And.intro ha hb), if_pos ha, if_pos hb]
-        exact hf
-      · have hnot : ¬(a.Coprime d ∧ b.Coprime d) := fun h ↦ hb h.2
-        rw [if_neg hnot, if_neg hb, mul_zero]
-    · have hnot : ¬(a.Coprime d ∧ b.Coprime d) := fun h ↦ ha h.1
-      rw [if_neg hnot, if_neg ha, zero_mul]
+      · simp [ha, hb, hf]
+      · simp [ha, hb]
+    · simp [ha]
 
 /-- Multiplicativity is derived from the actual filtered weight and zeta convolution. -/
 theorem isMultiplicative_actualCoprimeKernelAF (d : ℕ) :
@@ -177,7 +175,7 @@ theorem actual_coprime_kernel_eq_prime_product (d n : ℕ) (hn : n ≠ 0) :
   have hk := hprime.factorization_pos_of_dvd hn (Nat.dvd_of_mem_primeFactors hp)
   exact actual_coprime_kernel_prime_power d p hprime (n.factorization p) (Nat.ne_of_gt hk)
 
-/-- Nonnegativity is proved for the actual divisor sum, not assumed of a free kernel. -/
+/-- Nonnegativity of `actualCoprimeKernel`. -/
 theorem actual_coprime_kernel_nonneg (d n : ℕ) : 0 ≤ actualCoprimeKernel d n := by
   by_cases hn : n = 0
   · subst n
@@ -231,16 +229,5 @@ theorem coprime_weighted_mass_abs_le_kernel_mass (d N : ℕ) :
         _ ≤ (actualCoprimeKernel d k / (k : ℝ)) * 1 :=
           mul_le_mul_of_nonneg_left hM hK
         _ = _ := mul_one _
-
-#print axioms isMultiplicative_actualCoprimeKernelAF
-#print axioms actual_coprime_kernel_eq_prime_product
-#print axioms actual_coprime_kernel_nonneg
-#print axioms actual_coprime_kernel_le_one
-#print axioms coprime_weighted_mass_abs_le_kernel_mass
-
-#print axioms filtered_mobius_prime_power
-#print axioms actual_coprime_kernel_prime_power
-#print axioms actual_coprime_mobius_factorization
-#print axioms actual_coprime_weighted_mass
 
 end RhAstraSynthesis

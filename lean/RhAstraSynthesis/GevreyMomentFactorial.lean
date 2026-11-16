@@ -59,8 +59,4 @@ example : (Nat.factorial 0 : ℝ) / (Nat.factorial 0 : ℝ) = 1 := by norm_num
 example : (Nat.factorial 3 : ℝ) / (Nat.factorial 2 : ℝ) ≤ 8 := by norm_num
 example : (Nat.factorial 6 : ℝ) / (Nat.factorial 4 : ℝ) ≤ 8^2 * 2 := by norm_num
 
-#print axioms factorial_three_mul_le_eight_pow
-#print axioms factorial_three_mul_le_eight_pow_real
-#print axioms factorial_three_div_two_le_eight_factorial
-
 end RhAstraSynthesis

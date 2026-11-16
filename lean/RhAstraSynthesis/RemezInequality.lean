@@ -775,8 +775,4 @@ theorem remez_markov_interior_derivative_bound (P : Polynomial ℝ) (n s : ℕ) 
           rw [hinv_eq]
           ring
 
-#print axioms remez_inequality
-#print axioms remez_exponential_inequality
-#print axioms remez_markov_interior_derivative_bound
-
 end RhAstraSynthesis

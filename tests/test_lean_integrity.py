@@ -23,7 +23,7 @@ BANNED_LEAN_PATTERNS = [
     (r"(?m)^\s*axiom\s+", "custom axiom declaration"),
 ]
 
-UNSLOP_BANNED_PHRASES = [
+STYLE_BANNED_PHRASES = [
     r"\bserves as\b",
     r"\bnot only\b.*\bbut also\b",
     r"\bit is worth noting\b",
@@ -87,13 +87,13 @@ class LeanIntegrityTests(unittest.TestCase):
                 missing.append(tag)
         self.assertEqual(missing, [], f"Blueprint \\lean tags missing from Lean sources: {missing}")
 
-    def test_public_docs_pass_unslop_checks(self):
+    def test_public_docs_style(self):
         for doc in (README_MD, ARCH_MD):
             content = doc.read_text(encoding="utf-8")
-            for pattern in UNSLOP_BANNED_PHRASES:
+            for pattern in STYLE_BANNED_PHRASES:
                 self.assertIsNone(
                     re.search(pattern, content, flags=re.IGNORECASE),
-                    f"Unslop filler phrase matched {pattern!r} in {doc.relative_to(ROOT)}",
+                    f"Disallowed filler phrase matched {pattern!r} in {doc.relative_to(ROOT)}",
                 )
 
 

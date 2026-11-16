@@ -60,8 +60,4 @@ theorem markov_chebyshev_derivative_abs_at_one
       ((Polynomial.derivative^[s]) (Polynomial.Chebyshev.T ℝ m)).eval 1 := by
   exact markov_chebyshev_derivative_abs_outside P m s 1 (by norm_num) hdeg hbounded
 
-#print axioms markov_chebyshev_derivative_upper_outside
-#print axioms markov_chebyshev_derivative_abs_outside
-#print axioms markov_chebyshev_derivative_abs_at_one
-
 end RhAstraSynthesis

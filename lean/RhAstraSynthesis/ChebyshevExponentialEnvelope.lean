@@ -133,14 +133,4 @@ theorem remez_chebyshev_T_le_exp (m : ℕ) {L e : ℝ}
   have harg := remez_argument_of_measure L (m : ℝ) e hL hm hmeas_low
   exact (chebyshev_T_mono_of_one_le m h1 harg).trans (chebyshev_T_one_add_two_div_le_exp m hL)
 
-#print axioms cosh_le_exp_of_nonneg
-#print axioms chebyshev_T_eval_cosh
-#print axioms chebyshev_T_cosh_le_exp
-#print axioms chebyshev_T_mono_of_one_le
-#print axioms self_le_sinh_of_nonneg
-#print axioms one_add_sq_div_two_le_cosh
-#print axioms one_add_two_div_le_cosh_two_div_sqrt
-#print axioms chebyshev_T_one_add_two_div_le_exp
-#print axioms remez_chebyshev_T_le_exp
-
 end RhAstraSynthesis

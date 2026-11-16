@@ -95,11 +95,4 @@ theorem exists_squarefree_kernel_majorant (n : ℕ) (hn : 0 < n) :
   exact one_div_le_one_div_of_le (by exact_mod_cast ha)
     (squarefree_divisor_le_coprime_psi hs han (Nat.ne_of_gt hn))
 
-#print axioms coprime_psi_le_of_dvd
-#print axioms squarefree_divisor_le_coprime_psi
-#print axioms actual_coprime_kernel_eq_psi_gcd_div
-#print axioms actual_coprime_kernel_base_eq_inv_psi
-#print axioms actual_coprime_kernel_le_psi_mul_base
-#print axioms exists_squarefree_kernel_majorant
-
 end RhAstraSynthesis

@@ -137,7 +137,4 @@ theorem log_decay_integrable_and_tail_bound
     ring
   exact ⟨hG_int, hC_eval ▸ hint_le⟩
 
-#print axioms abel_summation_inv
-#print axioms log_decay_integrable_and_tail_bound
-
 end RhAstraSynthesis

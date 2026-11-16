@@ -3,9 +3,7 @@ import Mathlib.Tactic
 /-!
 # Reciprocal gap lengths decrease
 
-Source: the decreasing-gap step preceding equation (4) of the
-pinned Gevrey-1 reciprocal-sampling proof. This proves monotonicity
-of gap *lengths* only; it does not bound the number of occupied gaps.
+Proves antitone monotonicity of consecutive reciprocal gap lengths `1/n - 1/(n+1)`.
 -/
 
 namespace RhAstraSynthesis
@@ -33,11 +31,9 @@ theorem reciprocal_gap_length_antitone
     have hn10 : (n : ℝ) + 1 ≠ 0 := by positivity
     simp only [Nat.cast_add, Nat.cast_one]
     field_simp [hn0, hn10]
-    <;> ring
+    ring
   rw [hformula j hj, hformula k hk]
   apply (div_le_div_iff₀ (by positivity) (by positivity)).2
   nlinarith
-
-#print axioms RhAstraSynthesis.reciprocal_gap_length_antitone
 
 end RhAstraSynthesis

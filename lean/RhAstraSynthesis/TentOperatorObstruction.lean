@@ -754,7 +754,4 @@ theorem tent_numerator_infinitely_many_off_axis_zeros (R : ℝ) :
 
 end OffAxisZeros
 
-#print axioms tent_numerator_half_line_lower_bound
-#print axioms tent_numerator_infinitely_many_off_axis_zeros
-
 end RhAstraSynthesis

@@ -55,6 +55,4 @@ theorem reciprocal_good_measure_of_bad_bound
     simpa only [reciprocal_gap_telescope k m hk] using hbad
   linarith
 
-#print axioms RhAstraSynthesis.reciprocal_good_measure_of_bad_bound
-
 end RhAstraSynthesis

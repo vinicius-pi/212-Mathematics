@@ -241,10 +241,3 @@ theorem tent_mellin_ne_zero (s : ℂ) (h0 : 0 < s.re) (h1 : s.re < 1) :
 
 end TentMellin
 
-#print axioms TentMellin.ofReal_realTent
-#print axioms TentMellin.tent_eq_pieces
-#print axioms TentMellin.mellin_indicator_Ioc
-#print axioms TentMellin.tent_mellin_convergent
-#print axioms TentMellin.mellin_intervals
-#print axioms TentMellin.mellin_eq_multiplier
-#print axioms TentMellin.tent_mellin_ne_zero

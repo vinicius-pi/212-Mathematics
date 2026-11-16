@@ -23,5 +23,5 @@
 
 ## 4. Target Interfaces & Headline Index (2 modules)
 
-- `MainTheorems` — single-entry export table with `#print axioms` checks for all 35 headline declarations.
-- `TargetStatements` — Comparator-style frozen statement signatures paired with executable non-vacuity `example` witnesses verifying joint satisfiability of each theorem's hypotheses.
+- `MainTheorems` — single-entry export table with `#print axioms` checks for the 35 main declarations.
+- `TargetStatements` — self-contained Mathlib-type theorem signatures paired with concrete instantiations checking that their hypotheses hold simultaneously.

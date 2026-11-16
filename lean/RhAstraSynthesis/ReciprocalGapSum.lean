@@ -60,7 +60,4 @@ theorem reciprocal_gaps_sum_le_first_m
   apply one_div_le_one_div_of_le (by positivity)
   exact_mod_cast (Nat.le_succ (k+i))
 
-#print axioms reciprocal_gaps_sum_le_initial
-#print axioms reciprocal_gaps_sum_le_first_m
-
 end RhAstraSynthesis

@@ -153,8 +153,3 @@ theorem actual_calibration :
 
 end TentMoment
 
-#print axioms TentMoment.weighted_integral_split
-#print axioms TentMoment.integral_log_quotient
-#print axioms TentMoment.actualMoment_eq_polynomial
-#print axioms TentMoment.actual_tent_mass
-#print axioms TentMoment.actual_calibration

@@ -217,8 +217,3 @@ theorem density_hasMellin (b : ℝ) (hb : 1 < b) (s : ℂ) (hs : 1 < s.re) :
 
 end TentDensity
 
-#print axioms TentDensity.uniformLaw_probability
-#print axioms TentDensity.uniformLaw_interval
-#print axioms TentDensity.density_mellin_convergent
-#print axioms TentDensity.moment_relation
-#print axioms TentDensity.density_hasMellin

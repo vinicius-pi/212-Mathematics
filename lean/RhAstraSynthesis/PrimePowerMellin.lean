@@ -215,9 +215,3 @@ theorem primePower_hasMellin (s : ℂ) (hs : 1 < s.re) :
 
 end PrimePowerMellin
 
-#print axioms PrimePowerMellin.dilated_finite_support
-#print axioms PrimePowerMellin.primePower_finite_support
-#print axioms PrimePowerMellin.weighted_norm_integral
-#print axioms PrimePowerMellin.primePower_mellin_convergent
-#print axioms PrimePowerMellin.primePower_mellin_zeta
-#print axioms PrimePowerMellin.primePower_hasMellin

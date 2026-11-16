@@ -177,12 +177,4 @@ theorem exponent_envelope (a : ℝ) :
   · exact le_trans (by linarith) (le_max_left _ _)
   · exact le_trans (by linarith) (le_max_right _ _)
 
-#print axioms PowerKernelTransfer.tail_bound
-#print axioms PowerKernelTransfer.fractional_integral_bound
-#print axioms PowerKernelTransfer.remainder_bound
-#print axioms PowerKernelTransfer.weighted_integrable
-#print axioms PowerKernelTransfer.kernel_sub_limit
-#print axioms PowerKernelTransfer.kernel_error_bound
-#print axioms PowerKernelTransfer.exponent_envelope
-
 end PowerKernelTransfer

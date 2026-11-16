@@ -43,7 +43,6 @@ private theorem paired_pseries_summable (s : ℝ) (hs : 1 / 2 < s) :
     Real.summable_nat_rpow.mpr (by linarith)
   exact Summable.mul_of_nonneg hA hB (fun _ ↦ by positivity) (fun _ ↦ by positivity)
 
--- Opaque witness parameters keep choice terms out of analytic normalization.
 set_option maxHeartbeats 800000 in
 private theorem base_moment_summable_of_squarefree_parameters (s : ℝ) (hs : 1 / 2 < s)
     (a b : ℕ → ℕ) (ha : ∀ n, 0 < a n) (hb : ∀ n, 0 < b n)
@@ -131,13 +130,5 @@ theorem coprime_kernel_moment_euler_hasProd (s : ℝ) (hs : 1 / 2 < s)
   have hZero : coprimeKernelMomentTerm s d 0 = 0 := by
     simp [coprimeKernelMomentTerm, actualCoprimeKernel]
   exact EulerProduct.eulerProduct_hasProd hOne hMul hNorm hZero
-
-#print axioms reciprocal_square_weight
-#print axioms paired_pseries_summable
-#print axioms base_moment_summable_of_squarefree_parameters
-#print axioms coprime_kernel_moment_nonneg
-#print axioms coprime_kernel_base_moment_summable
-#print axioms coprime_kernel_moment_summable
-#print axioms coprime_kernel_moment_euler_hasProd
 
 end RhAstraSynthesis

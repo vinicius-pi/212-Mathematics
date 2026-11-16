@@ -141,9 +141,4 @@ theorem not_posSemidef_of_neg_two_by_two_minor
         exact mul_neg_of_pos_of_neg hii_pos (sub_neg.mpr hneg_det)
       linarith
 
-#print axioms parity_pseudo_density_nonneg
-#print axioms szegoDefectSq_pos
-#print axioms model_space_projection_defect_lower_bound
-#print axioms not_posSemidef_of_neg_two_by_two_minor
-
 end RhAstraSynthesis

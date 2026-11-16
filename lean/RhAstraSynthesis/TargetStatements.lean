@@ -1,22 +1,18 @@
 import RhAstraSynthesis.MainTheorems
 
 /-!
-# Target Statements & Non-Vacuity Witnesses
+# Statement Signatures and Examples
 
-Standalone mathematician-facing specification targets for `RhAstraSynthesis`,
-paired with executable kernel witnesses demonstrating that each headline theorem's
-hypothesis bundle is jointly satisfiable on concrete non-degenerate objects.
-
-Design rule: every public target uses canonical Mathlib types (`Polynomial ℝ`, `ℂ`,
-`ArithmeticFunction ℝ`, `MeasureTheory.volume`) without internal proof-search helpers,
-pre-empting vacuous implication (`False → P`) and definition drift.
+Self-contained Mathlib-type signatures for the headline theorems in
+`RhAstraSynthesis`, paired with concrete examples checking that each theorem's
+hypotheses hold simultaneously on non-degenerate inputs.
 -/
 
 namespace RhAstraSynthesis.TargetStatements
 
 open MeasureTheory Set
 
-section FrozenTargets
+section Signatures
 
 theorem bernstein_van_der_corput_schaake
     (P : Polynomial ℝ) (n : ℕ) {B : ℝ} (hB : 0 ≤ B)
@@ -84,66 +80,33 @@ theorem remez_inequality (P : _root_.Polynomial ℝ) (n : ℕ) {a b B : ℝ}
         (2 * (b - a) / MeasureTheory.volume.real E - 1) * B :=
   RhAstraSynthesis.remez_inequality P n hab hB hdeg hEm hEsub he_pos hEbnd hx
 
-end FrozenTargets
+/-- Exponential Remez bound when `|E| ≥ (b - a) / (1 + 1 / L)`. -/
+theorem remez_exponential_inequality (P : _root_.Polynomial ℝ) (n : ℕ) {a b L B : ℝ}
+    (hab : a < b) (hL : 0 < L) (hB : 0 ≤ B) (hdeg : P.natDegree ≤ n)
+    {E : Set ℝ} (hEm : MeasurableSet E) (hEsub : E ⊆ Set.Icc a b)
+    (hEmeas : (b - a) / (1 + 1 / L) ≤ MeasureTheory.volume.real E)
+    (hEbnd : ∀ t ∈ E, |P.eval t| ≤ B) {x : ℝ} (hx : x ∈ Set.Icc a b) :
+    |P.eval x| ≤ Real.exp (2 * (n : ℝ) / Real.sqrt L) * B :=
+  RhAstraSynthesis.remez_exponential_inequality P n hab hL hB hdeg hEm hEsub hEmeas hEbnd hx
 
-/-- Polynomial sublevel sets remain measurable after restriction to a measurable set. -/
-theorem measurable_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
-    {E : Set ℝ} (hE : MeasurableSet E) :
-    MeasurableSet {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
-  hE.inter (measurableSet_le P.continuous.abs.measurable measurable_const)
+/-- Combined measurable Remez and iterated Markov interior derivative bound on `[a, b]`. -/
+theorem remez_markov_interior_derivative_bound (P : _root_.Polynomial ℝ) (n s : ℕ) {a b B : ℝ}
+    (hab : a < b) (hB : 0 ≤ B) (hdeg : P.natDegree ≤ n)
+    {E : Set ℝ} (hEm : MeasurableSet E) (hEsub : E ⊆ Set.Icc a b)
+    (he_pos : 0 < MeasureTheory.volume.real E) (hEbnd : ∀ t ∈ E, |P.eval t| ≤ B)
+    {x : ℝ} (hx : x ∈ Set.Icc a b) :
+    |(Nat.iterate _root_.Polynomial.derivative s P).eval x| ≤
+      (2 / (b - a)) ^ s *
+        (∏ j ∈ Finset.range s, (((n - j : ℕ) : ℝ) ^ 2)) *
+        ((_root_.Polynomial.Chebyshev.T ℝ n).eval
+          (2 * (b - a) / MeasureTheory.volume.real E - 1) * B) :=
+  RhAstraSynthesis.remez_markov_interior_derivative_bound P n s hab hB hdeg hEm hEsub he_pos hEbnd hx
 
-/-- The good set for the nonconstant polynomial `X` on `[-1, 1]` is measurable. -/
-example : MeasurableSet
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1} :=
-  measurable_polynomial_good_set Polynomial.X 1 measurableSet_Icc
+end Signatures
 
-example : (1 / 2 : ℝ) ∈
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1} := by
-  norm_num
+section Examples
 
-/-- Polynomial good sets are closed when the restricting set is closed. -/
-theorem isClosed_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
-    {E : Set ℝ} (hE : IsClosed E) :
-    IsClosed {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
-  hE.inter (isClosed_le P.continuous.abs continuous_const)
-
-example : IsClosed
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} :=
-  isClosed_polynomial_good_set Polynomial.X (1 / 2) isClosed_Icc
-
-example : (1 / 4 : ℝ) ∈
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
-  norm_num
-
-example : (3 / 4 : ℝ) ∉
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
-  norm_num
-
-/-- Polynomial good sets inside compact sets are compact. -/
-theorem isCompact_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
-    {E : Set ℝ} (hE : IsCompact E) :
-    IsCompact {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
-  hE.inter_right (isClosed_le P.continuous.abs continuous_const)
-
-example : IsCompact
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} :=
-  isCompact_polynomial_good_set Polynomial.X (1 / 2) isCompact_Icc
-
-example : (1 / 4 : ℝ) ∈
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
-  norm_num
-
-example : (3 / 4 : ℝ) ∉
-    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
-  norm_num
-
-#print axioms isCompact_polynomial_good_set
-#print axioms isClosed_polynomial_good_set
-#print axioms measurable_polynomial_good_set
-
-section NonVacuityWitnesses
-
-/-- Non-trivial polynomial `P(x) = x` of degree `1` satisfies the Markov interior hypotheses at `x = 1`. -/
+/-- Polynomial `P(x) = x` of degree `1` satisfies the Markov interior bound at `x = 1`. -/
 example : |(Polynomial.derivative (Polynomial.X : Polynomial ℝ)).eval 1| ≤ ((1 : ℕ) : ℝ) ^ 2 * 1 :=
   markov_interior_derivative Polynomial.X 1 (by norm_num) (by simp)
     (fun t ht => by simp only [Polynomial.eval_X]; exact abs_le.mpr ⟨ht.1, ht.2⟩)
@@ -155,29 +118,29 @@ example : (1 : ℝ) / (↑(1 + 1 : ℕ) : ℝ) ≤
   reciprocal_good_set_measure (1 : Polynomial ℝ) 1 1 1 (by norm_num) (by norm_num)
     (by simp) (fun _ _ => by simp)
 
-/-- Witness `m = 1, L = 1, e = 1/2` satisfies the Remez–Chebyshev hypothesis interval. -/
+/-- Parameters `m = 1, L = 1, e = 1/2` satisfy the Remez–Chebyshev envelope hypotheses. -/
 example : (Polynomial.Chebyshev.T ℝ (1 : ℤ)).eval (2 * (1 / ((1 : ℝ) * ((1 : ℕ) : ℝ))) / (1 / 2 : ℝ) - 1) ≤
     Real.exp (2 * ((1 : ℕ) : ℝ) / Real.sqrt (1 : ℝ)) :=
   remez_chebyshev_envelope (m := 1) (L := 1) (e := (1 / 2 : ℝ))
     (by norm_num) (by norm_num) (by norm_num) (by norm_num)
 
-/-- Witness `d = 6, n = 5` is non-vacuous and coprime in `coprime_mobius_factorization`. -/
+/-- Parameters `d = 6, n = 5` satisfy `coprime_mobius_factorization`. -/
 example :
     (∑ a ∈ (5 : ℕ).divisorsAntidiagonal,
       (ArithmeticFunction.moebius a.1 : ℝ) * actualCoprimeKernel 6 a.2) =
       CoprimeMobius.f 5 * (if (5 : ℕ).Coprime 6 then 1 else 0) :=
   coprime_mobius_factorization 6 5 (by norm_num)
 
-/-- Witness `N = 6` satisfies the uniform harmonic Möbius hypothesis `1 ≤ N`. -/
+/-- Parameter `N = 6` satisfies `harmonic_moebius_bound`. -/
 example : |∑ n ∈ Finset.Ioc 0 6, (ArithmeticFunction.moebius n : ℝ) / (n : ℝ)| ≤ 1 :=
   harmonic_moebius_bound 6 (by norm_num)
 
-/-- Witness `s = 1/2 + I` satisfies `0 < s.re < 1` in `tent_mellin_nonvanishing`. -/
+/-- Point `s = 1/2 + I` satisfies `tent_mellin_nonvanishing`. -/
 example : mellin TentMellin.tent ((1 / 2 : ℂ) + Complex.I) ≠ 0 :=
   tent_mellin_nonvanishing ((1 / 2 : ℂ) + Complex.I)
     (by norm_num [Complex.add_re]) (by norm_num [Complex.add_re])
 
-/-- Witness `G(t) = 0` (`C = 1, δ = 1, K = 2`) satisfies `log_decay_tail_integrable`. -/
+/-- Data `G(t) = 0`, `C = 1, δ = 1, K = 2` satisfy `log_decay_tail_integrable`. -/
 example :
     IntegrableOn (fun t : ℝ => (0 : ℝ) / t) (Ioi 2) ∧
       |∫ t in Ioi (2 : ℝ), (0 : ℝ) / t| ≤ 1 / (1 * (Real.log 2) ^ (1 : ℝ)) :=
@@ -187,17 +150,7 @@ example :
       simp only [abs_zero]
       positivity)
 
-end NonVacuityWitnesses
-
-#print axioms bernstein_van_der_corput_schaake
-#print axioms markov_interior_derivative
-#print axioms reciprocal_good_set_measure
-#print axioms remez_chebyshev_envelope
-#print axioms coprime_mobius_factorization
-#print axioms harmonic_moebius_bound
-#print axioms tent_mellin_nonvanishing
-#print axioms log_decay_tail_integrable
-
+/-- Polynomial `P(x) = x` bounded by `1` on `E = [0, 1] ⊆ [0, 2]` satisfies `remez_inequality` at `x = 2`. -/
 example :
     |(_root_.Polynomial.X : _root_.Polynomial ℝ).eval (2 : ℝ)| ≤
       (_root_.Polynomial.Chebyshev.T ℝ 1).eval
@@ -210,6 +163,33 @@ example :
       exact abs_le.mpr ⟨by linarith [ht.1], by linarith [ht.2]⟩)
     ⟨by norm_num, by norm_num⟩
 
+/-- Polynomial `P(x) = x` bounded by `1` on `E = [0, 1] ⊆ [0, 2]` satisfies the combined derivative bound at `x = 2`. -/
+example :
+    |(Nat.iterate _root_.Polynomial.derivative 1 (_root_.Polynomial.X : _root_.Polynomial ℝ)).eval (2 : ℝ)| ≤
+      (2 / ((2 : ℝ) - 0)) ^ 1 *
+        (∏ j ∈ Finset.range 1, (((1 - j : ℕ) : ℝ) ^ 2)) *
+        ((_root_.Polynomial.Chebyshev.T ℝ 1).eval
+          (2 * ((2 : ℝ) - 0) / MeasureTheory.volume.real (Set.Icc (0 : ℝ) 1) - 1) * 1) :=
+  remez_markov_interior_derivative_bound _root_.Polynomial.X 1 1 (by norm_num) (by norm_num)
+    (by simp) measurableSet_Icc (Set.Icc_subset_Icc_right (by norm_num))
+    (by rw [Real.volume_real_Icc_of_le (by norm_num)]; norm_num)
+    (fun t ht => by
+      simp only [_root_.Polynomial.eval_X]
+      exact abs_le.mpr ⟨by linarith [ht.1], by linarith [ht.2]⟩)
+    ⟨by norm_num, by norm_num⟩
+
+end Examples
+
+#print axioms bernstein_van_der_corput_schaake
+#print axioms markov_interior_derivative
+#print axioms reciprocal_good_set_measure
+#print axioms remez_chebyshev_envelope
 #print axioms remez_inequality
+#print axioms remez_exponential_inequality
+#print axioms remez_markov_interior_derivative_bound
+#print axioms coprime_mobius_factorization
+#print axioms harmonic_moebius_bound
+#print axioms tent_mellin_nonvanishing
+#print axioms log_decay_tail_integrable
 
 end RhAstraSynthesis.TargetStatements

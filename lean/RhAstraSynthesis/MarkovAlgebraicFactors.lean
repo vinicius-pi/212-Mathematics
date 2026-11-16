@@ -65,9 +65,4 @@ theorem markov_derivative_eval_zero_above_degree
   rw [markov_derivative_zero_above_degree P m s hdegree hsm]
   simp
 
-#print axioms markov_product_le_degree_power
-#print axioms markov_derivative_zero_above_degree
-#print axioms markov_top_derivative_constant
-#print axioms markov_derivative_eval_zero_above_degree
-
 end RhAstraSynthesis

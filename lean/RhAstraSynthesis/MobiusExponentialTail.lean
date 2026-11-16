@@ -27,23 +27,18 @@ theorem mobius_tail_hasDerivAt (c : ℝ) (hc : 0 < c) (y : ℝ) :
       (fun x ↦ 2 * x ^ 3 / c + 6 * x ^ 2 / c ^ 2 + 12 * x / c ^ 3 + 12 / c ^ 4)
       (6 * y ^ 2 / c + 12 * y / c ^ 2 + 12 / c ^ 3) y := by
     convert ((h3.add h2).add h1).add h0 using 1
-    all_goals
-      first
-      | rfl
-      | (funext x <;> rfl)
-      | (norm_num [id_eq] <;> ring)
+    · ext x; simp only [Pi.add_apply, Pi.pow_apply, id_eq]; ring
+    · simp only [id_eq]; ring
   have he := ((hasDerivAt_id y).const_mul (-c)).exp
   convert he.mul hp using 1
-  all_goals
-    first
-    | rfl
-    | (funext x <;> rfl)
-    | (simp only [id_eq] <;> field_simp [ne_of_gt hc] <;> ring)
+  · ext x; simp only [Pi.mul_apply, id_eq]; ring
+  · simp only [id_eq]; field_simp [ne_of_gt hc]; ring
 
-/-- The fifth Taylor term is a lower bound, with no approximation error. -/
+/-- The fifth Taylor term gives a lower bound on `Real.exp t` for `t ≥ 0`. -/
 theorem exp_fifth_taylor_lower_bound (t : ℝ) (ht : 0 ≤ t) :
     t ^ 5 / 120 ≤ Real.exp t := by
-  convert Real.pow_div_factorial_le_exp (x := t) ht 5 using 1 <;> norm_num
+  convert Real.pow_div_factorial_le_exp (x := t) ht 5 using 1
+  norm_num
 
 /-- Explicit decay for any natural polynomial degree and inverse even power. -/
 theorem polynomial_exp_decay_bound (c z : ℝ) (hc : 0 < c) (hz : 0 < z)
@@ -80,10 +75,5 @@ theorem mobius_tail_polynomial_log_decay (c : ℝ) (hc : 0 < c) (A : ℕ) :
   refine ⟨((3 + 2 * A).factorial : ℝ) / c ^ (3 + 2 * A), by positivity, ?_⟩
   intro z hz
   exact polynomial_exp_decay_bound c z hc (lt_of_lt_of_le zero_lt_one hz) 3 A
-
-#print axioms mobius_tail_hasDerivAt
-#print axioms exp_fifth_taylor_lower_bound
-#print axioms polynomial_exp_decay_bound
-#print axioms mobius_tail_polynomial_log_decay
 
 end RhAstraSynthesis

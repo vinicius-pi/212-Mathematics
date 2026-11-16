@@ -17,7 +17,7 @@ namespace RhAstraSynthesis
 For `k > 0`, the total lengths of the first `m` consecutive
 reciprocal-node gaps beginning at `1/k` telescope exactly.
 -/
-theorem reciprocal_gap_telescope (k m : ℕ) (hk : 0 < k) :
+theorem reciprocal_gap_telescope (k m : ℕ) (_hk : 0 < k) :
     (∑ j ∈ Finset.range m,
       ((1 : ℝ) / (↑(k + j) : ℝ) -
         (1 : ℝ) / (↑(k + j + 1) : ℝ))) =
@@ -31,17 +31,14 @@ theorem reciprocal_gap_telescope (k m : ℕ) (hk : 0 < k) :
       simp only [Nat.add_succ]
       ring
 
-/-- The equivalent remaining-length identity in source equation (4). -/
-theorem reciprocal_gap_remaining (k m : ℕ) (hk : 0 < k) :
+/-- Complementary remaining-length identity for reciprocal gaps. -/
+theorem reciprocal_gap_remaining (k m : ℕ) (_hk : 0 < k) :
     (1 : ℝ) / (↑k : ℝ) -
       (∑ j ∈ Finset.range m,
         ((1 : ℝ) / (↑(k + j) : ℝ) -
           (1 : ℝ) / (↑(k + j + 1) : ℝ))) =
       (1 : ℝ) / (↑(k + m) : ℝ) := by
-  rw [reciprocal_gap_telescope k m hk]
+  rw [reciprocal_gap_telescope k m _hk]
   ring
-
-#print axioms RhAstraSynthesis.reciprocal_gap_telescope
-#print axioms RhAstraSynthesis.reciprocal_gap_remaining
 
 end RhAstraSynthesis

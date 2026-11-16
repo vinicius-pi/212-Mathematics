@@ -38,4 +38,3 @@ theorem actual_vaughan (h : ℕ) :
 
 end RhAstraSynthesis
 
-#print axioms RhAstraSynthesis.actual_vaughan

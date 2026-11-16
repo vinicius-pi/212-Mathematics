@@ -231,10 +231,4 @@ theorem markov_reciprocal_endpoint_factorial_bound
           ring
   exact markov_factored_bound_transfer _ M L (m : ℝ) s h_upper
 
-#print axioms chebyshev_iterate_derivative_eval_one_eq
-#print axioms markov_chebyshev_scaled_derivative_abs_outside
-#print axioms chebyshev_exterior_eval_abs_le
-#print axioms markov_endpoint_abs_le
-#print axioms markov_reciprocal_endpoint_factorial_bound
-
 end RhAstraSynthesis

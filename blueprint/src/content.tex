@@ -81,6 +81,48 @@ Under the scaled hypothesis $|P(u)| \le B$ on $[0, (Lm)^{-1}]$ ($L > 0$, $m \ge 
 The cases $n = 0$ and $n = 1$ are immediate ($2|P'(0)| = |P(1) - P(-1)| \le 2B$). For $n \ge 2$ on $|x| < \sqrt{1 - n^{-2}}$, $1 - x^2 \ge n^{-2}$ combines with Theorem~\ref{thm:vandercorput-schaake} ($\cos\theta = x$) to yield $n^{-2} P'(x)^2 \le n^2 B^2$. On the right strip $\sqrt{1 - n^{-2}} \le x \le 1$, Lemma~\ref{lem:lagrange-near-endpoint} implies $(-1)^i \ell_i'(x) \ge 0$, whence Chebyshev extremal domination gives $|P'(x)| \le T_n'(x) B \le T_n'(1) B = n^2 B$; reflecting $x \mapsto -x$ covers $[-1, -\sqrt{1 - n^{-2}}]$. Induction on $s$ using $\deg(P^{(k)}) \le n - k$ and affine rescaling $Q(u) = P(u/(2Lm) + 1/(2Lm))$ finish the proof.
 \end{proof}
 
+\subsection{The Measurable Equioscillation Remez Inequality}
+
+\begin{theorem}[Measurable equioscillation Remez inequality]
+\label{thm:remez-inequality}
+\lean{RhAstraSynthesis.remez_inequality}
+\leanok
+For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X]$ with $\deg P \le n$, and measurable subset $E \subseteq [a, b]$ of positive Lebesgue measure $|E| > 0$ on which $|P(t)| \le B$ ($B \ge 0$), every $x \in [a, b]$ satisfies
+\[
+|P(x)| \le T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
+\]
+\end{theorem}
+
+\begin{proof}
+Inner regularity of Lebesgue measure reduces $E$ to a compact subset $K \subseteq E$ with $|K| > 0$ via \texttt{MeasurableSet.exists\_isCompact\_diff\_lt}, and monotone continuity of $T_n$ on $[1, \infty)$ passes to the limit $|K| \uparrow |E|$. For any $x \in (a, b]$, applying the right-endpoint case to $[a, x]$ and $K \cap [a, x]$ (whenever $|K \cap [a, x]| > 0$, using monotonicity of $y \mapsto T_n(y)$) and symmetrically reflecting $t \mapsto -t$ on $[-b, -x]$ when $|K \cap [x, b]| > 0$ reduces the bound on $[a, b]$ to establishing the right-endpoint inequality at $x = b$. For the right-endpoint step on $[a, b]$ with $|K| = e > 0$ and $Y = 2(b-a)/e - 1 \ge 1$: continuity and Lipschitz regularity of $x \mapsto |K \cap [a, x]|$ yield ordered nodes $x_0 < \dots < x_n$ in $K$ satisfying
+\[
+|K \cap [a, x_k]| = \frac{t_k + 1}{2}\,e, \qquad t_k = -\cos\!\left(\frac{k\pi}{n}\right) \quad (0 \le k \le n).
+\]
+By additivity on intervals, $x_j - x_i \ge |K \cap [a, x_j]| - |K \cap [a, x_i]| = \frac{e}{2}(t_j - t_i)$ and $b - x_i \le (b - a) - |K \cap [a, x_i]| = \frac{e}{2}(Y - t_i)$. Expanding $P(b)$ by Lagrange interpolation at $\{x_k\}$ gives
+\[
+|P(b)| \le B \sum_{k=0}^n \prod_{i \ne k} \frac{b - x_i}{|x_k - x_i|}
+\le B \sum_{k=0}^n \prod_{i \ne k} \frac{Y - t_i}{|t_k - t_i|}
+= B \sum_{k=0}^n T_n(t_k)\,\ell_k^{\mathrm{Cheb}}(Y)
+= T_n(Y)\,B,
+\]
+since $(-1)^{n-k}\prod_{i \ne k}(t_k - t_i) > 0$ and $T_n(t_k) = (-1)^{n-k}$.
+\end{proof}
+
+\begin{theorem}[Exponential Remez and combined Markov interior derivative bound]
+\label{thm:remez-exp-markov}
+\lean{RhAstraSynthesis.remez_exponential_inequality, RhAstraSynthesis.remez_markov_interior_derivative_bound}
+\uses{thm:remez-inequality, thm:chebyshev-exp, thm:markov-interior}
+\leanok
+Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on a measurable set $E \subseteq [a, b]$ ($a < b$, $B \ge 0$). If $|E| \ge (b - a)/(1 + 1/L)$ for some $L > 0$, then $|P(x)| \le \exp(2n/\sqrt{L})\,B$ for all $x \in [a, b]$. Moreover, whenever $|E| > 0$, every $s \in \N$ and $x \in [a, b]$ satisfy
+\[
+|P^{(s)}(x)| \le \left(\frac{2}{b - a}\right)^s \left(\prod_{j=0}^{s-1}(n - j)^2\right) T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
+\]
+\end{theorem}
+
+\begin{proof}
+The hypothesis $|E| \ge (b-a)/(1+1/L)$ forces $1 \le 2(b-a)/|E| - 1 \le 1 + 2/L$, so combining Theorem~\ref{thm:remez-inequality} with monotonicity of $T_n$ on $[1, \infty)$ and Theorem~\ref{thm:chebyshev-exp} gives the exponential bound. For derivatives, $Q(u) = P\bigl(\frac{b-a}{2}u + \frac{a+b}{2}\bigr)$ satisfies $\deg Q \le n$ and $|Q(u)| \le T_n(2(b-a)/|E| - 1) B$ on $[-1, 1]$ by Theorem~\ref{thm:remez-inequality}; applying Theorem~\ref{thm:markov-interior} to $Q$ and rescaling by $((b-a)/2)^{-s}$ finishes the proof.
+\end{proof}
+
 \subsection{Exterior Chebyshev Growth, Discrete Grids, and Sharpness Witnesses}
 
 \begin{theorem}[Exterior Chebyshev growth and endpoint Markov transport]
@@ -130,7 +172,7 @@ For all $m \ge 1$, $\deg P_{m,m} \le 2m$, $|P_{m,m}(1/n)| \le 1$ ($n \ge 1$), an
 \label{def:coprime-kernel}
 \lean{RhAstraSynthesis.actualCoprimeKernel}
 \leanok
-For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \psi(\gcd(n, d)) / \psi(n)$ for $n \ge 1$, where $\psi$ is the multiplicative totient-ratio weight on $\N_{\ge 1}$.
+Define $\psi(n) = \prod_{p \mid n}(p + 1)$ and $f(n) = \mu(n)\prod_{p \mid n}\frac{p}{p + 1}$ for $n \ge 1$. For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \psi(\gcd(n, d)) / \psi(n)$ for $n \ge 1$.
 \end{definition}
 
 \begin{theorem}[Actual coprime M\"obius factorization and $s > 1/2$ Euler product]
@@ -212,71 +254,6 @@ For $t \ge 1$ and $\omega \in \R$, Selberg parity pseudo-densities $1 + t^{-1/4}
 \end{theorem}
 
 \section{Open Analytic Extensions}
-
-\begin{lemma}[Measurable polynomial good sets]
-\label{lem:remez-measurable-good-set}
-\lean{RhAstraSynthesis.TargetStatements.measurable_polynomial_good_set}
-\leanok
-For every $P \in \R[X]$, $B \in \R$, and measurable $E \subseteq \R$, the set
-$\{t \in E : |P(t)| \le B\}$ is measurable.
-\end{lemma}
-
-\begin{lemma}[Closed polynomial good sets]
-\label{lem:remez-closed-good-set}
-\lean{RhAstraSynthesis.TargetStatements.isClosed_polynomial_good_set}
-\leanok
-For every $P \in \R[X]$, $B \in \R$, and closed $E \subseteq \R$, the set
-$\{t \in E : |P(t)| \le B\}$ is closed.
-\end{lemma}
-
-\begin{lemma}[Compact polynomial good sets]
-\label{lem:remez-compact-good-set}
-\lean{RhAstraSynthesis.TargetStatements.isCompact_polynomial_good_set}
-\leanok
-For every $P \in \R[X]$, $B \in \R$, and compact $E \subseteq \R$, the set
-$\{t \in E : |P(t)| \le B\}$ is compact.
-\end{lemma}
-
-\begin{theorem}[Measurable equioscillation Remez inequality]
-\label{thm:open-remez}
-\lean{RhAstraSynthesis.remez_inequality}
-\uses{lem:remez-compact-good-set}
-\leanok
-For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X]$ with $\deg P \le n$, and measurable subset $E \subseteq [a, b]$ of positive Lebesgue measure $|E| > 0$ on which $|P(t)| \le B$ ($B \ge 0$), every $x \in [a, b]$ satisfies
-\[
-|P(x)| \le T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
-\]
-\end{theorem}
-
-\begin{proof}
-Inner regularity of Lebesgue measure reduces $E$ to a compact subset $K \subseteq E$ with $|K| > 0$ via \texttt{MeasurableSet.exists\_isCompact\_diff\_lt}, and monotone continuity of $T_n$ on $[1, \infty)$ passes to the limit $|K| \uparrow |E|$. For any $x \in (a, b]$, applying the right-endpoint case to $[a, x]$ and $K \cap [a, x]$ (whenever $|K \cap [a, x]| > 0$, using monotonicity of $y \mapsto T_n(y)$) and symmetrically reflecting $t \mapsto -t$ on $[-b, -x]$ when $|K \cap [x, b]| > 0$ reduces the bound on $[a, b]$ to establishing the right-endpoint inequality at $x = b$. For the right-endpoint step on $[a, b]$ with $|K| = e > 0$ and $Y = 2(b-a)/e - 1 \ge 1$: continuity and Lipschitz regularity of $x \mapsto |K \cap [a, x]|$ choose ordered nodes $x_0 < \dots < x_n$ in $K$ satisfying
-\[
-|K \cap [a, x_k]| = \frac{t_k + 1}{2}\,e, \qquad t_k = -\cos\!\left(\frac{k\pi}{n}\right) \quad (0 \le k \le n).
-\]
-By additivity on intervals, $x_j - x_i \ge |K \cap [a, x_j]| - |K \cap [a, x_i]| = \frac{e}{2}(t_j - t_i)$ and $b - x_i \le (b - a) - |K \cap [a, x_i]| = \frac{e}{2}(Y - t_i)$. Expanding $P(b)$ in Lagrange interpolation on $\{x_k\}$ gives
-\[
-|P(b)| \le B \sum_{k=0}^n \prod_{i \ne k} \frac{b - x_i}{|x_k - x_i|}
-\le B \sum_{k=0}^n \prod_{i \ne k} \frac{Y - t_i}{|t_k - t_i|}
-= B \sum_{k=0}^n T_n(t_k)\,\ell_k^{\mathrm{Cheb}}(Y)
-= T_n(Y)\,B,
-\]
-since $(-1)^{n-k}\prod_{i \ne k}(t_k - t_i) > 0$ and $T_n(t_k) = (-1)^{n-k}$.
-\end{proof}
-
-\begin{theorem}[Exponential Remez and combined Markov interior derivative bound]
-\label{thm:remez-exp-markov}
-\lean{RhAstraSynthesis.remez_exponential_inequality, RhAstraSynthesis.remez_markov_interior_derivative_bound}
-\uses{thm:open-remez, thm:chebyshev-exp, thm:markov-interior}
-\leanok
-Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on a measurable set $E \subseteq [a, b]$ ($a < b$, $B \ge 0$). If $|E| \ge (b - a)/(1 + 1/L)$ for some $L > 0$, then $|P(x)| \le \exp(2n/\sqrt{L})\,B$ for all $x \in [a, b]$. Moreover, whenever $|E| > 0$, every $s \in \N$ and $x \in [a, b]$ satisfy
-\[
-|P^{(s)}(x)| \le \left(\frac{2}{b - a}\right)^s \left(\prod_{j=0}^{s-1}(n - j)^2\right) T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
-\]
-\end{theorem}
-
-\begin{proof}
-The hypothesis $|E| \ge (b-a)/(1+1/L)$ forces $1 \le 2(b-a)/|E| - 1 \le 1 + 2/L$, so combining Theorem~\ref{thm:open-remez} with monotonicity of $T_n$ on $[1, \infty)$ and Theorem~\ref{thm:chebyshev-exp} gives the exponential bound. For derivatives, $Q(u) = P\bigl(\frac{b-a}{2}u + \frac{a+b}{2}\bigr)$ satisfies $\deg Q \le n$ and $|Q(u)| \le T_n(2(b-a)/|E| - 1) B$ on $[-1, 1]$ by Theorem~\ref{thm:open-remez}; applying Theorem~\ref{thm:markov-interior} to $Q$ and rescaling by $((b-a)/2)^{-s}$ finishes the proof.
-\end{proof}
 
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
 \label{thm:open-gevrey-alpha}

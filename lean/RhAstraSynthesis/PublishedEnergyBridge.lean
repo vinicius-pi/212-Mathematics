@@ -75,8 +75,4 @@ theorem finite_energy_exact (u Y : ℕ) (hu : 1 ≤ u) (hY : 1 ≤ Y) :
   rw [hcongr, Finset.sum_sub_distrib, Finset.sum_ite_eq']
   simp [h1]
 
-#print axioms tail_prefix_complement
-#print axioms square_terms
-#print axioms finite_energy_exact
-
 end PublishedEnergyBridge

@@ -24,8 +24,10 @@ theorem prime_moment_ratio_bounds (p : ℕ) (hp : p.Prime) :
     have ha := two_rpow_neg_three_fourths_lt_three_fifths
     have hden : 0 ≤ 1 - ((2 : ℝ) / 3) * (2 : ℝ) ^ (-(3 : ℝ) / 4) := by linarith
     constructor
-    · convert inv_nonneg.mpr hden using 1 <;> norm_num [primeMomentRatio]
-    · convert euler_factor_two_weighted_lt_two using 1 <;> norm_num [primeMomentRatio]
+    · convert inv_nonneg.mpr hden using 1
+      norm_num [primeMomentRatio]
+    · convert euler_factor_two_weighted_lt_two using 1
+      norm_num [primeMomentRatio]
   · have hp3 : 3 ≤ p := by have := hp.two_le; omega
     have hpR : (0 : ℝ) < (p : ℝ) := by exact_mod_cast hp.pos
     have hr : (p : ℝ) / ((p : ℝ) + 1) ≤ 1 :=
@@ -73,18 +75,12 @@ theorem finite_euler_ratio_le_divisor_count (d : ℕ) (hd : d ≠ 0) :
       (2 : ℝ) ^ d.primeFactors.card := by simpa using hprod
   exact hprod'.trans htau
 
-/-- Requested `5/4` budget for a nonnegative base mass times its finite Euler ratio.
-The infinite-mass factorization is not an extra premise hidden in this theorem. -/
+/-- Scaling bound on a nonnegative base mass by the finite Euler ratio and divisor count. -/
 theorem finite_moment_five_fourths_bound (A1 : ℝ) (hA1 : 0 ≤ A1) (d : ℕ) (hd : d ≠ 0) :
     A1 * (∏ p ∈ d.primeFactors, primeMomentRatio p) ≤
       ((5 : ℝ) / 4) * A1 * (d.divisors.card : ℝ) := by
   have h := mul_le_mul_of_nonneg_left (finite_euler_ratio_le_divisor_count d hd) hA1
   have ht : (0 : ℝ) ≤ (d.divisors.card : ℝ) := by positivity
   nlinarith [mul_nonneg hA1 ht]
-
-#print axioms prime_moment_ratio_bounds
-#print axioms two_pow_omega_le_divisor_count
-#print axioms finite_euler_ratio_le_divisor_count
-#print axioms finite_moment_five_fourths_bound
 
 end RhAstraSynthesis

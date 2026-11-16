@@ -136,9 +136,4 @@ theorem polynomial_reciprocal_good_measure
   rw [heq]
   exact polynomial_bad_set_measure_le_gap_sum P B k m hB hk hdegree hsample
 
-#print axioms reciprocal_node_good_zero
-#print axioms bad_point_mem_reciprocal_gap
-#print axioms polynomial_bad_set_measure_le_gap_sum
-#print axioms polynomial_reciprocal_good_measure
-
 end RhAstraSynthesis
