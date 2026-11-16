@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+lean/.lake/
+blueprint/src/*.aux
+blueprint/src/*.bbl
+blueprint/src/*.blg
+blueprint/src/*.log
+blueprint/src/*.out
+blueprint/src/*.toc
+blueprint/src/*.xdv
