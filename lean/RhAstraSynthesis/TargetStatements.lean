@@ -102,6 +102,12 @@ theorem remez_markov_interior_derivative_bound (P : _root_.Polynomial ℝ) (n s 
           (2 * (b - a) / MeasureTheory.volume.real E - 1) * B) :=
   RhAstraSynthesis.remez_markov_interior_derivative_bound P n s hab hB hdeg hEm hEsub he_pos hEbnd hx
 
+/-- Restricting a measurable set by a polynomial sublevel bound preserves measurability. -/
+theorem measurableSet_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
+    {E : Set ℝ} (hE : MeasurableSet E) :
+    MeasurableSet {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
+  hE.inter (isClosed_le P.continuous.abs continuous_const).measurableSet
+
 end Signatures
 
 section Examples
@@ -178,7 +184,22 @@ example :
       exact abs_le.mpr ⟨by linarith [ht.1], by linarith [ht.2]⟩)
     ⟨by norm_num, by norm_num⟩
 
+/-- A nonconstant polynomial cuts a proper, nonempty sublevel set from `[0,1]`. -/
+example : MeasurableSet {t : ℝ | t ∈ Icc 0 1 ∧
+    |(Polynomial.X : Polynomial ℝ).eval t| ≤ (1 / 2 : ℝ)} :=
+  measurableSet_polynomial_good_set Polynomial.X (1 / 2) measurableSet_Icc
+
+example : (1 / 4 : ℝ) ∈ {t : ℝ | t ∈ Icc 0 1 ∧
+    |(Polynomial.X : Polynomial ℝ).eval t| ≤ (1 / 2 : ℝ)} := by
+  norm_num
+
+example : (3 / 4 : ℝ) ∉ {t : ℝ | t ∈ Icc 0 1 ∧
+    |(Polynomial.X : Polynomial ℝ).eval t| ≤ (1 / 2 : ℝ)} := by
+  norm_num
+
 end Examples
+
+#print axioms measurableSet_polynomial_good_set
 
 #print axioms bernstein_van_der_corput_schaake
 #print axioms markov_interior_derivative

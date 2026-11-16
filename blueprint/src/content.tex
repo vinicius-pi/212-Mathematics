@@ -1,5 +1,16 @@
 \section{Chebyshev Extremal Bounds, Interior Markov, and Discrete Grids}
 
+\begin{lemma}[Measurable polynomial good set]
+\label{lem:measurable-polynomial-good-set}
+\lean{RhAstraSynthesis.TargetStatements.measurableSet_polynomial_good_set}
+\leanok
+For a real polynomial $P$, a real bound $B$, and a measurable set $E\subseteq\mathbb R$,
+$\{t\in E: |P(t)|\le B\}$ is measurable.
+\end{lemma}
+\begin{proof}
+Intersect $E$ with the closed sublevel set of the continuous function $|P|$.
+\end{proof}
+
 We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). Unless otherwise noted, all theorems below are formalized across 18 modules of \texttt{RhAstraSynthesis} and verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}.
 
 \subsection{Bernstein--Van der Corput--Schaake and A. A. Markov's Interior Theorem}
