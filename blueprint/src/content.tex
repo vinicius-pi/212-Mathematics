@@ -213,6 +213,14 @@ For $t \ge 1$ and $\omega \in \R$, Selberg parity pseudo-densities $1 + t^{-1/4}
 
 \section{Open Analytic Extensions}
 
+\begin{lemma}[Measurable polynomial good sets]
+\label{lem:remez-measurable-good-set}
+\lean{RhAstraSynthesis.TargetStatements.measurable_polynomial_good_set}
+\leanok
+For every $P \in \R[X]$, $B \in \R$, and measurable $E \subseteq \R$, the set
+$\{t \in E : |P(t)| \le B\}$ is measurable.
+\end{lemma}
+
 \begin{proposition}[Measurable equioscillation Remez inequality]
 \label{thm:open-remez}
 \uses{thm:chebyshev-exp}
