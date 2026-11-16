@@ -1,8 +1,8 @@
-name: Verify Lean 4 Library & Mathematical Probes
+name: Verify Lean 4, Rocq 9.0 & Mathematical Probes
 
 on:
   push:
-    branches: [main]
+    branches: [main, refactor/**, feat/**]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run mathematical boundary and counterexample probes
+      - name: Run mathematical boundary probes & Lean/blueprint integrity audit
         run: python3 -m unittest discover -s tests -p "test_*.py" -v
 
       - name: Verify pinned Mathlib manifest
@@ -62,3 +62,16 @@ jobs:
           axiom-audit-root: "RhAstraSynthesis"
           axiom-audit-allow: "propext,Classical.choice,Quot.sound"
           leanchecker: "true"
+
+  verify-rocq:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify finite rational signed-square envelope in Rocq 9.0
+        run: |
+          python3 rocq/verify_rocq.py

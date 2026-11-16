@@ -95,7 +95,7 @@ Every $P \in \R[X]$ with $\deg P \le m$ and $|P| \le B$ on $[-1, 1]$ satisfies $
 \label{thm:chebyshev-exp}
 \lean{RhAstraSynthesis.polynomial_reciprocal_good_measure, RhAstraSynthesis.remez_chebyshev_T_le_exp}
 \leanok
-Let $P \in \R[X]$ satisfy $\deg P \le m$, $B > 0$, $k > 0$, and $|P(1/n)| \le B$ for all $n \ge 1$. Then $E = \{t \in [0, 1/k] : |P(t)| \le B\}$ has measure $|E| \ge 1/(k + m)$. Moreover, for $(Lm + m)^{-1} \le e \le (Lm)^{-1}$ ($L, m > 0$),
+Let $P \in \R[X]$ satisfy $\deg P \le m$, $B > 0$, $k > 0$, and $|P(1/n)| \le B$ for all $n \ge 1$. Then $E = \{t \in [0, 1/k] : |P(t)| \le B\}$ has measure $|E| \ge 1/(k + m)$. For $(Lm + m)^{-1} \le e \le (Lm)^{-1}$ ($L, m > 0$),
 \[
 T_m\!\left(\frac{2(Lm)^{-1}}{e} - 1\right) \le T_m\!\left(1 + \frac{2}{L}\right) \le \exp\!\left(\frac{2m}{\sqrt{L}}\right).
 \]
@@ -128,7 +128,7 @@ For all $m \ge 1$, $\deg P_{m,m} \le 2m$, $|P_{m,m}(1/n)| \le 1$ ($n \ge 1$), an
 
 \begin{definition}[Coprime B\'aez--Duarte kernel]
 \label{def:coprime-kernel}
-\lean{RhAstraSynthesis.coprimeFilterKernel}
+\lean{RhAstraSynthesis.actualCoprimeKernel}
 \leanok
 For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \psi(\gcd(n, d)) / \psi(n)$ for $n \ge 1$, where $\psi$ is the multiplicative totient-ratio weight on $\N_{\ge 1}$.
 \end{definition}
@@ -138,7 +138,7 @@ For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \psi(\gcd
 \lean{RhAstraSynthesis.actual_coprime_mobius_factorization, RhAstraSynthesis.actual_coprime_kernel_le_psi_mul_base, RhAstraSynthesis.coprime_kernel_moment_euler_hasProd}
 \uses{def:coprime-kernel}
 \leanok
-For every $d \in \N$ and $n \ge 1$, $f(n)\ind_{(n,d)=1} = (\mu * g_d)(n)$ with $0 \le g_d(n) \le 1$ multiplicative and $g_d(n) \le \psi(d) g_1(n)$ ($d \ne 0$). Moreover, for every real $s > 1/2$ and $d \ne 0$, $\sum_{n \ge 1} g_d(n)n^{-s}$ converges to its infinite Euler product.
+For every $d \in \N$ and $n \ge 1$, $f(n)\ind_{(n,d)=1} = (\mu * g_d)(n)$ with $0 \le g_d(n) \le 1$ multiplicative and $g_d(n) \le \psi(d) g_1(n)$ ($d \ne 0$). For every real $s > 1/2$ and $d \ne 0$, $\sum_{n \ge 1} g_d(n)n^{-s}$ converges to its infinite Euler product.
 \end{theorem}
 
 \begin{theorem}[Modulus-uniform $s = 3/4$ local Euler-factor bound]
