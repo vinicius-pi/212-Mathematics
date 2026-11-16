@@ -90,6 +90,25 @@ example : (1 / 2 : ℝ) ∈
     {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1} := by
   norm_num
 
+/-- Polynomial good sets are closed when the restricting set is closed. -/
+theorem isClosed_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
+    {E : Set ℝ} (hE : IsClosed E) :
+    IsClosed {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
+  hE.inter (isClosed_le P.continuous.abs continuous_const)
+
+example : IsClosed
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} :=
+  isClosed_polynomial_good_set Polynomial.X (1 / 2) isClosed_Icc
+
+example : (1 / 4 : ℝ) ∈
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
+  norm_num
+
+example : (3 / 4 : ℝ) ∉
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
+  norm_num
+
+#print axioms isClosed_polynomial_good_set
 #print axioms measurable_polynomial_good_set
 
 section NonVacuityWitnesses
