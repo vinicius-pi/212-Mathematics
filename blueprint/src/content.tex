@@ -229,6 +229,14 @@ For every $P \in \R[X]$, $B \in \R$, and closed $E \subseteq \R$, the set
 $\{t \in E : |P(t)| \le B\}$ is closed.
 \end{lemma}
 
+\begin{lemma}[Compact polynomial good sets]
+\label{lem:remez-compact-good-set}
+\lean{RhAstraSynthesis.TargetStatements.isCompact_polynomial_good_set}
+\leanok
+For every $P \in \R[X]$, $B \in \R$, and compact $E \subseteq \R$, the set
+$\{t \in E : |P(t)| \le B\}$ is compact.
+\end{lemma}
+
 \begin{proposition}[Measurable equioscillation Remez inequality]
 \label{thm:open-remez}
 \uses{thm:chebyshev-exp}

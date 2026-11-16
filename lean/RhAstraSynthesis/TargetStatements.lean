@@ -108,6 +108,25 @@ example : (3 / 4 : ℝ) ∉
     {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
   norm_num
 
+/-- Polynomial good sets inside compact sets are compact. -/
+theorem isCompact_polynomial_good_set (P : Polynomial ℝ) (B : ℝ)
+    {E : Set ℝ} (hE : IsCompact E) :
+    IsCompact {t : ℝ | t ∈ E ∧ |P.eval t| ≤ B} :=
+  hE.inter_right (isClosed_le P.continuous.abs continuous_const)
+
+example : IsCompact
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} :=
+  isCompact_polynomial_good_set Polynomial.X (1 / 2) isCompact_Icc
+
+example : (1 / 4 : ℝ) ∈
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
+  norm_num
+
+example : (3 / 4 : ℝ) ∉
+    {t : ℝ | t ∈ Icc (-1 : ℝ) 1 ∧ |(Polynomial.X : Polynomial ℝ).eval t| ≤ 1 / 2} := by
+  norm_num
+
+#print axioms isCompact_polynomial_good_set
 #print axioms isClosed_polynomial_good_set
 #print axioms measurable_polynomial_good_set
 
