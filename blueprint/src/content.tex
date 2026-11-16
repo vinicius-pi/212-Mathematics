@@ -133,6 +133,27 @@ The hypothesis $|E| \ge (b-a)/(1+1/L)$ forces $1 \le 2(b-a)/|E| - 1 \le 1 + 2/L$
 Every $P \in \R[X]$ with $\deg P \le m$ and $|P| \le B$ on $[-1, 1]$ satisfies $|P(x)| \le B\,T_m(|x|)$ for $|x| \ge 1$ and $|P^{(s)}(\pm 1)| \le B D_s^{-1}\prod_{j=0}^{s-1}(m^2-j^2)$. Under $|P| \le M$ on $[0, (Lm)^{-1}]$, Taylor coefficients at $0$ obey $|P^{(s)}(0)|/s! \le M\,(4L)^s m^{3s}/(2s)!$, alongside the Gevrey factorial bound $(3k)!/(2k)! \le 8^k k!$.
 \end{theorem}
 
+\begin{lemma}[Uniform reciprocal-interval factorial bound]
+\label{lem:reciprocal-interval-factorial}
+\lean{RhAstraSynthesis.markov_reciprocal_interval_factorial_bound}
+\uses{thm:markov-general}
+For $L>0$, $m\ge1$, $0\le s\le m$, and $M\ge0$, if
+$\deg P\le m$ and $|P(t)|\le M$ on $[0,(Lm)^{-1}]$, then every
+$x\in[0,(Lm)^{-1}]$ satisfies
+\[
+\frac{|P^{(s)}(x)|}{s!}\le M\frac{(8L)^s m^{3s}}{(2s)!}.
+\]
+\end{lemma}
+\begin{proof}
+Write $h=(2Lm)^{-1}$. If $x\le h$, use $Q(t)=P(x+t)$ on $[0,h]$;
+otherwise use $Q(t)=P(x-t)$. Both segments lie in the original interval.
+Apply the endpoint bound with parameter $2L$ and use
+$|Q^{(s)}(0)|=|P^{(s)}(x)|$. This is a factorial-strength bound with a
+$2^s$ loss, not the sharp higher-order interior Markov theorem.
+The Lean declaration is awaiting CI compilation; the full all-radii
+Gevrey-$\alpha$ extension below remains open.
+\end{proof}
+
 \begin{theorem}[Reciprocal-grid good-set measure and Remez--Chebyshev envelope]
 \label{thm:chebyshev-exp}
 \lean{RhAstraSynthesis.polynomial_reciprocal_good_measure, RhAstraSynthesis.remez_chebyshev_T_le_exp}

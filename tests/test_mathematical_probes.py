@@ -8,7 +8,7 @@ not replace Lean kernel verification (`lake build` + `leanchecker`).
 from decimal import Decimal, localcontext
 from fractions import Fraction
 import cmath
-from math import comb, cos, exp, gcd, log, pi, prod, sin, sqrt
+from math import comb, cos, exp, factorial, gcd, log, pi, prod, sin, sqrt
 import unittest
 
 
@@ -89,6 +89,29 @@ def eval_poly(coeffs: list[Fraction], x: Fraction) -> Fraction:
 
 
 class MathematicalProbesTests(unittest.TestCase):
+    def test_uniform_reciprocal_factorial_half_segments(self):
+        # Exact rational probes, including order zero, midpoint, both endpoints,
+        # both orientations, and the highest nonzero derivative. Not a Lean check.
+        for m in range(1, 8):
+            for L in (Fraction(1, 3), Fraction(1), Fraction(5, 2)):
+                width = 1 / (L * m)
+                half = width / 2
+                coeffs = chebyshev_T_poly(m)
+                for j in range(9):
+                    x = width * Fraction(j, 8)
+                    a = 1 if x <= half else -1
+                    for k in range(5):
+                        image = x + a * half * Fraction(k, 4)
+                        self.assertLessEqual(0, image)
+                        self.assertLessEqual(image, width)
+                    cur = coeffs
+                    for s in range(m + 1):
+                        # P(t) = T_m(2*L*m*t - 1), uniformly bounded by one.
+                        value = (2 * L * m) ** s * eval_poly(cur, 2 * L * m * x - 1)
+                        bound = (8 * L) ** s * m ** (3 * s) / factorial(2 * s)
+                        self.assertLessEqual(abs(value) / factorial(s), bound)
+                        cur = [i * cur[i] for i in range(1, len(cur))]
+
     def test_cubic_sharpness_witness_and_quadratic_obstruction(self):
         for m in range(1, 8):
             ann = [Fraction(1)]

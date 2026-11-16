@@ -231,4 +231,53 @@ theorem markov_reciprocal_endpoint_factorial_bound
           ring
   exact markov_factored_bound_transfer _ M L (m : ℝ) s h_upper
 
+/-- Uniform Taylor-coefficient bound on the reciprocal interval. At each point,
+translate or reflect a half-length segment to start at zero and apply the endpoint
+bound with parameter `2 * L`. This loses `2^s`, but retains `(2*s)!`; it does not
+assert the sharp higher-order interior Markov inequality. -/
+theorem markov_reciprocal_interval_factorial_bound
+    (P : Polynomial ℝ) (m s : ℕ) {L M x : ℝ}
+    (hm : 0 < m) (hs : s ≤ m) (hL : 0 < L) (hM : 0 ≤ M)
+    (hdeg : P.degree ≤ m)
+    (hbounded : ∀ t ∈ Set.Icc (0 : ℝ) (1 / (L * (m : ℝ))), |P.eval t| ≤ M)
+    (hx : x ∈ Set.Icc (0 : ℝ) (1 / (L * (m : ℝ)))) :
+    |((derivative^[s]) P).eval x| / (s.factorial : ℝ) ≤
+      M * (((8 * L) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ)) := by
+  have hmpos : (0 : ℝ) < (m : ℝ) := Nat.cast_pos.mpr hm
+  have hhalf : 2 * (1 / ((2 * L) * (m : ℝ))) = 1 / (L * (m : ℝ)) := by
+    field_simp [hL.ne', hmpos.ne']
+    <;> ring
+  have htransport (a : ℝ) (ha : |a| = 1)
+      (himage : ∀ t ∈ Set.Icc (0 : ℝ) (1 / ((2 * L) * (m : ℝ))),
+        a * t + x ∈ Set.Icc (0 : ℝ) (1 / (L * (m : ℝ)))) :
+      |((derivative^[s]) P).eval x| / (s.factorial : ℝ) ≤
+        M * (((8 * L) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ)) := by
+    let Q : Polynomial ℝ := P.comp (C a * Polynomial.X + C x)
+    have hQdeg : Q.degree ≤ m := degree_comp_linear_le P m a x hdeg
+    have hQbound : ∀ t ∈ Set.Icc (0 : ℝ) (1 / ((2 * L) * (m : ℝ))),
+        |Q.eval t| ≤ M := by
+      intro t ht
+      simpa [Q] using hbounded (a * t + x) (himage t ht)
+    have h := markov_reciprocal_endpoint_factorial_bound Q m s hm hs
+      (by positivity : 0 < 2 * L) hM hQdeg hQbound
+    have heval : |((derivative^[s]) Q).eval 0| =
+        |((derivative^[s]) P).eval x| := by
+      rw [show ((derivative^[s]) Q).eval 0 =
+        a ^ s * ((derivative^[s]) P).eval x by
+          simpa [Q] using iterate_derivative_affine_eval P a x 0 s]
+      rw [abs_mul, abs_pow, ha, one_pow, one_mul]
+    rw [heval] at h
+    simpa only [show (4 : ℝ) * (2 * L) = 8 * L by ring] using h
+  by_cases hleft : x ≤ 1 / ((2 * L) * (m : ℝ))
+  · apply htransport 1 (by norm_num)
+    intro t ht
+    constructor <;> dsimp
+    · nlinarith [hx.1, ht.1]
+    · nlinarith [ht.2]
+  · apply htransport (-1) (by norm_num)
+    intro t ht
+    constructor <;> dsimp
+    · nlinarith [ht.2]
+    · nlinarith [hx.2, ht.1]
+
 end RhAstraSynthesis

@@ -102,9 +102,35 @@ theorem remez_markov_interior_derivative_bound (P : _root_.Polynomial ℝ) (n s 
           (2 * (b - a) / MeasureTheory.volume.real E - 1) * B) :=
   RhAstraSynthesis.remez_markov_interior_derivative_bound P n s hab hB hdeg hEm hEsub he_pos hEbnd hx
 
+/-- Factorial-strength uniform bound, with a half-interval `2^s` loss. -/
+theorem reciprocal_interval_factorial_bound
+    (P : Polynomial ℝ) (m s : ℕ) {L M x : ℝ}
+    (hm : 0 < m) (hs : s ≤ m) (hL : 0 < L) (hM : 0 ≤ M)
+    (hdeg : P.degree ≤ m)
+    (hbounded : ∀ t ∈ Icc (0 : ℝ) (1 / (L * (m : ℝ))), |P.eval t| ≤ M)
+    (hx : x ∈ Icc (0 : ℝ) (1 / (L * (m : ℝ)))) :
+    |((Polynomial.derivative^[s]) P).eval x| / (s.factorial : ℝ) ≤
+      M * (((8 * L) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ)) :=
+  RhAstraSynthesis.markov_reciprocal_interval_factorial_bound P m s hm hs hL hM
+    hdeg hbounded hx
+
 end Signatures
 
 section Examples
+
+/-- A genuine second derivative at the midpoint: `P(t) = t^2`, `m = 2`, `L = M = 1`. -/
+example :
+    |((Polynomial.derivative^[2]) ((Polynomial.X : Polynomial ℝ) ^ 2)).eval (1 / 4)| /
+        (2.factorial : ℝ) ≤
+      (1 : ℝ) * (((8 * 1) ^ 2 * (2 : ℝ) ^ (3 * 2)) / ((2 * 2).factorial : ℝ)) := by
+  apply reciprocal_interval_factorial_bound _ 2 2 (by norm_num) (by norm_num)
+    (by norm_num) (by norm_num) (by simp)
+  · intro t ht
+    simp only [Polynomial.eval_pow, Polynomial.eval_X]
+    rw [abs_of_nonneg (sq_nonneg t)]
+    norm_num at ht
+    nlinarith [ht.1, ht.2]
+  · norm_num
 
 /-- Polynomial `P(x) = x` of degree `1` satisfies the Markov interior bound at `x = 1`. -/
 example : |(Polynomial.derivative (Polynomial.X : Polynomial ℝ)).eval 1| ≤ ((1 : ℕ) : ℝ) ^ 2 * 1 :=
@@ -180,6 +206,7 @@ example :
 
 end Examples
 
+#print axioms reciprocal_interval_factorial_bound
 #print axioms bernstein_van_der_corput_schaake
 #print axioms markov_interior_derivative
 #print axioms reciprocal_good_set_measure
