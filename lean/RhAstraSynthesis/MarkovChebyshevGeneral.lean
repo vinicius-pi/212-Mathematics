@@ -246,7 +246,6 @@ theorem markov_reciprocal_interval_factorial_bound
   have hmpos : (0 : ℝ) < (m : ℝ) := Nat.cast_pos.mpr hm
   have hhalf : 2 * (1 / ((2 * L) * (m : ℝ))) = 1 / (L * (m : ℝ)) := by
     field_simp [hL.ne', hmpos.ne']
-    <;> ring
   have htransport (a : ℝ) (ha : |a| = 1)
       (himage : ∀ t ∈ Set.Icc (0 : ℝ) (1 / ((2 * L) * (m : ℝ))),
         a * t + x ∈ Set.Icc (0 : ℝ) (1 / (L * (m : ℝ)))) :

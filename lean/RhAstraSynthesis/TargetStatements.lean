@@ -121,7 +121,7 @@ section Examples
 /-- A genuine second derivative at the midpoint: `P(t) = t^2`, `m = 2`, `L = M = 1`. -/
 example :
     |((Polynomial.derivative^[2]) ((Polynomial.X : Polynomial ℝ) ^ 2)).eval (1 / 4)| /
-        (2.factorial : ℝ) ≤
+        (Nat.factorial 2 : ℝ) ≤
       (1 : ℝ) * (((8 * 1) ^ 2 * (2 : ℝ) ^ (3 * 2)) / ((2 * 2).factorial : ℝ)) := by
   apply reciprocal_interval_factorial_bound _ 2 2 (by norm_num) (by norm_num)
     (by norm_num) (by norm_num) (by simp)
