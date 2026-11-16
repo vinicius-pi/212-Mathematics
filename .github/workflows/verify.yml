@@ -1,0 +1,64 @@
+name: Verify Lean 4 Library & Mathematical Probes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: Run mathematical boundary and counterexample probes
+        run: python3 -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Verify pinned Mathlib manifest
+        working-directory: lean
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s lake-manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("lake-manifest.json").read_text(encoding="utf-8"))
+          exact = "5ed2965256430c3649e86755f9576b54eca72435"
+          matches = [p for p in manifest.get("packages", []) if p.get("name") == "mathlib"]
+          if len(matches) != 1 or matches[0].get("rev") != exact:
+              raise SystemExit(f"Expected Mathlib rev {exact}, got {matches}")
+          print("Verified Mathlib rev:", matches[0]["rev"])
+          PY
+
+      - name: Build Lean 4 package, run leanchecker, and audit axioms
+        uses: leanprover/lean-action@ba3fdfe5c4476c925da13bf11a005ddb47e47aee # v1.7.1
+        env:
+          LEAN_NUM_THREADS: "1"
+        with:
+          lake-package-directory: lean
+          use-mathlib-cache: "true"
+          use-github-cache: "false"
+          axiom-audit: "true"
+          axiom-audit-root: "RhAstraSynthesis"
+          axiom-audit-allow: "propext,Classical.choice,Quot.sound"
+          leanchecker: "true"

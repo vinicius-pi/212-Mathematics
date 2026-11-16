@@ -1,0 +1,11 @@
+name = "RhAstraSynthesis"
+version = "0.1.0"
+defaultTargets = ["RhAstraSynthesis"]
+
+[[lean_lib]]
+name = "RhAstraSynthesis"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "5ed2965256430c3649e86755f9576b54eca72435"
