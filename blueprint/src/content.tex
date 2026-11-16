@@ -1,0 +1,277 @@
+\section{Chebyshev Extremal Bounds, Interior Markov, and Discrete Grids}
+
+We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). Unless otherwise noted, all theorems below are formalized across 18 modules of \texttt{RhAstraSynthesis} and verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}.
+
+\subsection{Bernstein--Van der Corput--Schaake and A. A. Markov's Interior Theorem}
+
+\begin{definition}[Markov odd double-factorial denominator]
+\label{def:markov-denom}
+\lean{RhAstraSynthesis.markovOddDenom}
+\leanok
+For $s \in \N$, define the odd double-factorial denominator
+\[
+D_s = \prod_{j=0}^{s-1} (2j + 1).
+\]
+At $x = 1$, the $s$-th derivative of the Chebyshev polynomial $T_m$ satisfies
+$T_m^{(s)}(1) = D_s^{-1} \prod_{j=0}^{s-1} (m^2 - j^2)$.
+\end{definition}
+
+\begin{lemma}[Near-endpoint Chebyshev--Lagrange sign definiteness]
+\label{lem:lagrange-near-endpoint}
+\lean{RhAstraSynthesis.markov_interior_derivative_abs_le}
+\leanok
+Let $n \ge 2$ and let $x_i = \cos(i\pi/n)$ ($0 \le i \le n$) be the Chebyshev extrema in $[-1, 1]$, with Lagrange basis polynomials $\ell_i$. For every $x \in [\sqrt{1 - n^{-2}}, 1]$ and every $0 \le i \le n$,
+\[
+(-1)^i \ell_i'(x) \ge 0.
+\]
+\end{lemma}
+
+\begin{proof}
+Since $1 - x \le \frac{1 - x^2}{1 + x} \le \frac{5}{9} n^{-2}$ on $[\sqrt{1 - n^{-2}}, 1]$ while $1 - x_j = 2\sin^2\!\bigl(\frac{j\pi}{2n}\bigr) \ge 2(j/n)^2$ for $1 \le j \le n$, every gap satisfies $x - x_j \ge (2j^2 - 5/9)n^{-2} > 0$. By \texttt{Chebyshev.zero\_lt\_prod\_node\_sub\_node}, $(-1)^i \prod_{j \ne i}(x_i - x_j) > 0$. The case $i = 0$ is immediate from positivity of all factors $x - x_m$ ($m \ge 1$). For $1 \le i \le n$, extracting the $j = 0$ term ($x_0 = 1$) gives
+\[
+\ell_i'(x) \prod_{j \ne i}(x_i - x_j)
+= P_0(x)\!\left(1 - \sum_{\substack{1 \le j \le n \\ j \ne i}} \frac{1 - x}{x - x_j}\right),
+\qquad P_0(x) = \prod_{\substack{1 \le m \le n \\ m \ne i}} (x - x_m) > 0.
+\]
+Separating $j = 1$ and telescoping $\sum_{j=2}^n \frac{1}{2j^2 - 5/9} \le \frac{1}{2}\sum_{j=2}^n \left(\frac{1}{j-1} - \frac{1}{j}\right) < \frac{1}{2}$ yields
+\[
+\sum_{\substack{1 \le j \le n \\ j \ne i}} \frac{1 - x}{x - x_j}
+\le \frac{5}{13} + \frac{5}{9}\cdot \frac{1}{2} = \frac{155}{234} < 1,
+\]
+completing the sign claim.
+\end{proof}
+
+\begin{theorem}[Bernstein / Van der Corput--Schaake inequality~\cite{vandercorput1935}]
+\label{thm:vandercorput-schaake}
+\lean{RhAstraSynthesis.van_der_corput_schaake}
+\leanok
+For every $P \in \R[X]$ with $\deg P \le n$, $B \ge 0$ such that $|P(t)| \le B$ on $[-1, 1]$, and $\theta \in \R$,
+\[
+n^2 P(\cos\theta)^2 + \bigl(P'(\cos\theta)\sin\theta\bigr)^2 \le n^2 B^2.
+\]
+\end{theorem}
+
+\begin{proof}
+Normalizing to $B = 1$ ($n \ge 1$), suppose the left-hand side strictly exceeds $n^2$ at $\theta_0$. Choose $R = \sqrt{P(\cos\theta_0)^2 + (P'(\cos\theta_0)\sin\theta_0 / n)^2} > 1$, set $c = 1/R \in (0, 1)$, and phase-lock $\alpha \in \R$ so that
+\[
+\cos(n\theta_0 - \alpha) = c P(\cos\theta_0), \qquad
+\sin(n\theta_0 - \alpha) = \frac{c}{n} P'(\cos\theta_0)\sin\theta_0.
+\]
+Choose $\beta \in (0, 2\pi)$ avoiding the $2n + 1$ residue classes of $\{(\alpha + k\pi)/n + \pi\}_{0 \le k < 2n} \cup \{\theta_0 + \pi\}$ modulo $2\pi$, and substitute $\theta(t) = \beta + 2\arctan t$ ($t \in \R$). Using Chebyshev representations of $\cos(n\theta)$ and $\sin(n\theta)$,
+\[
+G(t) := (1 + t^2)^n \bigl(\cos(n\theta(t) - \alpha) - c P(\cos\theta(t))\bigr)
+\]
+is an algebraic polynomial of degree at most $2n$. The representative $s_* \equiv \theta_0 \pmod{2\pi}$ in $(\beta - \pi, \beta + \pi)$ gives $t_* = \tan((s_* - \beta)/2)$ where both $G(t_*) = 0$ and $G'(t_*) = 0$, so $(X - t_*)^2 \mid G$. Writing $G(t) = (t - t_*)^2 Q_1(t)$ forces $\deg Q_1 \le 2n - 2$ and $Q_1 \ne 0$. Meanwhile, $2n$ consecutive extrema $s_j = (\alpha + (k_0 + j)\pi)/n \in (\beta - \pi, \beta + \pi)$ yield ordered points $t_0 < \dots < t_{2n-1}$ at which $G(t_j)$ alternates strictly in sign (since $c < 1$). Dividing by $(t_j - t_*)^2 > 0$ produces $2n - 1$ sign changes and hence $2n - 1$ distinct roots of $Q_1$ by the intermediate value theorem, contradicting $\deg Q_1 \le 2n - 2$.
+\end{proof}
+
+\begin{theorem}[A. A. Markov's interior derivative inequality~\cite{markov1889}]
+\label{thm:markov-interior}
+\lean{RhAstraSynthesis.markov_interior_derivative_abs_le, RhAstraSynthesis.markov_iterate_derivative_interior_le, RhAstraSynthesis.markov_interior_interval_transfer}
+\uses{lem:lagrange-near-endpoint, thm:vandercorput-schaake}
+\leanok
+Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on $[-1, 1]$ ($B \ge 0$). Then for every $x \in [-1, 1]$ and every $s \in \N$,
+\[
+|P'(x)| \le n^2 B, \qquad
+|P^{(s)}(x)| \le B \prod_{j=0}^{s-1} (n - j)^2.
+\]
+Under the scaled hypothesis $|P(u)| \le B$ on $[0, (Lm)^{-1}]$ ($L > 0$, $m \ge 1$, $\deg P \le m$), affine transport gives $|P^{(s)}(t)| \le (2Lm)^s B \prod_{j=0}^{s-1}(m - j)^2$ on $[0, (Lm)^{-1}]$.
+\end{theorem}
+
+\begin{proof}
+The cases $n = 0$ and $n = 1$ are immediate ($2|P'(0)| = |P(1) - P(-1)| \le 2B$). For $n \ge 2$ on $|x| < \sqrt{1 - n^{-2}}$, $1 - x^2 \ge n^{-2}$ combines with Theorem~\ref{thm:vandercorput-schaake} ($\cos\theta = x$) to yield $n^{-2} P'(x)^2 \le n^2 B^2$. On the right strip $\sqrt{1 - n^{-2}} \le x \le 1$, Lemma~\ref{lem:lagrange-near-endpoint} implies $(-1)^i \ell_i'(x) \ge 0$, whence Chebyshev extremal domination gives $|P'(x)| \le T_n'(x) B \le T_n'(1) B = n^2 B$; reflecting $x \mapsto -x$ covers $[-1, -\sqrt{1 - n^{-2}}]$. Induction on $s$ using $\deg(P^{(k)}) \le n - k$ and affine rescaling $Q(u) = P(u/(2Lm) + 1/(2Lm))$ finish the proof.
+\end{proof}
+
+\subsection{The Measurable Equioscillation Remez Inequality}
+
+\begin{theorem}[Measurable equioscillation Remez inequality]
+\label{thm:remez-inequality}
+\lean{RhAstraSynthesis.remez_inequality}
+\leanok
+For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X]$ with $\deg P \le n$, and measurable subset $E \subseteq [a, b]$ of positive Lebesgue measure $|E| > 0$ on which $|P(t)| \le B$ ($B \ge 0$), every $x \in [a, b]$ satisfies
+\[
+|P(x)| \le T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
+\]
+\end{theorem}
+
+\begin{proof}
+Inner regularity of Lebesgue measure reduces $E$ to a compact subset $K \subseteq E$ with $|K| > 0$ via \texttt{MeasurableSet.exists\_isCompact\_diff\_lt}, and monotone continuity of $T_n$ on $[1, \infty)$ passes to the limit $|K| \uparrow |E|$. For any $x \in (a, b]$, applying the right-endpoint case to $[a, x]$ and $K \cap [a, x]$ (whenever $|K \cap [a, x]| > 0$, using monotonicity of $y \mapsto T_n(y)$) and symmetrically reflecting $t \mapsto -t$ on $[-b, -x]$ when $|K \cap [x, b]| > 0$ reduces the bound on $[a, b]$ to establishing the right-endpoint inequality at $x = b$. For the right-endpoint step on $[a, b]$ with $|K| = e > 0$ and $Y = 2(b-a)/e - 1 \ge 1$: continuity and Lipschitz regularity of $x \mapsto |K \cap [a, x]|$ yield ordered nodes $x_0 < \dots < x_n$ in $K$ satisfying
+\[
+|K \cap [a, x_k]| = \frac{t_k + 1}{2}\,e, \qquad t_k = -\cos\!\left(\frac{k\pi}{n}\right) \quad (0 \le k \le n).
+\]
+By additivity on intervals, $x_j - x_i \ge |K \cap [a, x_j]| - |K \cap [a, x_i]| = \frac{e}{2}(t_j - t_i)$ and $b - x_i \le (b - a) - |K \cap [a, x_i]| = \frac{e}{2}(Y - t_i)$. Expanding $P(b)$ by Lagrange interpolation at $\{x_k\}$ gives
+\[
+|P(b)| \le B \sum_{k=0}^n \prod_{i \ne k} \frac{b - x_i}{|x_k - x_i|}
+\le B \sum_{k=0}^n \prod_{i \ne k} \frac{Y - t_i}{|t_k - t_i|}
+= B \sum_{k=0}^n T_n(t_k)\,\ell_k^{\mathrm{Cheb}}(Y)
+= T_n(Y)\,B,
+\]
+since $(-1)^{n-k}\prod_{i \ne k}(t_k - t_i) > 0$ and $T_n(t_k) = (-1)^{n-k}$.
+\end{proof}
+
+\begin{theorem}[Exponential Remez and combined Markov interior derivative bound]
+\label{thm:remez-exp-markov}
+\lean{RhAstraSynthesis.remez_exponential_inequality, RhAstraSynthesis.remez_markov_interior_derivative_bound}
+\uses{thm:remez-inequality, thm:chebyshev-exp, thm:markov-interior}
+\leanok
+Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on a measurable set $E \subseteq [a, b]$ ($a < b$, $B \ge 0$). If $|E| \ge (b - a)/(1 + 1/L)$ for some $L > 0$, then $|P(x)| \le \exp(2n/\sqrt{L})\,B$ for all $x \in [a, b]$. Moreover, whenever $|E| > 0$, every $s \in \N$ and $x \in [a, b]$ satisfy
+\[
+|P^{(s)}(x)| \le \left(\frac{2}{b - a}\right)^s \left(\prod_{j=0}^{s-1}(n - j)^2\right) T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
+\]
+\end{theorem}
+
+\begin{proof}
+The hypothesis $|E| \ge (b-a)/(1+1/L)$ forces $1 \le 2(b-a)/|E| - 1 \le 1 + 2/L$, so combining Theorem~\ref{thm:remez-inequality} with monotonicity of $T_n$ on $[1, \infty)$ and Theorem~\ref{thm:chebyshev-exp} gives the exponential bound. For derivatives, $Q(u) = P\bigl(\frac{b-a}{2}u + \frac{a+b}{2}\bigr)$ satisfies $\deg Q \le n$ and $|Q(u)| \le T_n(2(b-a)/|E| - 1) B$ on $[-1, 1]$ by Theorem~\ref{thm:remez-inequality}; applying Theorem~\ref{thm:markov-interior} to $Q$ and rescaling by $((b-a)/2)^{-s}$ finishes the proof.
+\end{proof}
+
+\subsection{Exterior Chebyshev Growth, Discrete Grids, and Sharpness Witnesses}
+
+\begin{theorem}[Exterior Chebyshev growth and endpoint Markov transport]
+\label{thm:markov-general}
+\lean{RhAstraSynthesis.chebyshev_exterior_eval_abs_le, RhAstraSynthesis.markov_endpoint_abs_le, RhAstraSynthesis.markov_reciprocal_endpoint_factorial_bound, RhAstraSynthesis.markov_affine_interval_bound_transfer, RhAstraSynthesis.factorial_three_div_two_le_eight_factorial}
+\uses{def:markov-denom}
+\leanok
+Every $P \in \R[X]$ with $\deg P \le m$ and $|P| \le B$ on $[-1, 1]$ satisfies $|P(x)| \le B\,T_m(|x|)$ for $|x| \ge 1$ and $|P^{(s)}(\pm 1)| \le B D_s^{-1}\prod_{j=0}^{s-1}(m^2-j^2)$. Under $|P| \le M$ on $[0, (Lm)^{-1}]$, Taylor coefficients at $0$ obey $|P^{(s)}(0)|/s! \le M\,(4L)^s m^{3s}/(2s)!$, alongside the Gevrey factorial bound $(3k)!/(2k)! \le 8^k k!$.
+\end{theorem}
+
+\begin{theorem}[Reciprocal-grid good-set measure and Remez--Chebyshev envelope]
+\label{thm:chebyshev-exp}
+\lean{RhAstraSynthesis.polynomial_reciprocal_good_measure, RhAstraSynthesis.remez_chebyshev_T_le_exp}
+\leanok
+Let $P \in \R[X]$ satisfy $\deg P \le m$, $B > 0$, $k > 0$, and $|P(1/n)| \le B$ for all $n \ge 1$. Then $E = \{t \in [0, 1/k] : |P(t)| \le B\}$ has measure $|E| \ge 1/(k + m)$. For $(Lm + m)^{-1} \le e \le (Lm)^{-1}$ ($L, m > 0$),
+\[
+T_m\!\left(\frac{2(Lm)^{-1}}{e} - 1\right) \le T_m\!\left(1 + \frac{2}{L}\right) \le \exp\!\left(\frac{2m}{\sqrt{L}}\right).
+\]
+\end{theorem}
+
+\begin{proof}
+Between any two bad points in $[0, 1/k]$ where $|P| > B$, the reciprocal lattice leaves at most $m$ occupied intervals (Rolle's theorem produces $m$ distinct zeros of $P'$), and antitone telescoping of gaps $(n(n+1))^{-1}$ keeps $|[0, 1/k] \setminus E| \le 1/k - 1/(k+m)$. Writing $1 + 2/L = \cosh\eta$ yields $2/L = \cosh\eta - 1 \ge \eta^2/2$, so $\eta \le 2/\sqrt{L}$ and $T_m(1+2/L) = \cosh(m\eta) \le e^{m\eta} \le e^{2m/\sqrt{L}}$.
+\end{proof}
+
+\begin{definition}[Reciprocal and square-root sharpness witnesses]
+\label{def:sharpness-witnesses}
+\lean{RhAstraSynthesis.reciprocalSharpnessWitness, RhAstraSynthesis.sqrtSharpnessWitness}
+\leanok
+For $m \ge 1$, set
+\[
+P_{m,m}(t) = \left(\prod_{j=1}^m (1 - jt)\right) T_m(1 - 2mt), \qquad
+Q_{m,m}(t) = \left(\prod_{j=1}^m (1 - \sqrt{j}\,t)\right) T_m(1 - 2\sqrt{m}\,t).
+\]
+\end{definition}
+
+\begin{theorem}[Cubic and $n^{-1/2}$ sharpness witnesses and fractional envelopes]
+\label{thm:fractional-sharpness}
+\lean{RhAstraSynthesis.reciprocalSharpnessWitness_cubic_lower_bound, RhAstraSynthesis.fractional_gap_antitone, RhAstraSynthesis.fractional_remez_chebyshev_envelope, RhAstraSynthesis.sqrtSharpnessWitness_eval_inv_sqrt_abs_le_one, RhAstraSynthesis.sqrtSharpnessWitness_derivative_at_zero}
+\uses{thm:chebyshev-exp, def:sharpness-witnesses}
+\leanok
+For all $m \ge 1$, $\deg P_{m,m} \le 2m$, $|P_{m,m}(1/n)| \le 1$ ($n \ge 1$), and $|P_{m,m}'(0)| \ge 2m^3 > m^2$. For $0 < \alpha \le 1$, gaps $n^{-\alpha} - (n+1)^{-\alpha}$ are strictly positive and antitone, and $T_m(2(Lm)^{-\alpha}/e - 1) \le \exp(2m\sqrt{\alpha/L})$. When $\alpha = 1/2$, $\deg Q_{m,m} \le 2m$, $|Q_{m,m}(1/\sqrt{n})| \le 1$ ($n \ge 1$), and $|Q_{m,m}'(0)| = 2m^{5/2} + \sum_{j=1}^m \sqrt{j} \ge 2m^{5/2} > m^2$.
+\end{theorem}
+
+\section{Coprime M\"obius Convolutions, Euler Products, and Tails}
+
+\begin{definition}[Coprime B\'aez--Duarte kernel]
+\label{def:coprime-kernel}
+\lean{RhAstraSynthesis.actualCoprimeKernel}
+\leanok
+Define $\psi(n) = \prod_{p \mid n}(p + 1)$ and $f(n) = \mu(n)\prod_{p \mid n}\frac{p}{p + 1}$ for $n \ge 1$. For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \psi(\gcd(n, d)) / \psi(n)$ for $n \ge 1$.
+\end{definition}
+
+\begin{theorem}[Actual coprime M\"obius factorization and $s > 1/2$ Euler product]
+\label{thm:coprime-euler}
+\lean{RhAstraSynthesis.actual_coprime_mobius_factorization, RhAstraSynthesis.actual_coprime_kernel_le_psi_mul_base, RhAstraSynthesis.coprime_kernel_moment_euler_hasProd}
+\uses{def:coprime-kernel}
+\leanok
+For every $d \in \N$ and $n \ge 1$, $f(n)\ind_{(n,d)=1} = (\mu * g_d)(n)$ with $0 \le g_d(n) \le 1$ multiplicative and $g_d(n) \le \psi(d) g_1(n)$ ($d \ne 0$). For every real $s > 1/2$ and $d \ne 0$, $\sum_{n \ge 1} g_d(n)n^{-s}$ converges to its infinite Euler product.
+\end{theorem}
+
+\begin{theorem}[Modulus-uniform $s = 3/4$ local Euler-factor bound]
+\label{thm:euler-ratio}
+\lean{RhAstraSynthesis.tau_sq_le_choose_three, RhAstraSynthesis.finite_euler_ratio_le_divisor_count}
+\uses{def:coprime-kernel}
+\leanok
+For all $e \in \N$, $(e+1)^2 \le \binom{e+3}{3}$, and for every $d \ne 0$ (including $p = 2$ with $r_2 = 2/3$), $\prod_{p \mid d} (1 - r_p p^{-3/4})^{-1} \le 2^{\omega(d)} \le \tau(d)$.
+\end{theorem}
+
+\begin{proof}
+At $p = 2$, $2^{3/4} > 5/3$ gives $(1 - \frac{2}{3} 2^{-3/4})^{-1} < 2$; for $p \ge 3$, $p^{3/4} > 2$ gives $(1 - p^{-3/4})^{-1} < 2$, and multiplying over $p \mid d$ bounds the product by $2^{\omega(d)} \le \prod_{p^e \parallel d} (e + 1) = \tau(d)$.
+\end{proof}
+
+\begin{theorem}[Harmonic M\"obius bound, Laurent--exponential tail, and Vaughan identity]
+\label{thm:mobius-tail}
+\lean{RhAstraSynthesis.moebius_harmonic_abs_le_one, RhAstraSynthesis.mobius_tail_hasDerivAt, RhAstraSynthesis.mobius_tail_polynomial_log_decay, RhAstraSynthesis.actual_vaughan}
+\leanok
+For every $N \ge 1$, $\bigl|\sum_{n=1}^N \mu(n)/n\bigr| \le 1$. For $c > 0$, $z^3 e^{-cz}$ admits an explicit Laurent--exponential antiderivative and satisfies $z^3 e^{-cz} = O_{c,A}(z^{-2A})$ for $z \ge 1$. Finite Dirichlet convolutions satisfy Vaughan's cutoff identity on \texttt{ArithmeticFunction} $\R$.
+\end{theorem}
+
+\section{Mellin Multipliers, Floor-Kernel Transfers, and Analytic Obstructions}
+
+\begin{definition}[Tent kernel and Mellin multiplier]
+\label{def:tent-mellin}
+\lean{TentMultiplier.numerator, TentMellin.mellin_eq_multiplier}
+\leanok
+Let $\tau : [1, 2] \to \R$ be the symmetric unit-height tent supported on $[1, 2]$ with peak at $u = 4/3$, with Mellin transform
+\[
+M_\tau(s) = \int_1^2 \tau(u) u^{s-1}\dd u = \frac{4\,\mathrm{num}_\tau(s)}{s(s-1)}, \qquad
+\mathrm{num}_\tau(s) = 1 + 2^{s-1} - 2\left(\frac{4}{3}\right)^{s-1}.
+\]
+\end{definition}
+
+\begin{theorem}[Critical-strip non-vanishing, $\zeta'/\zeta$ identity, and floor-kernel transfer]
+\label{thm:tent-mellin}
+\lean{TentMellin.tent_mellin_ne_zero, PrimePowerMellin.primePower_mellin_zeta, PowerKernelTransfer.kernel_error_bound, PublishedEnergyBridge.finite_energy_exact, RhAstraSynthesis.coprime_signed_square_commRing}
+\uses{def:tent-mellin}
+\leanok
+On $0 < \RePart(s) < 1$, $M_\tau(s) \ne 0$, and on $\RePart(s) > 1$, $M_\tau$ multiplies $-\zeta'(s)/\zeta(s)$ in the dilated prime-power Mellin identity. If a measurable function $G$ satisfies $|G(t)| \le C t^{-\gamma}$ ($0 < \gamma < 1$), then the Lebesgue floor-kernel remainder is $O(K^{-\gamma})$ with minimax energy envelope $80/89$ at exponent balance $53/89$. Finite B\'aez--Duarte truncated $L^2$ shifts~\cite{baez2003} satisfy $E_{\mathrm{tail}} = E_{\mathrm{trunc}} - 1$.
+\end{theorem}
+
+\begin{theorem}[Abel summation and Stieltjes polylogarithmic $L^1$ tail]
+\label{thm:stieltjes-tail}
+\lean{RhAstraSynthesis.abel_summation_inv, RhAstraSynthesis.log_decay_integrable_and_tail_bound}
+\leanok
+If $a : \N \to \R$ has partial sums $S(n) = \sum_{m=1}^n a(m)$, then $\sum_{n=u+1}^N a(n)/n = \frac{S(N)}{N} - \frac{S(u)}{u} + \sum_{n=u}^{N-1} S(n)\!\left(\frac{1}{n} - \frac{1}{n+1}\right)$. Any measurable $G$ satisfying $|G(t)| \le C(\log t)^{-1-\delta}$ ($\delta > 0$, $C \ge 0$, $t \ge 2$) obeys $G(t)/t \in L^1((K, \infty))$ with $\bigl|\int_K^\infty G(t)\,\dd t/t\bigr| \le C/(\delta (\log K)^\delta)$ for every $K \ge 2$.
+\end{theorem}
+
+\begin{theorem}[Sharp critical-line tent gap and infinitely many non-outer off-axis zeros]
+\label{thm:tent-obstructions}
+\lean{RhAstraSynthesis.tent_numerator_half_line_lower_bound, RhAstraSynthesis.tent_numerator_infinitely_many_off_axis_zeros}
+\uses{def:tent-mellin, thm:tent-mellin}
+\leanok
+On $\RePart(s) = 1/2$, $|\mathrm{num}_\tau(s)| \ge \sqrt{3} - 1 - 1/\sqrt{2} > 0$. Conversely, $\mathrm{num}_\tau$ possesses infinitely many off-axis zeros in the strip $2 < \RePart(s) < 4$ with arbitrarily large imaginary parts, so $M_\tau$ is non-outer in $H^2(\C_{1/2}^+)$.
+\end{theorem}
+
+\begin{proof}
+Setting $w = s - 1$, the equation $\mathrm{num}_\tau(s) = 1 + 2^w - 2(4/3)^w = 0$ divides by $2^w$ into $(3/2)^w = 2 / (1 + 2^{-w})$. On each closed ball $\overline{B}(c_k, 1/2)$ centered at $c_k = \frac{9}{4} + \frac{2\pi i k}{\log(3/2)}$ ($k \ge 1$), the fixed-point map
+\[
+F_k(w) = \frac{\log 2 - \log(1 + 2^{-w})}{\log(3/2)} + \frac{2\pi i k}{\log(3/2)}
+\]
+is a strict contraction inside $\RePart(w) \in [7/4, 11/4]$, yielding a zero $s_k = w_k + 1$ with $\RePart(s_k) \in (2, 4)$ for every sufficiently large $k$.
+\end{proof}
+
+\begin{theorem}[Parity pseudo-density, Hardy model-space defect, and $2\times 2$ Pick minors]
+\label{thm:parity-pick}
+\lean{RhAstraSynthesis.parity_pseudo_density_nonneg, RhAstraSynthesis.model_space_projection_defect_lower_bound, RhAstraSynthesis.not_posSemidef_of_neg_two_by_two_minor}
+\leanok
+For $t \ge 1$ and $\omega \in \R$, Selberg parity pseudo-densities $1 + t^{-1/4}\cos(\omega\log t)$ are everywhere non-negative. An off-axis zero $z$ ($\RePart z > 1/2$) induces a positive $H^2(\C_{1/2}^+)$ model-space projection defect $(2\RePart z - 1)/|z|^2 > 0$, and any symmetric matrix with a negative $2 \times 2$ principal minor fails \texttt{Matrix.PosSemidef}.
+\end{theorem}
+
+\section{Open Analytic Extensions}
+
+\begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
+\label{thm:open-gevrey-alpha}
+\uses{thm:markov-interior, thm:fractional-sharpness, thm:remez-exp-markov}
+\notready
+Combine Theorems~\ref{thm:markov-interior}, \ref{thm:fractional-sharpness}, and~\ref{thm:remez-exp-markov} to deduce uniform Gevrey-$\alpha$ remainder bounds $\Gamma(\alpha p + 1) n^{-\alpha p}$ on arbitrary compact disks $\{|z| \le r\}$ for sequences sampled at $\{n^{-\alpha}\}$ ($\alpha \in (0, 1]$).
+\end{proposition}
+
+\begin{proposition}[Unconditional PNT input and $s=3/4$ Euler-product transfer~\cite{titchmarsh1986}]
+\label{thm:open-pnt-vk}
+\uses{thm:coprime-euler, thm:euler-ratio, thm:stieltjes-tail}
+\notready
+Feed the Prime Number Theorem ($\sum \mu(n)/n = 0$) and unconditional Vinogradov--Korobov decay $M(x) \ll x (\log x)^{-A}$ into Theorems~\ref{thm:coprime-euler}, \ref{thm:euler-ratio}, and~\ref{thm:stieltjes-tail} to conclude $A(d) \le A(1)\tau(d)$ and $\int_1^\infty |G(x)|\,\dd x/x < \infty$.
+\end{proposition}
+
+\begin{proposition}[Deformed-theta Blaschke products and Pick/Hankel obstructions]
+\label{thm:open-blaschke}
+\uses{thm:tent-obstructions, thm:parity-pick}
+\notready
+Construct the Blaschke product of the off-axis zeros from Theorem~\ref{thm:tent-obstructions} and apply Theorem~\ref{thm:parity-pick} to finite-dimensional Pick and Stieltjes--Hankel matrices arising from modular theta deformations $\Xi_H = \Xi M_H$.
+\end{proposition}

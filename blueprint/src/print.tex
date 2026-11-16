@@ -1,0 +1,50 @@
+\documentclass[11pt]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=1in,heightrounded]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,xurl}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% leanblueprint compatibility macros for standalone LaTeX/Tectonic compilation
+\makeatletter
+\newcommand\bpurlstyle{\def\UrlFont{\upshape\ttfamily}}
+\makeatother
+\DeclareUrlCommand\leanurl{\bpurlstyle}
+\setlength{\emergencystretch}{2em}
+\raggedbottom
+\providecommand{\lean}[1]{\par{\raggedright\noindent\footnotesize\upshape\texttt{Lean:} \leanurl{#1}\par}}
+\providecommand{\leanok}{\par\noindent{\footnotesize\upshape\textbf{[Formalized in Lean 4]}}}
+\providecommand{\uses}[1]{\par{\raggedright\noindent\footnotesize\upshape\textit{Uses:} \leanurl{#1}.\par}}
+\providecommand{\proves}[1]{}
+\providecommand{\notready}{\par\noindent{\footnotesize\upshape\textit{[Open target --- not yet formalized in Lean]}}}
+
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\RePart}{Re}
+\DeclareMathOperator{\ImPart}{Im}
+
+\title[RhAstraSynthesis Blueprint]{RhAstraSynthesis Blueprint: Polynomial Extremal Bounds, Coprime Convolutions, and Zeta Multipliers}
+\author{Vinicius M. Pimenta}
+\date{November 16, 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\input{content}
+\bibliographystyle{amsplain}
+{\sloppy\bibliography{references}}
+\end{document}
