@@ -114,9 +114,52 @@ theorem reciprocal_interval_factorial_bound
   RhAstraSynthesis.markov_reciprocal_interval_factorial_bound P m s hm hs hL hM
     hdeg hbounded hx
 
+/-- Reciprocal samples imply uniform exponential control on the shrinking interval. -/
+theorem reciprocal_sample_exponential_bound
+    (P : Polynomial ℝ) (B : ℝ) (L m : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m)
+    (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ n : ℕ, 0 < n → |P.eval (1 / (n : ℝ))| ≤ B) :
+    ∀ x ∈ Icc (0 : ℝ) (1 / ((L : ℝ) * (m : ℝ))),
+      |P.eval x| ≤ Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B :=
+  RhAstraSynthesis.polynomial_reciprocal_remez_exponential_bound
+    P B L m hB hL hm hdegree hsample
+
+/-- Reciprocal Gevrey-1 polynomial input: all orders up to the degree bound,
+uniformly over the closed shrinking interval, with the `(8L)^s` loss. -/
+theorem reciprocal_sample_factorial_bound
+    (P : Polynomial ℝ) (B : ℝ) (L m s : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m) (hs : s ≤ m)
+    (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ n : ℕ, 0 < n → |P.eval (1 / (n : ℝ))| ≤ B)
+    {x : ℝ} (hx : x ∈ Icc (0 : ℝ) (1 / ((L : ℝ) * (m : ℝ)))) :
+    |((Polynomial.derivative^[s]) P).eval x| / (s.factorial : ℝ) ≤
+      (Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
+        (((8 * (L : ℝ)) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ)) :=
+  RhAstraSynthesis.polynomial_reciprocal_sample_factorial_bound
+    P B L m s hB hL hm hs hdegree hsample hx
+
 end Signatures
 
 section Examples
+
+/-- Nonconstant sampled witness with a nonzero highest derivative:
+`P(t) = t^2`, `B = 1`, `L = 2`, `m = s = 2`, at the midpoint `1/8`. -/
+example :
+    |((Polynomial.derivative^[2]) ((Polynomial.X : Polynomial ℝ) ^ 2)).eval (1 / 8)| /
+        (Nat.factorial 2 : ℝ) ≤
+      (Real.exp (2 * (2 : ℝ) / Real.sqrt (2 : ℝ)) * 1) *
+        (((8 * (2 : ℝ)) ^ 2 * (2 : ℝ) ^ (3 * 2)) / ((2 * 2).factorial : ℝ)) := by
+  apply reciprocal_sample_factorial_bound _ 1 2 2 2 (by norm_num) (by norm_num)
+    (by norm_num) (by norm_num) (by simp)
+  · intro n hn
+    have hnreal : (1 : ℝ) ≤ n := by exact_mod_cast (Nat.succ_le_of_lt hn)
+    have hnonneg : (0 : ℝ) ≤ 1 / (n : ℝ) := by positivity
+    have hle : (1 : ℝ) / (n : ℝ) ≤ 1 := (div_le_one (by positivity)).2 hnreal
+    simp only [Polynomial.eval_pow, Polynomial.eval_X]
+    rw [abs_of_nonneg (sq_nonneg _)]
+    nlinarith
+  · norm_num
 
 /-- A genuine second derivative at the midpoint: `P(t) = t^2`, `m = 2`, `L = M = 1`. -/
 example :
@@ -207,6 +250,8 @@ example :
 end Examples
 
 #print axioms reciprocal_interval_factorial_bound
+#print axioms reciprocal_sample_exponential_bound
+#print axioms reciprocal_sample_factorial_bound
 #print axioms bernstein_van_der_corput_schaake
 #print axioms markov_interior_derivative
 #print axioms reciprocal_good_set_measure

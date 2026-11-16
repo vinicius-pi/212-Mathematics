@@ -775,4 +775,49 @@ theorem remez_markov_interior_derivative_bound (P : Polynomial ℝ) (n s : ℕ) 
           rw [hinv_eq]
           ring
 
+/-- Reciprocal samples give a uniform exponential bound on the shrinking interval. -/
+theorem polynomial_reciprocal_remez_exponential_bound
+    (P : Polynomial ℝ) (B : ℝ) (L m : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m)
+    (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ n : ℕ, 0 < n → |P.eval (1 / (n : ℝ))| ≤ B) :
+    ∀ x ∈ Set.Icc (0 : ℝ) (1 / ((L : ℝ) * (m : ℝ))),
+      |P.eval x| ≤ Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B := by
+  have hLreal : (0 : ℝ) < L := by exact_mod_cast hL
+  have hmreal : (0 : ℝ) < m := by exact_mod_cast hm
+  let E : Set ℝ := {t | t ∈ Set.Icc (0 : ℝ) (1 / ((L : ℝ) * (m : ℝ))) ∧
+    |P.eval t| ≤ B}
+  have hEm : MeasurableSet E :=
+    measurableSet_Icc.inter (isClosed_le P.continuous.abs continuous_const).measurableSet
+  have hmeasure : 1 / ((L : ℝ) * (m : ℝ) + (m : ℝ)) ≤ volume.real E := by
+    simpa only [E, Nat.cast_add, Nat.cast_mul] using
+      polynomial_reciprocal_good_measure P B (L * m) m hB (Nat.mul_pos hL hm)
+        hdegree hsample
+  have hnormalize :
+      (1 / ((L : ℝ) * (m : ℝ)) - 0) / (1 + 1 / (L : ℝ)) =
+        1 / ((L : ℝ) * (m : ℝ) + (m : ℝ)) := by
+    apply (div_eq_iff₀ (show (1 + 1 / (L : ℝ)) ≠ 0 by positivity)).2
+    field_simp [hLreal.ne', hmreal.ne', (mul_pos hLreal hmreal).ne',
+      (add_pos (mul_pos hLreal hmreal) hmreal).ne']
+    <;> ring
+  intro x hx
+  exact remez_exponential_inequality P m (by positivity) hLreal hB.le hdegree hEm
+    (fun _ ht => ht.1) (hnormalize.symm ▸ hmeasure) (fun _ ht => ht.2) hx
+
+/-- Factorial derivative control from reciprocal samples, uniformly on the shrinking interval. -/
+theorem polynomial_reciprocal_sample_factorial_bound
+    (P : Polynomial ℝ) (B : ℝ) (L m s : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m) (hs : s ≤ m)
+    (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ n : ℕ, 0 < n → |P.eval (1 / (n : ℝ))| ≤ B)
+    {x : ℝ} (hx : x ∈ Set.Icc (0 : ℝ) (1 / ((L : ℝ) * (m : ℝ)))) :
+    |((derivative^[s]) P).eval x| / (s.factorial : ℝ) ≤
+      (Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
+        (((8 * (L : ℝ)) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ)) := by
+  have hdeg : P.degree ≤ m :=
+    le_trans Polynomial.degree_le_natDegree (by exact_mod_cast hdegree)
+  exact markov_reciprocal_interval_factorial_bound P m s hm hs
+    (by exact_mod_cast hL) (mul_nonneg (Real.exp_pos _).le hB.le) hdeg
+    (polynomial_reciprocal_remez_exponential_bound P B L m hB hL hm hdegree hsample) hx
+
 end RhAstraSynthesis

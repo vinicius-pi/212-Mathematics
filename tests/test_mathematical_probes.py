@@ -89,6 +89,27 @@ def eval_poly(coeffs: list[Fraction], x: Fraction) -> Fraction:
 
 
 class MathematicalProbesTests(unittest.TestCase):
+    def test_reciprocal_sample_remez_factorial_bridge(self):
+        # Exact normalization of the measure lower bound used by full Remez.
+        # P(t)=t^m has |P(1/n)| <= 1 for every n>=1 (not just the probes).
+        # Include s=0 and s=m, endpoints and midpoint, and several L values.
+        for m in range(1, 9):
+            for L in (1, 2, 5, 16):
+                width = Fraction(1, L * m)
+                good_measure_lower = Fraction(1, L * m + m)
+                self.assertEqual(width / (1 + Fraction(1, L)), good_measure_lower)
+                self.assertEqual(2 * width / good_measure_lower - 1, 1 + Fraction(2, L))
+                envelope = exp(2 * m / sqrt(L))
+                for n in range(1, 40):
+                    self.assertLessEqual(Fraction(1, n) ** m, 1)
+                for j in range(9):
+                    x = width * Fraction(j, 8)
+                    self.assertLessEqual(float(x**m), envelope)
+                    for s in range(m + 1):
+                        taylor_coefficient = comb(m, s) * x ** (m - s)
+                        factorial_factor = Fraction((8 * L) ** s * m ** (3 * s), factorial(2 * s))
+                        self.assertLessEqual(float(taylor_coefficient), envelope * float(factorial_factor))
+
     def test_uniform_reciprocal_factorial_half_segments(self):
         # Exact rational probes, including order zero, midpoint, both endpoints,
         # both orientations, and the highest nonzero derivative. Not a Lean check.
