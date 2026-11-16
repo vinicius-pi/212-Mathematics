@@ -796,7 +796,6 @@ theorem polynomial_reciprocal_remez_exponential_bound
   have hnormalize :
       (1 / ((L : ℝ) * (m : ℝ)) - 0) / (1 + 1 / (L : ℝ)) =
         1 / ((L : ℝ) * (m : ℝ) + (m : ℝ)) := by
-    apply (div_eq_iff₀ (show (1 + 1 / (L : ℝ)) ≠ 0 by positivity)).2
     field_simp [hLreal.ne', hmreal.ne', (mul_pos hLreal hmreal).ne',
       (add_pos (mul_pos hLreal hmreal) hmreal).ne']
     <;> ring
