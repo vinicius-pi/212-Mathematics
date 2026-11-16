@@ -62,7 +62,7 @@ theorem harmonic_moebius_bound (N : ℕ) (hN : 1 ≤ N) :
   RhAstraSynthesis.moebius_harmonic_abs_le_one N hN
 
 theorem tent_mellin_nonvanishing (s : ℂ) (h0 : 0 < s.re) (h1 : s.re < 1) :
-    MeasureTheory.mellin TentMellin.tent s ≠ 0 :=
+    mellin TentMellin.tent s ≠ 0 :=
   TentMellin.tent_mellin_ne_zero s h0 h1
 
 theorem log_decay_tail_integrable
@@ -80,7 +80,8 @@ section NonVacuityWitnesses
 /-- Non-trivial polynomial `P(x) = x` of degree `1` satisfies the Markov interior hypotheses at `x = 1`. -/
 example : |(Polynomial.derivative (Polynomial.X : Polynomial ℝ)).eval 1| ≤ ((1 : ℕ) : ℝ) ^ 2 * 1 :=
   markov_interior_derivative Polynomial.X 1 (by norm_num) (by simp)
-    (fun t ht => abs_le.mpr ⟨ht.1, ht.2⟩) ⟨by norm_num, by norm_num⟩
+    (fun t ht => by simp only [Polynomial.eval_X]; exact abs_le.mpr ⟨ht.1, ht.2⟩)
+    ⟨by norm_num, by norm_num⟩
 
 /-- Constant polynomial `P(x) = 1` satisfies the reciprocal good-measure hypotheses for `k = 1, m = 1`. -/
 example : (1 : ℝ) / (↑(1 + 1 : ℕ) : ℝ) ≤
@@ -89,9 +90,10 @@ example : (1 : ℝ) / (↑(1 + 1 : ℕ) : ℝ) ≤
     (by simp) (fun _ _ => by simp)
 
 /-- Witness `m = 1, L = 1, e = 1/2` satisfies the Remez–Chebyshev hypothesis interval. -/
-example : (Polynomial.Chebyshev.T ℝ (1 : ℤ)).eval (2 * (1 / (1 * (1 : ℝ))) / (1 / 2) - 1) ≤
-    Real.exp (2 * (1 : ℝ) / Real.sqrt 1) :=
-  remez_chebyshev_envelope 1 (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+example : (Polynomial.Chebyshev.T ℝ (1 : ℤ)).eval (2 * (1 / ((1 : ℝ) * ((1 : ℕ) : ℝ))) / (1 / 2 : ℝ) - 1) ≤
+    Real.exp (2 * ((1 : ℕ) : ℝ) / Real.sqrt (1 : ℝ)) :=
+  remez_chebyshev_envelope (m := 1) (L := 1) (e := (1 / 2 : ℝ))
+    (by norm_num) (by norm_num) (by norm_num) (by norm_num)
 
 /-- Witness `d = 6, n = 5` is non-vacuous and coprime in `coprime_mobius_factorization`. -/
 example :
@@ -105,9 +107,9 @@ example : |∑ n ∈ Finset.Ioc 0 6, (ArithmeticFunction.moebius n : ℝ) / (n :
   harmonic_moebius_bound 6 (by norm_num)
 
 /-- Witness `s = 1/2 + I` satisfies `0 < s.re < 1` in `tent_mellin_nonvanishing`. -/
-example : MeasureTheory.mellin TentMellin.tent ((1 / 2 : ℂ) + Complex.I) ≠ 0 :=
+example : mellin TentMellin.tent ((1 / 2 : ℂ) + Complex.I) ≠ 0 :=
   tent_mellin_nonvanishing ((1 / 2 : ℂ) + Complex.I)
-    (by simp; norm_num) (by simp; norm_num)
+    (by norm_num [Complex.add_re]) (by norm_num [Complex.add_re])
 
 /-- Witness `G(t) = 0` (`C = 1, δ = 1, K = 2`) satisfies `log_decay_tail_integrable`. -/
 example :
