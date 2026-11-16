@@ -142,7 +142,7 @@ private theorem isMultiplicative_filteredMobiusAF (d : ℕ) :
       simp only [CoprimeMobius.f, hr, hmu, Int.cast_mul]
       ring
     simp only [filteredMobiusValue, Nat.coprime_mul_iff_left]
-    split_ifs <;> first | exact hf | ring | tauto
+    split_ifs <;> first | exact hf | (exfalso; tauto) | ring
 
 /-- Multiplicativity is derived from the actual filtered weight and zeta convolution. -/
 theorem isMultiplicative_actualCoprimeKernelAF (d : ℕ) :
