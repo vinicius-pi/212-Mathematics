@@ -161,9 +161,57 @@ theorem reciprocal_gevrey_majorant
       C / (1 - σ) * (64 * L / (1 - σ) ^ 3) ^ s * (s.factorial : ℝ) :=
   RhAstraSynthesis.cubic_geometric_gevrey_majorant a s hC hL hσ hσ1 ha hbound
 
+/-- Polynomial-family specialization: the majorant is derived from samples. -/
+theorem reciprocal_polynomial_family_gevrey
+    (P : ℕ → Polynomial ℝ) (s L : ℕ) {C R r : ℝ}
+    (hC : 0 < C) (hR : 0 < R) (hr : 0 ≤ r) (hL : 0 < L)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m)
+    (hσ : (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1) :
+    Summable (fun n : ℕ =>
+      |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+        (s.factorial : ℝ) * r ^ (n + 1)) ∧
+      (∑' n : ℕ, |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+        (s.factorial : ℝ) * r ^ (n + 1)) ≤
+      C / (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+        (64 * (L : ℝ) /
+          (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ s *
+        (s.factorial : ℝ) :=
+  RhAstraSynthesis.polynomial_reciprocal_family_gevrey P s L hC hR hr hL
+    hdegree hsample hσ
+
 end Signatures
 
 section Examples
+
+/-- A nonconstant family with a nonzero first derivative at every index and
+positive radius: `P_m = X`, `C = R = L = 1`, `r = exp(-2)/2`, `σ = 1/2`. -/
+example :
+    Summable (fun n : ℕ =>
+      |((Polynomial.derivative^[1]) (Polynomial.X : Polynomial ℝ)).eval 0| /
+        (Nat.factorial 1 : ℝ) * (Real.exp (-2) / 2) ^ (n + 1)) ∧
+      (∑' n : ℕ,
+        |((Polynomial.derivative^[1]) (Polynomial.X : Polynomial ℝ)).eval 0| /
+          (Nat.factorial 1 : ℝ) * (Real.exp (-2) / 2) ^ (n + 1)) ≤ 1024 := by
+  have he : (Real.exp (-2) / 2 / 1) *
+      Real.exp (2 / Real.sqrt (1 : ℝ)) = (1 / 2 : ℝ) := by
+    simp only [Real.sqrt_one, div_one, Real.exp_neg]
+    field_simp [Real.exp_ne_zero]
+  have h := reciprocal_polynomial_family_gevrey
+    (fun _ => (Polynomial.X : Polynomial ℝ)) 1 1
+    (C := 1) (R := 1) (r := Real.exp (-2) / 2)
+    (by norm_num) (by norm_num) (by positivity) (by norm_num)
+    (fun m hm => by simpa using Nat.succ_le_of_lt hm)
+    (fun m hm k hk => by
+      have hkreal : (1 : ℝ) ≤ k := by exact_mod_cast Nat.succ_le_of_lt hk
+      simp only [Polynomial.eval_X, div_one, one_pow, mul_one]
+      rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
+      exact (div_le_one (by positivity)).2 hkreal)
+    (by rw [he]; norm_num)
+  norm_num only [he, Nat.cast_one, Nat.factorial_one] at h
+  norm_num at h ⊢
+  exact h
 
 /-- A nonzero second moment at ratio `1/2`; the bound is `2! * 2^3 = 16`. -/
 example :
@@ -287,6 +335,8 @@ example :
 
 end Examples
 
+#print axioms reciprocal_polynomial_family_gevrey
+#print axioms RhAstraSynthesis.polynomial_reciprocal_family_pointwise
 #print axioms reciprocal_interval_factorial_bound
 #print axioms geometric_power_moment_bound
 #print axioms RhAstraSynthesis.geometric_power_moment_zero

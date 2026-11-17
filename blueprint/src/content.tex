@@ -291,11 +291,36 @@ Then $\sum_{n\ge0}a_n$ converges and
 \begin{proof}
 Use the positive-index geometric moment bound at order $3s$, then
 $(3s)!/(2s)!\le8^s s!$. This includes $s=0$ and $\sigma=0$.
-The new Lean declaration is uncompiled, awaiting CI. This is an abstract
-fixed-order summation bridge, not yet the polynomial-family specialization:
-for that application one must normalize the weighted derivative estimate
-with $\sigma=(r/R)\exp(2/\sqrt L)$, and discharge orders above the degree
+This is the abstract fixed-order summation bridge. The separate polynomial-family
+specialization below normalizes the weighted derivative estimate with
+$\sigma=(r/R)\exp(2/\sqrt L)$ and discharges orders above the degree
 by vanishing. No fractional-grid or remainder assertion is made here.
+\end{proof}
+
+\begin{theorem}[Reciprocal polynomial-family Gevrey-1 coefficient bound]
+\label{thm:reciprocal-family-gevrey}
+\lean{RhAstraSynthesis.polynomial_reciprocal_family_gevrey}
+\uses{lem:cubic-geometric-gevrey, lem:reciprocal-interval-factorial, thm:remez-exp-markov}
+Let $P_m\in\mathbb R[X]$, $C,R>0$, $r\ge0$, and $L\in\mathbb N$ with $L>0$.
+Suppose for every $m\ge1$ that $\deg P_m\le m$ and
+$|P_m(1/k)|\le C R^{-m}$ for every $k\ge1$.
+Put $\sigma=(r/R)\exp(2/\sqrt L)$ and assume $\sigma<1$.
+Then for every $s\in\mathbb N$ the series
+$\sum_{m\ge1}|P_m^{(s)}(0)|r^m/s!$ converges and
+\[
+\sum_{m\ge1}\frac{|P_m^{(s)}(0)|}{s!}r^m
+\le \frac{C}{1-\sigma}
+  \left(\frac{64L}{(1-\sigma)^3}\right)^s s!.
+\]
+\end{theorem}
+\begin{proof}
+For $s\le m$, the reciprocal-sample factorial estimate at zero gives
+$|P_m^{(s)}(0)|r^m/s!\le C(8L)^s m^{3s}\sigma^m/(2s)!$;
+use $\exp(2m/\sqrt L)=\exp(2/\sqrt L)^m$.
+For $s>m$ the derivative vanishes. Apply
+Lemma~\ref{lem:cubic-geometric-gevrey}. This includes $s=0$ and $r=0$.
+The new family declarations await CI compilation. This separate coefficient-series
+result does not establish the all-radii fractional-grid remainder target below.
 \end{proof}
 
 \section{Open Analytic Extensions}

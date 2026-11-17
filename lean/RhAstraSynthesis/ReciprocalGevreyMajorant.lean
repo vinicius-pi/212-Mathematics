@@ -1,4 +1,5 @@
 import RhAstraSynthesis.GevreyMomentFactorial
+import RhAstraSynthesis.RemezInequality
 
 /-!
 # Cubic geometric majorants for reciprocal Gevrey-1
@@ -64,5 +65,73 @@ theorem cubic_geometric_gevrey_majorant
             ((8 * L / (1 - σ) ^ 3) ^ s * (8 : ℝ) ^ s) *
             (s.factorial : ℝ) := by ring
         _ = _ := by rw [hp]
+
+/-- Normalize the exponential degree loss before summing over a family. -/
+theorem reciprocal_exponential_weight (m : ℕ) (r R L : ℝ) :
+    Real.exp (2 * (m : ℝ) / Real.sqrt L) * (1 / R) ^ m * r ^ m =
+      ((r / R) * Real.exp (2 / Real.sqrt L)) ^ m := by
+  have he : Real.exp (2 * (m : ℝ) / Real.sqrt L) =
+      Real.exp (2 / Real.sqrt L) ^ m := by
+    rw [← Real.exp_nat_mul]
+    congr 1
+    ring
+  rw [he, ← mul_pow, ← mul_pow]
+  congr 1
+  ring
+
+/-- The sampled polynomial estimate, including derivative orders above the degree.
+The radius may be zero; no hypothesis on the degree-zero polynomial is needed. -/
+theorem polynomial_reciprocal_family_pointwise
+    (P : ℕ → Polynomial ℝ) (m s L : ℕ) {C R r : ℝ}
+    (hC : 0 < C) (hR : 0 < R) (hr : 0 ≤ r) (hL : 0 < L)
+    (hm : 0 < m) (hdegree : (P m).natDegree ≤ m)
+    (hsample : ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m) :
+    |((Polynomial.derivative^[s]) (P m)).eval 0| / (s.factorial : ℝ) * r ^ m ≤
+      (C * (8 * (L : ℝ)) ^ s / ((2 * s).factorial : ℝ)) *
+        ((m : ℝ) ^ (3 * s) * ((r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ m) := by
+  by_cases hs : s ≤ m
+  · have hb := polynomial_reciprocal_sample_factorial_bound
+      (P m) (C * (1 / R) ^ m) L m s (by positivity) hL hm hs hdegree hsample
+      (x := 0) ⟨le_rfl, by positivity⟩
+    have hw := mul_le_mul_of_nonneg_right hb (pow_nonneg hr m)
+    refine hw.trans_eq ?_
+    calc
+      _ = (C * (8 * (L : ℝ)) ^ s / ((2 * s).factorial : ℝ)) *
+          ((m : ℝ) ^ (3 * s) *
+            (Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * (1 / R) ^ m * r ^ m)) := by ring
+      _ = _ := by rw [reciprocal_exponential_weight]
+  · have hz : (Polynomial.derivative^[s]) (P m) = 0 :=
+      Polynomial.iterate_derivative_eq_zero (hdegree.trans_lt (Nat.lt_of_not_ge hs))
+    rw [hz]
+    simp only [Polynomial.eval_zero, abs_zero, zero_div, zero_mul]
+    positivity
+
+/-- Reciprocal samples for a degree-controlled polynomial family imply absolute
+summability of every weighted Taylor order and an explicit Gevrey-1 bound.
+This is a coefficient-series result, not a remainder or fractional-grid theorem. -/
+theorem polynomial_reciprocal_family_gevrey
+    (P : ℕ → Polynomial ℝ) (s L : ℕ) {C R r : ℝ}
+    (hC : 0 < C) (hR : 0 < R) (hr : 0 ≤ r) (hL : 0 < L)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m)
+    (hσ : (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1) :
+    Summable (fun n : ℕ =>
+      |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+        (s.factorial : ℝ) * r ^ (n + 1)) ∧
+      (∑' n : ℕ, |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+        (s.factorial : ℝ) * r ^ (n + 1)) ≤
+      C / (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+        (64 * (L : ℝ) /
+          (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ s *
+        (s.factorial : ℝ) := by
+  apply cubic_geometric_gevrey_majorant _ s hC.le (Nat.cast_nonneg L)
+    (mul_nonneg (div_nonneg hr hR.le) (Real.exp_pos _).le) hσ
+  · intro n
+    positivity
+  · intro n
+    exact polynomial_reciprocal_family_pointwise P (n + 1) s L hC hR hr hL
+      (Nat.succ_pos n) (hdegree _ (Nat.succ_pos n)) (hsample _ (Nat.succ_pos n))
 
 end RhAstraSynthesis
