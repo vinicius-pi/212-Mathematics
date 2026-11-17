@@ -194,9 +194,8 @@ example :
       (∑' n : ℕ,
         |((Polynomial.derivative^[1]) (Polynomial.X : Polynomial ℝ)).eval 0| /
           (Nat.factorial 1 : ℝ) * (Real.exp (-2) / 2) ^ (n + 1)) ≤ 1024 := by
-  have he : (Real.exp (-2) / 2 / 1) *
-      Real.exp (2 / Real.sqrt (1 : ℝ)) = (1 / 2 : ℝ) := by
-    simp only [Real.sqrt_one, div_one, Real.exp_neg]
+  have he : Real.exp (-2) / 2 * Real.exp 2 = (1 / 2 : ℝ) := by
+    rw [Real.exp_neg]
     field_simp [Real.exp_ne_zero]
   have h := reciprocal_polynomial_family_gevrey
     (fun _ => (Polynomial.X : Polynomial ℝ)) 1 1
@@ -208,8 +207,9 @@ example :
       simp only [Polynomial.eval_X, div_one, one_pow, mul_one]
       rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
       exact (div_le_one (by positivity)).2 hkreal)
-    (by rw [he]; norm_num)
-  norm_num only [he, Nat.cast_one, Nat.factorial_one] at h
+    (by norm_num only [Nat.cast_one, Real.sqrt_one, div_one]; rw [he]; norm_num)
+  norm_num only [Nat.cast_one, Real.sqrt_one, div_one, Nat.factorial_one] at h
+  rw [he] at h
   norm_num at h ⊢
   exact h
 
