@@ -34,7 +34,15 @@ lemma reciprocal_iteratedDeriv_eval (P : Polynomial ℝ) (s : ℕ) :
 lemma reciprocal_normalized_derivative_coeff (P : Polynomial ℝ) (s : ℕ) :
     ((Polynomial.derivative^[s]) P).eval 0 / (s.factorial : ℝ) = P.coeff s := by
   have hz : ((Polynomial.derivative^[s]) P).eval 0 =
-      ((Polynomial.derivative^[s]) P).coeff 0 := by simp
+      ((Polynomial.derivative^[s]) P).coeff 0 := by
+    have hzero (Q : Polynomial ℝ) : Q.eval 0 = Q.coeff 0 := by
+      induction Q using Polynomial.induction_on' with
+      | add Q T hQ hT => simp [hQ, hT]
+      | monomial n a =>
+        by_cases hn : n = 0
+        · simp [hn]
+        · simp [hn, Ne.symm hn]
+    exact hzero _
   rw [hz, Polynomial.coeff_iterate_derivative]
   simp only [zero_add, Nat.descFactorial_self, nsmul_eq_mul]
   exact mul_div_cancel_left₀ _ (by positivity : (s.factorial : ℝ) ≠ 0)
