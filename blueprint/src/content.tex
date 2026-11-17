@@ -323,6 +323,36 @@ The new family declarations await CI compilation. This separate coefficient-seri
 result does not establish the all-radii fractional-grid remainder target below.
 \end{proof}
 
+\begin{lemma}[Natural parameter at every strict subradius]
+\label{lem:reciprocal-all-radii-parameter}
+\lean{RhAstraSynthesis.exists_reciprocal_gevrey_parameter}
+For every $R>0$ and every real $0\le r<R$, there exists a natural
+$L>0$ with $\sigma=(r/R)\exp(2/\sqrt L)<1$.
+\end{lemma}
+\begin{proof}
+If $r=0$, take $L=1$. Otherwise $\log(R/r)>0$; choose a natural
+$N>2/\log(R/r)$ and put $L=N^2$. Then $N>0$ and
+$\exp(2/\sqrt L)<R/r$. The declaration awaits CI compilation.
+\end{proof}
+
+\begin{theorem}[All-radii reciprocal Gevrey-1 coefficient series]
+\label{thm:reciprocal-family-all-radii}
+\lean{RhAstraSynthesis.polynomial_reciprocal_family_gevrey_all_radii}
+\uses{lem:reciprocal-all-radii-parameter, thm:reciprocal-family-gevrey}
+Under the degree and sample hypotheses of
+Theorem~\ref{thm:reciprocal-family-gevrey}, for every real $0\le r<R$
+there is a natural $L>0$, independent of $s$, such that
+$\sigma=(r/R)\exp(2/\sqrt L)<1$ and, simultaneously for every $s\in\mathbb N$,
+$\sum_{m\ge1}|P_m^{(s)}(0)|r^m/s!$ is summable and is bounded by
+$C(1-\sigma)^{-1}(64L/(1-\sigma)^3)^s s!$.
+\end{theorem}
+\begin{proof}
+Choose $L$ by the preceding lemma and apply the existing family theorem
+for each $s$. This closes the universal radius quantifier, including zero,
+only for reciprocal coefficient series. The declaration awaits CI compilation;
+the fractional-grid and full remainder target below remains open.
+\end{proof}
+
 \section{Open Analytic Extensions}
 
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]

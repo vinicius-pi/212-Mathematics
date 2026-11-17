@@ -27,6 +27,35 @@ class PolynomialFamilyTests(unittest.TestCase):
                     bound = C / (1 - sigma) * (64 * L / (1 - sigma) ** 3) ** s * math.factorial(s)
                     self.assertLessEqual(partial, bound)
 
+    def test_all_strict_radii_parameter(self):
+        # Independent Archimedean/log witness, including zero and near-boundary radii.
+        for R in (0.125, 1.0, 7.0):
+            for q in (0.0, 0.01, 0.5, 0.9, 0.99, 0.9999):
+                r = R * q
+                N = 1 if r == 0 else math.floor(2 / math.log(R / r)) + 1
+                L = N * N
+                sigma = (r / R) * math.exp(2 / math.sqrt(L))
+                self.assertGreater(L, 0)
+                self.assertLess(sigma, 1)
+                # P_m = X, C = R = 1: nonzero first-order series at q.
+                if R == 1:
+                    bound = 1 / (1 - sigma) * (64 * L / (1 - sigma) ** 3)
+                    self.assertLessEqual(q / (1 - q), bound)
+
+    def test_all_radii_contract(self):
+        source = (ROOT / 'lean/RhAstraSynthesis/ReciprocalGevreyMajorant.lean').read_text()
+        targets = (ROOT / 'lean/RhAstraSynthesis/TargetStatements.lean').read_text()
+        blueprint = (ROOT / 'blueprint/src/content.tex').read_text()
+        for name in ('exists_reciprocal_gevrey_parameter',
+                     'polynomial_reciprocal_family_gevrey_all_radii'):
+            self.assertIn('theorem ' + name, source)
+            self.assertIn('theorem ' + name, targets)
+            self.assertIn('#print axioms ' + name, targets)
+            self.assertIn('RhAstraSynthesis.' + name, blueprint)
+        self.assertIn('∀ r : ℝ, 0 ≤ r → r < R → ∃ L : ℕ', source)
+        self.assertIn('< 1 ∧ ∀ s : ℕ', source)
+        self.assertIn(r'\label{thm:open-gevrey-alpha}', blueprint)
+
     def test_family_interface_and_imports(self):
         source = (ROOT / 'lean/RhAstraSynthesis/ReciprocalGevreyMajorant.lean').read_text()
         for name in ('reciprocal_exponential_weight', 'polynomial_reciprocal_family_pointwise',

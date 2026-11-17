@@ -1,5 +1,6 @@
 import RhAstraSynthesis.GevreyMomentFactorial
 import RhAstraSynthesis.RemezInequality
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
 /-!
 # Cubic geometric majorants for reciprocal Gevrey-1
@@ -133,5 +134,57 @@ theorem polynomial_reciprocal_family_gevrey
   · intro n
     exact polynomial_reciprocal_family_pointwise P (n + 1) s L hC hR hr hL
       (Nat.succ_pos n) (hdegree _ (Nat.succ_pos n)) (hsample _ (Nat.succ_pos n))
+
+/-- Every strict subradius admits a positive natural Remez parameter. The
+parameter depends only on the radii, not on the derivative order or family. -/
+theorem exists_reciprocal_gevrey_parameter {R r : ℝ}
+    (hR : 0 < R) (hr : 0 ≤ r) (hrR : r < R) :
+    ∃ L : ℕ, 0 < L ∧ (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 := by
+  by_cases hr0 : r = 0
+  · exact ⟨1, by norm_num, by simp [hr0]⟩
+  have hrp : 0 < r := lt_of_le_of_ne hr (Ne.symm hr0)
+  have hratio : 1 < R / r := (one_lt_div hrp).2 hrR
+  have hlog : 0 < Real.log (R / r) := Real.log_pos hratio
+  obtain ⟨N, hN⟩ := exists_nat_gt (2 / Real.log (R / r))
+  have hNp : (0 : ℝ) < N := lt_trans (by positivity) hN
+  have hNnat : 0 < N := by exact_mod_cast hNp
+  refine ⟨N ^ 2, pow_pos hNnat _, ?_⟩
+  have hexponent : 2 / (N : ℝ) < Real.log (R / r) := by
+    apply (div_lt_iff₀ hNp).2
+    have := (div_lt_iff₀ hlog).1 hN
+    nlinarith
+  have he : Real.exp (2 / (N : ℝ)) < R / r := by
+    rw [← Real.exp_log (div_pos hR hrp)]
+    exact Real.exp_lt_exp.mpr hexponent
+  rw [Nat.cast_pow, Real.sqrt_sq hNp.le]
+  calc
+    r / R * Real.exp (2 / (N : ℝ)) < r / R * (R / r) :=
+      mul_lt_mul_of_pos_left he (div_pos hrp hR)
+    _ = 1 := by field_simp [ne_of_gt hR, ne_of_gt hrp]
+
+/-- All strict subradii, including zero, with one natural parameter working
+simultaneously for every derivative order. This closes the radius quantifier
+for coefficient series only; no Taylor remainder is asserted. -/
+theorem polynomial_reciprocal_family_gevrey_all_radii
+    (P : ℕ → Polynomial ℝ) {C R : ℝ}
+    (hC : 0 < C) (hR : 0 < R)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m) :
+    ∀ r : ℝ, 0 ≤ r → r < R → ∃ L : ℕ, 0 < L ∧
+      (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 ∧ ∀ s : ℕ,
+      Summable (fun n : ℕ =>
+        |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+          (s.factorial : ℝ) * r ^ (n + 1)) ∧
+      (∑' n : ℕ, |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+          (s.factorial : ℝ) * r ^ (n + 1)) ≤
+        C / (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+          (64 * (L : ℝ) /
+            (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ s *
+          (s.factorial : ℝ) := by
+  intro r hr hrR
+  obtain ⟨L, hL, hσ⟩ := exists_reciprocal_gevrey_parameter hR hr hrR
+  exact ⟨L, hL, hσ, fun s => polynomial_reciprocal_family_gevrey
+    P s L hC hR hr hL hdegree hsample hσ⟩
 
 end RhAstraSynthesis

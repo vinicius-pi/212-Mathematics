@@ -181,9 +181,50 @@ theorem reciprocal_polynomial_family_gevrey
   RhAstraSynthesis.polynomial_reciprocal_family_gevrey P s L hC hR hr hL
     hdegree hsample hσ
 
+theorem exists_reciprocal_gevrey_parameter {R r : ℝ}
+    (hR : 0 < R) (hr : 0 ≤ r) (hrR : r < R) :
+    ∃ L : ℕ, 0 < L ∧ (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 :=
+  RhAstraSynthesis.exists_reciprocal_gevrey_parameter hR hr hrR
+
+theorem polynomial_reciprocal_family_gevrey_all_radii
+    (P : ℕ → Polynomial ℝ) {C R : ℝ}
+    (hC : 0 < C) (hR : 0 < R)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m) :
+    ∀ r : ℝ, 0 ≤ r → r < R → ∃ L : ℕ, 0 < L ∧
+      (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 ∧ ∀ s : ℕ,
+      Summable (fun n : ℕ =>
+        |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+          (s.factorial : ℝ) * r ^ (n + 1)) ∧
+      (∑' n : ℕ, |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
+          (s.factorial : ℝ) * r ^ (n + 1)) ≤
+        C / (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+          (64 * (L : ℝ) /
+            (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ s *
+          (s.factorial : ℝ) :=
+  RhAstraSynthesis.polynomial_reciprocal_family_gevrey_all_radii P hC hR hdegree hsample
+
 end Signatures
 
 section Examples
+
+/-- The nonconstant family `P_m = X` at the genuine subradius `r = 1/2`:
+no small-radius exponential hypothesis is supplied. -/
+example : Summable (fun n : ℕ =>
+    |((Polynomial.derivative^[1]) (Polynomial.X : Polynomial ℝ)).eval 0| /
+      (Nat.factorial 1 : ℝ) * (1 / 2 : ℝ) ^ (n + 1)) := by
+  obtain ⟨L, hL, hσ, hall⟩ := polynomial_reciprocal_family_gevrey_all_radii
+    (fun _ => (Polynomial.X : Polynomial ℝ)) (C := 1) (R := 1)
+    (by norm_num) (by norm_num)
+    (fun m hm => by simpa using Nat.succ_le_of_lt hm)
+    (fun m hm k hk => by
+      have hkreal : (1 : ℝ) ≤ k := by exact_mod_cast Nat.succ_le_of_lt hk
+      simp only [Polynomial.eval_X, div_one, one_pow, mul_one]
+      rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
+      exact (div_le_one (by positivity)).2 hkreal)
+    (1 / 2) (by norm_num) (by norm_num)
+  exact (hall 1).1
 
 /-- A nonconstant family with a nonzero first derivative at every index and
 positive radius: `P_m = X`, `C = R = L = 1`, `r = exp(-2)/2`, `σ = 1/2`. -/
@@ -335,6 +376,8 @@ example :
 
 end Examples
 
+#print axioms exists_reciprocal_gevrey_parameter
+#print axioms polynomial_reciprocal_family_gevrey_all_radii
 #print axioms reciprocal_polynomial_family_gevrey
 #print axioms RhAstraSynthesis.polynomial_reciprocal_family_pointwise
 #print axioms reciprocal_interval_factorial_bound
