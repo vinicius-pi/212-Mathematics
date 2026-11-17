@@ -66,6 +66,42 @@ class ReciprocalTaylorRemainderProbes(unittest.TestCase):
         self.assertGreater(Q(1, L * m - 1), Q(1, L * m))
         self.assertEqual(Q(1, L * m), Q(1, 6))
 
+    def test_large_degree_scaled_bound_exact(self):
+        # The exponential is >= 1. Test the stronger algebraic estimate with
+        # our l1 coefficient bound B, including p=0 and every s>m zero term.
+        count = 0
+        for m in range(1, 9):
+            coeffs = [Q((-1)**s * (s + 1), m + 1) for s in range(m + 1)]
+            B = sum(map(abs, coeffs))
+            for L in (1, 2, 5):
+                for n in sorted({1, max(1, L * m - 1), L * m}):
+                    for p in range(m + 4):
+                        lhs = n**p * abs(remainder(coeffs, p, Q(1, n)))
+                        rhs = B * L**p * m**p + B * L**p * sum(
+                            (Q(8**s * m**(p + 2*s), factorial(2*s))
+                             for s in range(p)), Q(0))
+                        self.assertLessEqual(lhs, rhs)
+                        for s in range(m + 1, p):
+                            self.assertEqual(coeffs[s] if s < len(coeffs) else 0, 0)
+                        count += 1
+        self.assertGreater(count, 500)
+
+    def test_mixed_factorials_and_finite_geometric_collapse(self):
+        for p in range(21):
+            for s in range(p + 1):
+                self.assertLessEqual(factorial(p + 2*s),
+                                     8**p * factorial(2*s) * factorial(p))
+            for sigma in (Q(0), Q(1, 2), Q(9, 10)):
+                d = 1 - sigma
+                finite = sum((Q(8**s, 1) / d**(p + 2*s + 1)
+                              for s in range(p)), Q(0))
+                geometric = (1 + 8 / d**2)**p / d**(p + 1)
+                self.assertLessEqual(finite, geometric)
+                # Mixed-moment factorial loss and the finite s-sum collapse
+                # to a single order-p factorial with a radius-only base.
+                self.assertLessEqual(8**p * finite * factorial(p),
+                                     Q(1, 1) / d * (72 / d**3)**p * factorial(p))
+
     def test_lagrange_factorial_not_vector_bound_factorial(self):
         # For X^p the normalized p-th derivative is exactly 1, and the
         # remainder is x^p. Using the vector mean bound loses a factor p.

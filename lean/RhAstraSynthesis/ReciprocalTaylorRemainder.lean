@@ -134,6 +134,94 @@ theorem polynomial_reciprocal_taylor_remainder_bound
   · rw [reciprocal_taylor_remainder_zero P m p hdegree (by omega) hx, abs_zero]
     positivity
 
+/-- Coefficient control at zero, including orders strictly above the degree. -/
+lemma reciprocal_coefficient_bound (P : Polynomial ℝ) (B : ℝ) (L m s : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m)
+    (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ k : ℕ, 0 < k → |P.eval (1 / (k : ℝ))| ≤ B) :
+    |P.coeff s| ≤ (Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
+      (((8 * (L : ℝ)) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ)) := by
+  by_cases hs : s ≤ m
+  · have hb := polynomial_reciprocal_sample_factorial_bound
+      P B L m s hB hL hm hs hdegree hsample (x := 0) ⟨le_rfl, by positivity⟩
+    rw [← reciprocal_normalized_derivative_coeff P s, abs_div,
+      abs_of_pos (by positivity : (0 : ℝ) < (s.factorial : ℝ))]
+    exact hb
+  · have hz := Polynomial.iterate_derivative_eq_zero
+      (hdegree.trans_lt (Nat.lt_of_not_ge hs))
+    have hc := reciprocal_normalized_derivative_coeff P s
+    rw [hz] at hc
+    have hc0 : P.coeff s = 0 := by simpa using hc.symm
+    rw [hc0, abs_zero]
+    positivity
+
+/-- Direct large-degree estimate. Unlike interval Taylor control, this uses the
+sample at the target and coefficient bounds only at zero. No restriction `p ≤ m`
+is imposed; coefficients above the degree are handled by vanishing. -/
+theorem polynomial_reciprocal_large_degree_remainder_bound
+    (P : Polynomial ℝ) (B : ℝ) (L m n p : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m) (hn : 0 < n)
+    (hlarge : n ≤ L * m) (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ k : ℕ, 0 < k → |P.eval (1 / (k : ℝ))| ≤ B) :
+    (n : ℝ) ^ p * |P.eval (1 / (n : ℝ)) -
+      (∑ s ∈ Finset.range p, P.coeff s * (1 / (n : ℝ)) ^ s)| ≤
+      B * (L : ℝ) ^ p * (m : ℝ) ^ p +
+        Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B * (L : ℝ) ^ p *
+          ∑ s ∈ Finset.range p,
+            (8 : ℝ) ^ s * (m : ℝ) ^ (p + 2 * s) / ((2 * s).factorial : ℝ) := by
+  have hnreal : (0 : ℝ) < n := by exact_mod_cast hn
+  have hnm : (n : ℝ) ≤ (L : ℝ) * (m : ℝ) := by exact_mod_cast hlarge
+  have hterm (s : ℕ) (hs : s ∈ Finset.range p) :
+      (n : ℝ) ^ p * |P.coeff s * (1 / (n : ℝ)) ^ s| ≤
+        Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B * (L : ℝ) ^ p *
+          ((8 : ℝ) ^ s * (m : ℝ) ^ (p + 2 * s) / ((2 * s).factorial : ℝ)) := by
+    have hsp : s ≤ p := (Finset.mem_range.mp hs).le
+    have he : p = s + (p - s) := by omega
+    have hmexp : 3 * s + (p - s) = p + 2 * s := by omega
+    have hb := reciprocal_coefficient_bound P B L m s hB hL hm hdegree hsample
+    calc
+      _ = |P.coeff s| * (n : ℝ) ^ (p - s) := by
+        rw [abs_mul, abs_of_nonneg (by positivity : (0 : ℝ) ≤ (1 / (n : ℝ)) ^ s)]
+        conv_lhs => rw [he, pow_add]
+        field_simp [ne_of_gt hnreal]
+        <;> ring
+      _ ≤ ((Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
+          (((8 * (L : ℝ)) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ))) *
+            ((L : ℝ) * (m : ℝ)) ^ (p - s) := by
+        exact mul_le_mul hb (by gcongr) (by positivity) (by positivity)
+      _ = _ := by
+        rw [mul_pow, mul_pow]
+        have hLp : (L : ℝ) ^ s * (L : ℝ) ^ (p - s) = (L : ℝ) ^ p := by
+          rw [← pow_add, ← he]
+        have hmp : (m : ℝ) ^ (3 * s) * (m : ℝ) ^ (p - s) =
+            (m : ℝ) ^ (p + 2 * s) := by rw [← pow_add, hmexp]
+        simp only [div_eq_mul_inv]
+        calc
+          _ = (Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
+              ((L : ℝ) ^ s * (L : ℝ) ^ (p - s)) *
+              ((8 : ℝ) ^ s * ((m : ℝ) ^ (3 * s) * (m : ℝ) ^ (p - s)) *
+                (((2 * s).factorial : ℝ))⁻¹) := by ring
+          _ = _ := by rw [hLp, hmp]; ring
+  calc
+    _ ≤ (n : ℝ) ^ p * (|P.eval (1 / (n : ℝ))| +
+        ∑ s ∈ Finset.range p, |P.coeff s * (1 / (n : ℝ)) ^ s|) := by
+      gcongr
+      exact (abs_sub _ _).trans (add_le_add_left (abs_sum_le_sum_abs _ _) _)
+    _ = (n : ℝ) ^ p * |P.eval (1 / (n : ℝ))| +
+        ∑ s ∈ Finset.range p, (n : ℝ) ^ p * |P.coeff s * (1 / (n : ℝ)) ^ s| := by
+      rw [mul_add, Finset.mul_sum]
+    _ ≤ B * (L : ℝ) ^ p * (m : ℝ) ^ p +
+        ∑ s ∈ Finset.range p,
+          Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B * (L : ℝ) ^ p *
+            ((8 : ℝ) ^ s * (m : ℝ) ^ (p + 2 * s) / ((2 * s).factorial : ℝ)) := by
+      apply add_le_add
+      · calc
+          _ ≤ ((L : ℝ) * (m : ℝ)) ^ p * B :=
+            mul_le_mul (by gcongr) (hsample n hn) (abs_nonneg _) (by positivity)
+          _ = _ := by rw [mul_pow]; ring
+      · exact Finset.sum_le_sum hterm
+    _ = _ := by rw [Finset.mul_sum]
+
 /-- A genuine nonzero remainder at the boundary `n = Lm`: `X²`, `p = 2`.
 This is not a witness whose remainder vanishes for degree reasons. -/
 theorem reciprocal_taylor_nonzero_witness :

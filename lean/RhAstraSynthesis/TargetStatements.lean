@@ -221,6 +221,15 @@ theorem polynomial_reciprocal_family_gevrey_all_radii
 
 end Signatures
 
+/-- Large-degree bridge, including the shared boundary `n=Lm` and order zero.
+This is a finite-polynomial bound, not the full profile remainder theorem. -/
+abbrev reciprocal_large_degree_remainder :=
+  @RhAstraSynthesis.polynomial_reciprocal_large_degree_remainder_bound
+
+/-- Mixed moments retain `(2s)!` with `s≤p`; convergence is part of the result. -/
+abbrev reciprocal_mixed_geometric_moment :=
+  @RhAstraSynthesis.mixed_geometric_gevrey_moment
+
 /-- Closed complex subdisks: one parameter for every order and point, with
 absolute convergence and uniform convergence of partial sums included.
 The complete explicit signature is in `ReciprocalCoefficientProfile`. -/
@@ -232,6 +241,25 @@ abbrev reciprocal_profiles_holomorphic :=
   @RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic
 
 section Examples
+
+/-- Large-degree side immediately below `Lm=4`, with a nonzero remainder. -/
+example :
+    (3 : ℝ) ^ 2 * |(Polynomial.X ^ 2 : Polynomial ℝ).eval (1 / 3) -
+      (∑ s ∈ Finset.range 2,
+        (Polynomial.X ^ 2 : Polynomial ℝ).coeff s * (1 / 3 : ℝ) ^ s)| = 1 := by
+  norm_num [Finset.sum_range_succ, Polynomial.coeff_X_pow]
+
+/-- Above-degree terms must vanish even though the majorant stays positive. -/
+example :
+    (Polynomial.X ^ 2 : Polynomial ℝ).eval (1 / 3) -
+      (∑ s ∈ Finset.range 4,
+        (Polynomial.X ^ 2 : Polynomial ℝ).coeff s * (1 / 3 : ℝ) ^ s) = 0 := by
+  norm_num [Finset.sum_range_succ, Polynomial.coeff_X_pow]
+
+/-- Mixed order `s=1<p=3` rather than only the diagonal `s=p`. -/
+example : ((3 + 2 * 1).factorial : ℝ) / ((2 * 1).factorial : ℝ) ≤
+    (8 : ℝ) ^ 3 * (Nat.factorial 3 : ℝ) :=
+  factorial_mixed_moment_div_le 3 1 (by omega)
 
 /-- Nonzero second-order remainder at the small-degree boundary. -/
 example :
@@ -441,6 +469,8 @@ example :
 
 end Examples
 
+#print axioms reciprocal_large_degree_remainder
+#print axioms reciprocal_mixed_geometric_moment
 #print axioms exists_reciprocal_gevrey_parameter
 #print axioms reciprocal_complex_profiles
 #print axioms reciprocal_profiles_holomorphic

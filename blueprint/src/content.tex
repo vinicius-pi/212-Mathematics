@@ -428,6 +428,41 @@ close the infinite-family or fractional-grid remainder proposition below.
 \end{proof}
 
 
+\begin{lemma}[Finite large-degree reciprocal remainder and mixed moments]
+\label{lem:reciprocal-large-degree}
+\lean{RhAstraSynthesis.reciprocal_coefficient_bound, RhAstraSynthesis.polynomial_reciprocal_large_degree_remainder_bound, RhAstraSynthesis.factorial_mixed_moment_div_le, RhAstraSynthesis.mixed_geometric_gevrey_moment, RhAstraSynthesis.finite_mixed_geometric_bound}
+\uses{lem:reciprocal-taylor-remainder, lem:cubic-geometric-gevrey}
+Under the same polynomial and sample hypotheses, let $1\le n\le Lm$
+and $p\ge0$. Then
+\[
+ n^p\left|P(1/n)-\sum_{s<p}P_s n^{-s}\right|
+ \le BL^pm^p+e^{2m/\sqrt L}BL^p
+       \sum_{s<p}\frac{8^s m^{p+2s}}{(2s)!}.
+\]
+For $0\le s\le p$, $(p+2s)!/(2s)!\le8^p p!$.
+If $0\le\sigma<1$, the positive-index mixed moment series is summable and
+\[
+ \sum_{m\ge1}\frac{m^{p+2s}\sigma^m}{(2s)!}
+ \le\frac{8^p p!}{(1-\sigma)^{p+2s+1}}.
+\]
+Writing $d=1-\sigma$, the finite Taylor-index sum satisfies
+\[
+ \sum_{s<p}\frac{8^s}{d^{p+2s+1}}
+ \le\frac1d\left(\frac{1+8/d^2}{d}\right)^p.
+\]
+\end{lemma}
+\begin{proof}
+Multiply the triangle inequality by $n^p$. Bound the sampled value by $B$,
+and for each $s<p$ use $n^{p-s}\le(Lm)^{p-s}$ and the coefficient estimate
+at zero. For $s>m$ that coefficient is zero, not an application of a
+Markov inequality outside its order range. The mixed factorial bound follows
+from $\binom{p+2s}{p}\le2^{p+2s}\le8^p$. Apply the positive-index geometric
+moment theorem and sum the remaining geometric progression in $8/d^2$;
+$\sum_{s<p}a^s\le(1+a)^p$ for $a\ge0$ includes $p=0$.
+These are separate finite and summability results; no full remainder promotion
+is made here.
+\end{proof}
+
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
 \label{thm:open-gevrey-alpha}
 \uses{thm:markov-interior, thm:fractional-sharpness, thm:remez-exp-markov}

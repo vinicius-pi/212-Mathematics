@@ -67,6 +67,76 @@ theorem cubic_geometric_gevrey_majorant
             (s.factorial : ℝ) := by ring
         _ = _ := by rw [hp]
 
+/-- A finite geometric sum with a uniform exponential bound, including
+order zero. The recurrence avoids dividing by `1-a`. -/
+lemma finite_geometric_sum_le_add_one_pow (a : ℝ) (ha : 0 ≤ a) (p : ℕ) :
+    (∑ s ∈ Finset.range p, a ^ s) ≤ (1 + a) ^ p := by
+  induction p with
+  | zero => simp
+  | succ p ih =>
+    have hrec : (∑ s ∈ Finset.range (p + 1), a ^ s) =
+        1 + a * ∑ s ∈ Finset.range p, a ^ s := by
+      induction p with
+      | zero => simp
+      | succ p hp =>
+        rw [Finset.sum_range_succ, hp, Finset.sum_range_succ, pow_succ]
+        ring
+    rw [hrec, pow_succ]
+    have hone : (1 : ℝ) ≤ (1 + a) ^ p := one_le_pow₀ (by linarith)
+    nlinarith [mul_le_mul_of_nonneg_left ih ha]
+
+/-- Explicit finite Taylor-order summation. Together with the mixed moment
+bound this leaves only one order-`p` factorial, with a base depending on `σ`
+but not on `p`. -/
+lemma finite_mixed_geometric_bound (p : ℕ) {σ : ℝ} (hσ1 : σ < 1) :
+    (∑ s ∈ Finset.range p,
+      (8 : ℝ) ^ s / (1 - σ) ^ (p + 2 * s + 1)) ≤
+        1 / (1 - σ) * ((1 + 8 / (1 - σ) ^ 2) / (1 - σ)) ^ p := by
+  let d : ℝ := 1 - σ
+  have hd : 0 < d := sub_pos.mpr hσ1
+  have heq (s : ℕ) : (8 : ℝ) ^ s / d ^ (p + 2 * s + 1) =
+      (1 / d ^ (p + 1)) * (8 / d ^ 2) ^ s := by
+    rw [div_pow, ← pow_mul]
+    have hexp : p + 2 * s + 1 = (p + 1) + 2 * s := by omega
+    rw [hexp, pow_add]
+    simp only [div_eq_mul_inv, mul_inv_rev]
+    ring
+  change (∑ s ∈ Finset.range p, (8 : ℝ) ^ s / d ^ (p + 2 * s + 1)) ≤ _
+  calc
+    _ = (1 / d ^ (p + 1)) * ∑ s ∈ Finset.range p, (8 / d ^ 2) ^ s := by
+      rw [Finset.mul_sum]
+      exact Finset.sum_congr rfl (fun s _ => heq s)
+    _ ≤ (1 / d ^ (p + 1)) * (1 + 8 / d ^ 2) ^ p :=
+      mul_le_mul_of_nonneg_left
+        (finite_geometric_sum_le_add_one_pow _ (by positivity) p) (by positivity)
+    _ = _ := by
+      change _ = 1 / d * ((1 + 8 / d ^ 2) / d) ^ p
+      rw [div_pow, pow_succ]
+      simp only [div_eq_mul_inv, mul_inv_rev]
+      ring
+
+/-- Mixed moments for the large-degree regime, with convergence certified.
+The finite Taylor-order sum can use this bound separately for each `s < p`. -/
+theorem mixed_geometric_gevrey_moment (p s : ℕ) (hs : s ≤ p)
+    {σ : ℝ} (hσ : 0 ≤ σ) (hσ1 : σ < 1) :
+    Summable (fun k : ℕ =>
+      (((k + 1 : ℕ) : ℝ) ^ (p + 2 * s) * σ ^ (k + 1)) /
+        ((2 * s).factorial : ℝ)) ∧
+    (∑' k : ℕ, (((k + 1 : ℕ) : ℝ) ^ (p + 2 * s) * σ ^ (k + 1)) /
+      ((2 * s).factorial : ℝ)) ≤
+        (8 : ℝ) ^ p * (p.factorial : ℝ) / (1 - σ) ^ (p + 2 * s + 1) := by
+  obtain ⟨hm, hb⟩ := geometric_power_moment (p + 2 * s) hσ hσ1
+  have hsum := hm.div_const ((2 * s).factorial : ℝ)
+  refine ⟨hsum, ?_⟩
+  rw [tsum_div_const]
+  calc
+    _ ≤ (((p + 2 * s).factorial : ℝ) / (1 - σ) ^ (p + 2 * s + 1)) /
+        ((2 * s).factorial : ℝ) := div_le_div_of_nonneg_right hb (by positivity)
+    _ = (((p + 2 * s).factorial : ℝ) / ((2 * s).factorial : ℝ)) /
+        (1 - σ) ^ (p + 2 * s + 1) := by ring
+    _ ≤ _ := div_le_div_of_nonneg_right (factorial_mixed_moment_div_le p s hs)
+      (by positivity)
+
 /-- Normalize the exponential degree loss before summing over a family. -/
 theorem reciprocal_exponential_weight (m : ℕ) (r R L : ℝ) :
     Real.exp (2 * (m : ℝ) / Real.sqrt L) * (1 / R) ^ m * r ^ m =

@@ -37,6 +37,35 @@ theorem factorial_three_mul_le_eight_pow (s : ℕ) :
         (mul_le_mul_of_nonneg_right hchoose (Nat.zero_le _)) (Nat.zero_le _)
     _ = 8^s * (2*s).factorial * s.factorial := by ac_rfl
 
+/-- Mixed moment loss for the large-degree remainder. The Taylor index may
+be smaller than the remainder order; replacing it by the order before taking
+moments would lose the crucial denominator `(2s)!`. -/
+theorem factorial_mixed_moment_le (p s : ℕ) (hs : s ≤ p) :
+    (p + 2 * s).factorial ≤ 8 ^ p * (2 * s).factorial * p.factorial := by
+  have hc : (p + 2 * s).choose p ≤ 8 ^ p := by
+    calc
+      _ ≤ 2 ^ (p + 2 * s) := Nat.choose_le_two_pow _ _
+      _ ≤ 2 ^ (3 * p) := by gcongr; omega
+      _ = 8 ^ p := by rw [pow_mul]; norm_num
+  have hf := Nat.choose_mul_factorial_mul_factorial
+    (show p ≤ p + 2 * s by omega)
+  have hsub : p + 2 * s - p = 2 * s := by omega
+  rw [hsub] at hf
+  calc
+    _ = (p + 2 * s).choose p * p.factorial * (2 * s).factorial := hf.symm
+    _ ≤ 8 ^ p * p.factorial * (2 * s).factorial := by gcongr
+    _ = _ := by ac_rfl
+
+/-- Real form of the mixed factorial moment estimate. -/
+theorem factorial_mixed_moment_div_le (p s : ℕ) (hs : s ≤ p) :
+    ((p + 2 * s).factorial : ℝ) / ((2 * s).factorial : ℝ) ≤
+      (8 : ℝ) ^ p * (p.factorial : ℝ) := by
+  apply (div_le_iff₀ (by positivity : (0 : ℝ) < ((2 * s).factorial : ℝ))).2
+  have h : ((p + 2 * s).factorial : ℝ) ≤
+      (8 : ℝ) ^ p * ((2 * s).factorial : ℝ) * (p.factorial : ℝ) := by
+    exact_mod_cast factorial_mixed_moment_le p s hs
+  nlinarith
+
 /-- Cast of the factorial bound into real arithmetic for analytic estimates. -/
 theorem factorial_three_mul_le_eight_pow_real (s : ℕ) :
     (Nat.factorial (3*s) : ℝ) ≤
