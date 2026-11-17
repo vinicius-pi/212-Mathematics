@@ -2,7 +2,7 @@
 
 Lean 4 formalization (`leanprover/lean4:v4.34.0`, `mathlib@5ed2965256430c3649e86755f9576b54eca72435`) of polynomial extremal and Remez–Markov inequalities, coprime Möbius convolutions, and Mellin multiplier bounds, together with a Rocq `9.0` formalization of the finite rational signed-square envelope.
 
-All 44 Lean modules build without `sorry`, custom axioms, `native_decide`, or `Lean.ofReduceBool` under `lake build` and `leanchecker`, using only `[propext, Classical.choice, Quot.sound]`. Self-contained signatures and concrete examples live in [`TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean); theorem dependencies and proofs are summarized in the [Blueprint PDF](blueprint/src/print.pdf) ([`content.tex`](blueprint/src/content.tex)).
+All 49 Lean submodules build without `sorry`, custom axioms, `native_decide`, or `Lean.ofReduceBool` under `lake build` and `leanchecker`, using only `[propext, Classical.choice, Quot.sound]`. Self-contained signatures and concrete examples live in [`TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean); theorem dependencies and proofs are summarized in the [Blueprint PDF](blueprint/src/print.pdf) ([`content.tex`](blueprint/src/content.tex)).
 
 ## Headline Theorems
 
@@ -21,6 +21,35 @@ All 44 Lean modules build without `sorry`, custom axioms, `native_decide`, or `L
 | Affine Markov scaling & Gevrey factorial | `markovAffineTransfer`, `gevreyFactorialBound` | Factor $(2k)^s$ on $[0, 1/k]$; $(3k)!/(2k)! \le 8^k k!$ |
 | Cubic sharpness witness on $\{1/n\}$ | `cubicSharpnessBound` | $\lvert P_{m,m}(1/n)\rvert \le 1$, $\deg P_{m,m} \le 2m$, $\lvert P_{m,m}'(0)\rvert \ge 2m^3 > m^2$ |
 | Fractional $\{n^{-\alpha}\}$ envelope & $n^{-1/2}$ witness | `fractionalRemezEnvelope`, `sqrtSharpnessDerivative` | $T_m(2(Lm)^{-\alpha}/e - 1) \le \exp(2m\sqrt{\alpha/L})$; $\lvert Q_{m,m}'(0)\rvert \ge 2m^{5/2}$ |
+
+### Reciprocal Gevrey-1 expansion
+
+For real polynomials `P_m` with degree at most `m` and sample bounds
+`|P_m(1/k)| ≤ C R^(-m)` for all positive `m,k`, where `C,R > 0`, define
+`q_n(u) = 1 + ∑_{m≥1} P_m(1/n) u^m` and
+`F_s(u) = ∑_{m≥1} ([X^s]P_m) u^m`.
+The theorem `polynomial_reciprocal_gevrey_expansion` proves that for every
+`0 ≤ r < R` there is one natural `L > 0`, chosen before all positive `n,p`
+and all complex `u` with `|u| ≤ r`, such that, writing
+`d = 1 - (r/R) exp(2/√L) > 0`,
+
+```text
+|q_n(u) - (1 + ∑_{s<p} F_s(u) n^(-s))|
+  ≤ (3C/d) (72L/d³)^p p! / n^p.
+```
+
+The sampled series converges absolutely, and its remainder is identified with
+the convergent series of polynomial remainders. Separately,
+`polynomial_reciprocal_profiles_all_radii` proves absolute and uniform
+convergence of each coefficient profile on closed subdisks, with bound
+`|F_s(u)| ≤ (C/d)(64L/d³)^s s!`; `polynomial_reciprocal_profiles_holomorphic`
+proves their holomorphy on the open disk. The explicit constant `1` is not
+part of `F_0`: the full zeroth profile is `1 + F_0`.
+
+These are reciprocal-sample results, not the open fractional-grid
+Gevrey-alpha extension. No separate sampled-function holomorphy theorem or
+mathematical originality/upstream acceptance claim is asserted here.
+See the [proof dependency map](docs/RECIPROCAL_REMAINDER_GAP_MAP.md).
 
 ### 2. Multiplicative Convolutions, Euler Products & Arithmetic Identities
 
@@ -47,7 +76,7 @@ All 44 Lean modules build without `sorry`, custom axioms, `native_decide`, or `L
 
 ## Repository Layout
 
-- [`lean/RhAstraSynthesis.lean`](lean/RhAstraSynthesis.lean) — Root module (`44` submodules).
+- [`lean/RhAstraSynthesis.lean`](lean/RhAstraSynthesis.lean) — Root module (`49` submodules).
 - [`lean/RhAstraSynthesis/MainTheorems.lean`](lean/RhAstraSynthesis/MainTheorems.lean) — Theorem index with `#print axioms` checks.
 - [`lean/RhAstraSynthesis/TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean) — Self-contained theorem signatures and concrete examples.
 - [`rocq/`](rocq/) — Rocq `9.0` finite rational signed-square envelope and sharpness counterexample (`rocqchk`).

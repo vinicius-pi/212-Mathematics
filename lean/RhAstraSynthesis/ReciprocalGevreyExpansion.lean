@@ -41,7 +41,7 @@ theorem reciprocal_sampled_summable
       mul_le_mul_of_nonneg_right (hsample (k + 1) (Nat.succ_pos k) n hn)
         (by positivity)
     _ = C * (‖u‖ / R) ^ (k + 1) := by
-      simp only [div_eq_mul_inv, mul_pow, one_pow, one_mul]
+      simp only [div_eq_mul_inv, mul_pow, one_mul]
       ring
 
 /-- The finite Taylor sum may be interchanged with the degree series because

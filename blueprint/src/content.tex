@@ -1,6 +1,6 @@
 \section{Chebyshev Extremal Bounds, Interior Markov, and Discrete Grids}
 
-We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). Unless otherwise noted, all theorems below are formalized across 18 modules of \texttt{RhAstraSynthesis} and verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}.
+We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). The polynomial and reciprocal Gevrey-1 chain occupies 23 modules of \texttt{RhAstraSynthesis}. Results marked complete are verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}; the fractional-grid remainder proposition remains open.
 
 \subsection{Bernstein--Van der Corput--Schaake and A. A. Markov's Interior Theorem}
 
@@ -136,6 +136,7 @@ Every $P \in \R[X]$ with $\deg P \le m$ and $|P| \le B$ on $[-1, 1]$ satisfies $
 \begin{lemma}[Uniform reciprocal-interval factorial bound]
 \label{lem:reciprocal-interval-factorial}
 \lean{RhAstraSynthesis.markov_reciprocal_interval_factorial_bound}
+\leanok
 \uses{thm:markov-general}
 For $L>0$, $m\ge1$, $0\le s\le m$, and $M\ge0$, if
 $\deg P\le m$ and $|P(t)|\le M$ on $[0,(Lm)^{-1}]$, then every
@@ -150,8 +151,7 @@ otherwise use $Q(t)=P(x-t)$. Both segments lie in the original interval.
 Apply the endpoint bound with parameter $2L$ and use
 $|Q^{(s)}(0)|=|P^{(s)}(x)|$. This is a factorial-strength bound with a
 $2^s$ loss, not the sharp higher-order interior Markov theorem.
-The Lean declaration is awaiting CI compilation; the full all-radii
-Gevrey-$\alpha$ extension below remains open.
+The full all-radii Gevrey-$\alpha$ extension below remains separate and open.
 \end{proof}
 
 \begin{theorem}[Reciprocal-grid good-set measure and Remez--Chebyshev envelope]
@@ -300,6 +300,7 @@ by vanishing. No fractional-grid or remainder assertion is made here.
 \begin{theorem}[Reciprocal polynomial-family Gevrey-1 coefficient bound]
 \label{thm:reciprocal-family-gevrey}
 \lean{RhAstraSynthesis.polynomial_reciprocal_family_gevrey}
+\leanok
 \uses{lem:cubic-geometric-gevrey, lem:reciprocal-interval-factorial, thm:remez-exp-markov}
 Let $P_m\in\mathbb R[X]$, $C,R>0$, $r\ge0$, and $L\in\mathbb N$ with $L>0$.
 Suppose for every $m\ge1$ that $\deg P_m\le m$ and
@@ -319,25 +320,27 @@ $|P_m^{(s)}(0)|r^m/s!\le C(8L)^s m^{3s}\sigma^m/(2s)!$;
 use $\exp(2m/\sqrt L)=\exp(2/\sqrt L)^m$.
 For $s>m$ the derivative vanishes. Apply
 Lemma~\ref{lem:cubic-geometric-gevrey}. This includes $s=0$ and $r=0$.
-The new family declarations await CI compilation. This separate coefficient-series
-result does not establish the all-radii fractional-grid remainder target below.
+This coefficient-series result does not establish the all-radii fractional-grid
+remainder target below.
 \end{proof}
 
 \begin{lemma}[Natural parameter at every strict subradius]
 \label{lem:reciprocal-all-radii-parameter}
 \lean{RhAstraSynthesis.exists_reciprocal_gevrey_parameter}
+\leanok
 For every $R>0$ and every real $0\le r<R$, there exists a natural
 $L>0$ with $\sigma=(r/R)\exp(2/\sqrt L)<1$.
 \end{lemma}
 \begin{proof}
 If $r=0$, take $L=1$. Otherwise $\log(R/r)>0$; choose a natural
 $N>2/\log(R/r)$ and put $L=N^2$. Then $N>0$ and
-$\exp(2/\sqrt L)<R/r$. The declaration awaits CI compilation.
+$\exp(2/\sqrt L)<R/r$.
 \end{proof}
 
 \begin{theorem}[All-radii reciprocal Gevrey-1 coefficient series]
 \label{thm:reciprocal-family-all-radii}
 \lean{RhAstraSynthesis.polynomial_reciprocal_family_gevrey_all_radii}
+\leanok
 \uses{lem:reciprocal-all-radii-parameter, thm:reciprocal-family-gevrey}
 Under the degree and sample hypotheses of
 Theorem~\ref{thm:reciprocal-family-gevrey}, for every real $0\le r<R$
@@ -349,13 +352,14 @@ $C(1-\sigma)^{-1}(64L/(1-\sigma)^3)^s s!$.
 \begin{proof}
 Choose $L$ by the preceding lemma and apply the existing family theorem
 for each $s$. This closes the universal radius quantifier, including zero,
-only for reciprocal coefficient series. The declaration awaits CI compilation;
-the fractional-grid and full remainder target below remains open.
+for reciprocal coefficient series. The full reciprocal remainder is established
+separately below; the fractional-grid target remains open.
 \end{proof}
 
 \begin{theorem}[Absolute weighted real reciprocal remainder series]
 \label{thm:reciprocal-absolute-remainder-series}
 \lean{RhAstraSynthesis.polynomial_reciprocal_family_remainder_gevrey}
+\leanok
 \uses{thm:reciprocal-family-gevrey, lem:reciprocal-taylor-remainder}
 Let $C,R>0$, $r\ge0$, and $L\ge1$ be a natural number. Suppose
 $\deg P_m\le m$ and $|P_m(1/k)|\le C R^{-m}$ for every $m,k\ge1$.
@@ -388,6 +392,7 @@ the fractional-grid target is unchanged.
 \begin{theorem}[Full reciprocal Gevrey-1 expansion on closed subdisks]
 \label{thm:reciprocal-full-gevrey-expansion}
 \lean{RhAstraSynthesis.reciprocal_sampled_summable, RhAstraSynthesis.reciprocal_complex_remainder_identity, RhAstraSynthesis.polynomial_reciprocal_gevrey_expansion}
+\leanok
 \uses{thm:reciprocal-absolute-remainder-series, lem:reciprocal-all-radii-parameter, thm:reciprocal-complex-profiles, thm:reciprocal-profile-holomorphy}
 Suppose $C,R>0$, $\deg P_m\le m$, and
 $|P_m(1/k)|\le CR^{-m}$ for every $m,k\ge1$. Define
@@ -423,7 +428,7 @@ $n=2$, $p=1$, $u=i/2$. This separate theorem treats only reciprocal samples,
 not the original $n^{-\alpha}$ generalization.
 \end{proof}
 
-\section{Open Analytic Extensions}
+\subsection{Reciprocal Profile Convergence and Finite Remainder Dependencies}
 \begin{theorem}[Complex reciprocal coefficient profiles on closed subdisks]
 \label{thm:reciprocal-complex-profiles}
 \lean{RhAstraSynthesis.reciprocalCoefficientProfile, RhAstraSynthesis.polynomial_reciprocal_profiles_all_radii}
@@ -446,9 +451,8 @@ The norm of the $n$th complex term is the real normalized absolute
 derivative times $|u|^{n+1}$, bounded by the summable radial majorant.
 Apply the triangle inequality for absolutely summable series and
 Mathlib's uniform series theorem on the closed subdisk.
-These convergence declarations were compiled and axiom-audited at commit
-\texttt{0235439} (CI run \texttt{43993607022}, zero compiler warnings).
-The full Taylor remainder theorem and the fractional-grid target remain open.
+This establishes profile convergence, independently of the full reciprocal
+remainder estimate above. No boundary convergence at radius $R$ is asserted.
 \end{proof}
 
 \begin{theorem}[Holomorphy of reciprocal coefficient profiles]
@@ -464,15 +468,16 @@ At each $u$ choose $|u|<r<R$. The closed radius-$r$ disk is a
 neighborhood of $u$ on which the polynomial partial sums converge uniformly.
 Thus convergence is locally uniform on the open radius-$R$ disk.
 Apply Mathlib's locally uniform limit theorem for holomorphic functions.
-The Lean proof and the nonconstant witness $P_m(t)=t$, $s=1$, $R=1$
-were checked at commit \texttt{eeee831} (CI run \texttt{43996597124}).
-No outer-boundary convergence, full Taylor remainder, or fractional-grid
-conclusion is asserted.
+The nonconstant witness $P_m(t)=t$, $s=1$, $R=1$ instantiates the theorem.
+This is coefficient-profile holomorphy, not a separate formal theorem of
+holomorphy for the sampled function $q_n$. No outer-boundary convergence or
+fractional-grid conclusion is asserted.
 \end{proof}
 
 \begin{lemma}[Finite small-degree reciprocal Taylor remainder]
 \label{lem:reciprocal-taylor-remainder}
 \lean{RhAstraSynthesis.reciprocal_normalized_derivative_coeff, RhAstraSynthesis.reciprocal_polynomial_lagrange, RhAstraSynthesis.reciprocal_taylor_remainder_zero, RhAstraSynthesis.polynomial_reciprocal_taylor_remainder_bound}
+\leanok
 \uses{lem:reciprocal-interval-factorial, thm:remez-exp-markov}
 Let $L,m,n,p$ be positive integers, $Lm\le n$, $B>0$, and
 $P\in\mathbb R[X]$ have degree at most $m$. Suppose
@@ -493,14 +498,15 @@ If $p\le m$, then $y\in[0,(Lm)^{-1}]$ and the sampled uniform
 factorial bound gives the displayed inequality, without losing a factor $p$.
 If $p>m$, the derivative vanishes. For $P=X^2$, $L=m=p=2$, $n=4$,
 the remainder is $1/16$, not zero.
-These new Lean declarations are uncompiled; this finite lemma does not
-close the infinite-family or fractional-grid remainder proposition below.
+This finite lemma supplies the small-degree input to the absolute real
+remainder-series theorem; it does not establish the fractional-grid proposition.
 \end{proof}
 
 
 \begin{lemma}[Finite large-degree reciprocal remainder and mixed moments]
 \label{lem:reciprocal-large-degree}
 \lean{RhAstraSynthesis.reciprocal_coefficient_bound, RhAstraSynthesis.polynomial_reciprocal_large_degree_remainder_bound, RhAstraSynthesis.factorial_mixed_moment_div_le, RhAstraSynthesis.mixed_geometric_gevrey_moment, RhAstraSynthesis.finite_mixed_geometric_bound}
+\leanok
 \uses{lem:reciprocal-taylor-remainder, lem:cubic-geometric-gevrey}
 Under the same polynomial and sample hypotheses, let $1\le n\le Lm$
 and $p\ge0$. Then
@@ -529,9 +535,11 @@ Markov inequality outside its order range. The mixed factorial bound follows
 from $\binom{p+2s}{p}\le2^{p+2s}\le8^p$. Apply the positive-index geometric
 moment theorem and sum the remaining geometric progression in $8/d^2$;
 $\sum_{s<p}a^s\le(1+a)^p$ for $a\ge0$ includes $p=0$.
-These are separate finite and summability results; no full remainder promotion
-is made here.
+These finite and summability results supply the complementary regime in the
+absolute real remainder-series theorem above.
 \end{proof}
+
+\section{Open Analytic Extensions}
 
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
 \label{thm:open-gevrey-alpha}
