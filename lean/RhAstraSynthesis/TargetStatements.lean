@@ -207,7 +207,32 @@ theorem polynomial_reciprocal_family_gevrey_all_radii
 
 end Signatures
 
+/-- Closed complex subdisks: one parameter for every order and point, with
+absolute convergence and uniform convergence of partial sums included.
+The complete explicit signature is in `ReciprocalCoefficientProfile`. -/
+abbrev reciprocal_complex_profiles :=
+  @RhAstraSynthesis.polynomial_reciprocal_profiles_all_radii
+
 section Examples
+
+/-- Every profile vanishes at the origin, including order zero. -/
+example (P : ℕ → Polynomial ℝ) : reciprocalCoefficientProfile P 0 0 = 0 := by
+  simp
+
+/-- Nonconstant family at a genuinely nonreal point in the closed half disk. -/
+example : Summable (fun n => ‖reciprocalProfileTerm
+    (fun _ => (Polynomial.X : Polynomial ℝ)) 1 n (Complex.I / 2)‖) := by
+  obtain ⟨L, hL, hσ, hall⟩ := reciprocal_complex_profiles
+    (fun _ => (Polynomial.X : Polynomial ℝ)) (C := 1) (R := 1)
+    (by norm_num) (by norm_num)
+    (fun m hm => by simpa using Nat.succ_le_of_lt hm)
+    (fun m hm k hk => by
+      have hkreal : (1 : ℝ) ≤ k := by exact_mod_cast Nat.succ_le_of_lt hk
+      simp only [Polynomial.eval_X, div_one, one_pow, mul_one]
+      rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
+      exact (div_le_one (by positivity)).2 hkreal)
+    (1 / 2) (by norm_num) (by norm_num)
+  exact ((hall 1).1 (Complex.I / 2) (by norm_num [norm_div])).1
 
 /-- The nonconstant family `P_m = X` at the genuine subradius `r = 1/2`:
 no small-radius exponential hypothesis is supplied. -/
@@ -377,6 +402,7 @@ example :
 end Examples
 
 #print axioms exists_reciprocal_gevrey_parameter
+#print axioms reciprocal_complex_profiles
 #print axioms polynomial_reciprocal_family_gevrey_all_radii
 #print axioms reciprocal_polynomial_family_gevrey
 #print axioms RhAstraSynthesis.polynomial_reciprocal_family_pointwise

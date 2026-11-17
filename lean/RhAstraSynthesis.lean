@@ -11,6 +11,7 @@ import RhAstraSynthesis.MarkovAlgebraicFactors
 import RhAstraSynthesis.MarkovFactorialNormalization
 import RhAstraSynthesis.GevreyMomentFactorial
 import RhAstraSynthesis.ReciprocalGevreyMajorant
+import RhAstraSynthesis.ReciprocalCoefficientProfile
 import RhAstraSynthesis.MarkovAffineTransport
 import RhAstraSynthesis.MarkovChebyshevEndpoint
 import RhAstraSynthesis.MarkovChebyshevGeneral

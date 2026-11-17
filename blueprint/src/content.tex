@@ -354,6 +354,32 @@ the fractional-grid and full remainder target below remains open.
 \end{proof}
 
 \section{Open Analytic Extensions}
+\begin{theorem}[Complex reciprocal coefficient profiles on closed subdisks]
+\label{thm:reciprocal-complex-profiles}
+\lean{RhAstraSynthesis.reciprocalCoefficientProfile, RhAstraSynthesis.polynomial_reciprocal_profiles_all_radii}
+\uses{thm:reciprocal-family-all-radii}
+Under the reciprocal family degree and sample hypotheses, define
+\[
+ F_s(u)=\sum_{n\ge0}\left(P_{n+1}^{(s)}(0)/s!\right)u^{n+1}.
+\]
+For each $0\le r<R$ there is one natural $L>0$, independent of both
+$s$ and $u$, with $\delta=1-(r/R)\exp(2/\sqrt L)>0$.
+On $|u|\le r$, this series is absolutely summable and
+\[
+ |F_s(u)|\le (C/\delta)(64L/\delta^3)^s s!.
+\]
+Its partial sums converge uniformly on that closed subdisk.
+\end{theorem}
+\begin{proof}
+The norm of the $n$th complex term is the real normalized absolute
+derivative times $|u|^{n+1}$, bounded by the summable radial majorant.
+Apply the triangle inequality for absolutely summable series and
+Mathlib's uniform series theorem on the closed subdisk.
+The new Lean proofs are written but not yet compiled or axiom-audited;
+this statement is not marked kernel-checked. Holomorphy on the open disk,
+the full Taylor remainder theorem, and the fractional-grid target remain open.
+\end{proof}
+
 
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
 \label{thm:open-gevrey-alpha}
