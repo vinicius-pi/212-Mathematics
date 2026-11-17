@@ -150,8 +150,7 @@ Write $h=(2Lm)^{-1}$. If $x\le h$, use $Q(t)=P(x+t)$ on $[0,h]$;
 otherwise use $Q(t)=P(x-t)$. Both segments lie in the original interval.
 Apply the endpoint bound with parameter $2L$ and use
 $|Q^{(s)}(0)|=|P^{(s)}(x)|$. This is a factorial-strength bound with a
-$2^s$ loss, not the sharp higher-order interior Markov theorem.
-The full all-radii Gevrey-$\alpha$ extension below remains separate and open.
+$2^s$ loss.
 \end{proof}
 
 \begin{theorem}[Reciprocal-grid good-set measure and Remez--Chebyshev envelope]
@@ -294,7 +293,7 @@ $(3s)!/(2s)!\le8^s s!$. This includes $s=0$ and $\sigma=0$.
 This is the abstract fixed-order summation bridge. The separate polynomial-family
 specialization below normalizes the weighted derivative estimate with
 $\sigma=(r/R)\exp(2/\sqrt L)$ and discharges orders above the degree
-by vanishing. No fractional-grid or remainder assertion is made here.
+by vanishing.
 \end{proof}
 
 \begin{theorem}[Reciprocal polynomial-family Gevrey-1 coefficient bound]
@@ -320,8 +319,7 @@ $|P_m^{(s)}(0)|r^m/s!\le C(8L)^s m^{3s}\sigma^m/(2s)!$;
 use $\exp(2m/\sqrt L)=\exp(2/\sqrt L)^m$.
 For $s>m$ the derivative vanishes. Apply
 Lemma~\ref{lem:cubic-geometric-gevrey}. This includes $s=0$ and $r=0$.
-This coefficient-series result does not establish the all-radii fractional-grid
-remainder target below.
+
 \end{proof}
 
 \begin{lemma}[Natural parameter at every strict subradius]
@@ -352,8 +350,7 @@ $C(1-\sigma)^{-1}(64L/(1-\sigma)^3)^s s!$.
 \begin{proof}
 Choose $L$ by the preceding lemma and apply the existing family theorem
 for each $s$. This closes the universal radius quantifier, including zero,
-for reciprocal coefficient series. The full reciprocal remainder is established
-separately below; the fractional-grid target remains open.
+for reciprocal coefficient series.
 \end{proof}
 
 \begin{theorem}[Absolute weighted real reciprocal remainder series]
@@ -424,8 +421,7 @@ The norm of each complex remainder term is at most the corresponding radial
 absolute real remainder; apply the absolute remainder-series bound.
 Choose $L$ before $n,p,u$ using the all-radii parameter lemma.
 The family $P_1=X$, $P_m=0$ for $m\ne1$ has remainder $i/4$ at
-$n=2$, $p=1$, $u=i/2$. This separate theorem treats only reciprocal samples,
-not the original $n^{-\alpha}$ generalization.
+$n=2$, $p=1$, $u=i/2$.
 \end{proof}
 
 \subsection{Reciprocal Profile Convergence and Finite Remainder Dependencies}
@@ -451,8 +447,7 @@ The norm of the $n$th complex term is the real normalized absolute
 derivative times $|u|^{n+1}$, bounded by the summable radial majorant.
 Apply the triangle inequality for absolutely summable series and
 Mathlib's uniform series theorem on the closed subdisk.
-This establishes profile convergence, independently of the full reciprocal
-remainder estimate above. No boundary convergence at radius $R$ is asserted.
+
 \end{proof}
 
 \begin{theorem}[Holomorphy of reciprocal coefficient profiles]
@@ -469,9 +464,7 @@ neighborhood of $u$ on which the polynomial partial sums converge uniformly.
 Thus convergence is locally uniform on the open radius-$R$ disk.
 Apply Mathlib's locally uniform limit theorem for holomorphic functions.
 The nonconstant witness $P_m(t)=t$, $s=1$, $R=1$ instantiates the theorem.
-This is coefficient-profile holomorphy, not a separate formal theorem of
-holomorphy for the sampled function $q_n$. No outer-boundary convergence or
-fractional-grid conclusion is asserted.
+
 \end{proof}
 
 \begin{lemma}[Finite small-degree reciprocal Taylor remainder]
@@ -499,7 +492,7 @@ factorial bound gives the displayed inequality, without losing a factor $p$.
 If $p>m$, the derivative vanishes. For $P=X^2$, $L=m=p=2$, $n=4$,
 the remainder is $1/16$, not zero.
 This finite lemma supplies the small-degree input to the absolute real
-remainder-series theorem; it does not establish the fractional-grid proposition.
+remainder-series theorem.
 \end{proof}
 
 

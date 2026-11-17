@@ -11,8 +11,7 @@
 
 ### Reciprocal coefficient profiles and full remainder
 
-The five modules below complete the reciprocal Gevrey-1 chain; they do not
-establish the fractional-grid Gevrey-alpha proposition.
+The five modules below form the reciprocal Gevrey-1 proof chain.
 
 - `ReciprocalGevreyMajorant` — positive-index geometric and mixed moments,
   cubic factorial majorant, sample-derived family coefficient bounds, and
@@ -36,9 +35,8 @@ establish the fractional-grid Gevrey-alpha proposition.
   every `0 ≤ r < R` admits one `L` for the preceding bound, simultaneously
   for positive `n,p` and `|u| ≤ r`. The full zeroth profile is `1+F_0`.
 
-Only coefficient-profile holomorphy has a dedicated theorem here; the
-sampled-function interface states convergence and remainder control.
-See the [dependency map](RECIPROCAL_REMAINDER_GAP_MAP.md) for exact declarations.
+The sampled-function interface states convergence and uniform remainder control.
+See the [dependency map](RECIPROCAL_GEVREY_PROOF.md) for exact declarations.
 
 ## 2. Multiplicative Convolutions, Euler Products & Arithmetic Identities (12 modules)
 

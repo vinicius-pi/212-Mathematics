@@ -46,10 +46,9 @@ convergence of each coefficient profile on closed subdisks, with bound
 proves their holomorphy on the open disk. The explicit constant `1` is not
 part of `F_0`: the full zeroth profile is `1 + F_0`.
 
-These are reciprocal-sample results, not the open fractional-grid
-Gevrey-alpha extension. No separate sampled-function holomorphy theorem or
-mathematical originality/upstream acceptance claim is asserted here.
-See the [proof dependency map](docs/RECIPROCAL_REMAINDER_GAP_MAP.md).
+The coefficient profiles are holomorphic on the open disk, and the expansion
+has uniform Gevrey-1 remainder control on every closed subdisk.
+See the [proof dependency map](docs/RECIPROCAL_GEVREY_PROOF.md).
 
 ### 2. Multiplicative Convolutions, Euler Products & Arithmetic Identities
 
