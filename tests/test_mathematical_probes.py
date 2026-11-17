@@ -89,6 +89,37 @@ def eval_poly(coeffs: list[Fraction], x: Fraction) -> Fraction:
 
 
 class MathematicalProbesTests(unittest.TestCase):
+    def test_geometric_power_moment_uniform_bound(self):
+        # Apply (sigma d/dsigma)^j to 1/(1-sigma), using exact rational
+        # generating functions P_j(sigma)/(1-sigma)^(j+1). Remove m=0
+        # only at j=0: this explicitly probes the 0^0 indexing trap.
+        ratios = (Fraction(0), Fraction(1, 1000), Fraction(1, 2),
+                  Fraction(9, 10), Fraction(99, 100), Fraction(999, 1000))
+        polynomial = [Fraction(1)]
+        for j in range(13):
+            for sigma in ratios:
+                with self.subTest(j=j, sigma=sigma):
+                    moment = eval_poly(polynomial, sigma) / (1 - sigma) ** (j + 1)
+                    if j == 0:
+                        moment -= 1
+                        self.assertEqual(moment, sigma / (1 - sigma))
+                    self.assertGreaterEqual(moment, 0)
+                    self.assertLessEqual(moment, factorial(j) / (1 - sigma) ** (j + 1))
+                    if sigma == 0:
+                        self.assertEqual(moment, 0)
+                    if j == 2 and sigma == Fraction(1, 2):
+                        self.assertEqual(moment, 6)
+            # P_{j+1} = sigma * ((1-sigma) P'_j + (j+1) P_j).
+            nxt = [Fraction(0)] * (len(polynomial) + 1)
+            for k, coefficient in enumerate(polynomial):
+                nxt[k] += k * coefficient
+                nxt[k + 1] += (j + 1 - k) * coefficient
+            polynomial = nxt
+        # Exact termwise majorant used in Lean, including j=n=0.
+        for n in range(20):
+            for j in range(13):
+                self.assertLessEqual((n + 1) ** j, factorial(j) * comb(n + j, j))
+
     def test_reciprocal_sample_remez_factorial_bridge(self):
         # Exact normalization of the measure lower bound used by full Remez.
         # P(t)=t^m has |P(1/n)| <= 1 for every n>=1 (not just the probes).

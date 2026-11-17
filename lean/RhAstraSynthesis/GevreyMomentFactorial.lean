@@ -1,4 +1,5 @@
 import Mathlib.Data.Nat.Choose.Bounds
+import Mathlib.Analysis.SpecificLimits.Normed
 import Mathlib.Tactic
 
 /-!
@@ -58,5 +59,51 @@ theorem factorial_three_div_two_le_eight_factorial (s : ℕ) :
 example : (Nat.factorial 0 : ℝ) / (Nat.factorial 0 : ℝ) = 1 := by norm_num
 example : (Nat.factorial 3 : ℝ) / (Nat.factorial 2 : ℝ) ≤ 8 := by norm_num
 example : (Nat.factorial 6 : ℝ) / (Nat.factorial 4 : ℝ) ≤ 8^2 * 2 := by norm_num
+
+/-- A power is dominated by a rising factorial, in the form needed for the
+negative-binomial generating function. -/
+theorem power_le_factorial_mul_choose (n j : ℕ) :
+    (n + 1) ^ j ≤ j.factorial * (n + j).choose j := by
+  simpa only [Nat.ascFactorial_eq_factorial_mul_choose] using
+    Nat.pow_succ_le_ascFactorial (n + 1) j
+
+/-- Geometric power moments starting at `m = 1` are summable and have a
+factorial bound uniform in the ratio. The shift is intentional: at order zero
+the sum is `σ / (1 - σ)`, not `1 / (1 - σ)`.
+
+The majorant is the negative-binomial series, whose exact sum is provided by
+Mathlib's `hasSum_choose_mul_geometric_of_norm_lt_one`. -/
+theorem geometric_power_moment (j : ℕ) {σ : ℝ}
+    (hσ : 0 ≤ σ) (hσ1 : σ < 1) :
+    Summable (fun n : ℕ => ((n + 1 : ℕ) : ℝ) ^ j * σ ^ (n + 1)) ∧
+      (∑' n : ℕ, ((n + 1 : ℕ) : ℝ) ^ j * σ ^ (n + 1)) ≤
+        (j.factorial : ℝ) / (1 - σ) ^ (j + 1) := by
+  have hnorm : ‖σ‖ < 1 := by simpa [Real.norm_eq_abs, abs_of_nonneg hσ] using hσ1
+  have hmajor := (hasSum_choose_mul_geometric_of_norm_lt_one j hnorm).mul_left
+    (j.factorial : ℝ)
+  have hle (n : ℕ) :
+      ((n + 1 : ℕ) : ℝ) ^ j * σ ^ (n + 1) ≤
+        (j.factorial : ℝ) * ((n + j).choose j * σ ^ n) := by
+    have hp : ((n + 1 : ℕ) : ℝ) ^ j ≤
+        (j.factorial : ℝ) * ((n + j).choose j : ℝ) := by
+      exact_mod_cast power_le_factorial_mul_choose n j
+    have hpow : σ ^ (n + 1) ≤ σ ^ n := by
+      rw [pow_succ]
+      exact mul_le_of_le_one_right (pow_nonneg hσ n) hσ1.le
+    calc
+      _ ≤ ((j.factorial : ℝ) * ((n + j).choose j : ℝ)) * σ ^ n :=
+        mul_le_mul hp hpow (pow_nonneg hσ _) (by positivity)
+      _ = _ := by ring
+  have hsum : Summable (fun n : ℕ => ((n + 1 : ℕ) : ℝ) ^ j * σ ^ (n + 1)) :=
+    Summable.of_nonneg_of_le (fun n => by positivity) hle hmajor.summable
+  refine ⟨hsum, (hsum.tsum_le_tsum hle hmajor.summable).trans_eq ?_⟩
+  rw [hmajor.tsum_eq]
+  ring
+
+/-- The zero-order positive-index moment, including the endpoint `σ = 0`. -/
+theorem geometric_power_moment_zero {σ : ℝ} (hσ : 0 ≤ σ) (hσ1 : σ < 1) :
+    (∑' n : ℕ, ((n + 1 : ℕ) : ℝ) ^ 0 * σ ^ (n + 1)) = σ / (1 - σ) := by
+  simpa [pow_succ, div_eq_mul_inv, mul_comm] using
+    ((hasSum_geometric_of_lt_one hσ hσ1).mul_right σ).tsum_eq
 
 end RhAstraSynthesis

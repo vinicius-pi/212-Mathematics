@@ -1,4 +1,5 @@
 import RhAstraSynthesis.MainTheorems
+import RhAstraSynthesis.GevreyMomentFactorial
 
 /-!
 # Statement Signatures and Examples
@@ -139,9 +140,33 @@ theorem reciprocal_sample_factorial_bound
   RhAstraSynthesis.polynomial_reciprocal_sample_factorial_bound
     P B L m s hB hL hm hs hdegree hsample hx
 
+/-- Uniform positive-index geometric moment estimate, with convergence included. -/
+theorem geometric_power_moment_bound (j : ℕ) {σ : ℝ}
+    (hσ : 0 ≤ σ) (hσ1 : σ < 1) :
+    Summable (fun n : ℕ => ((n + 1 : ℕ) : ℝ) ^ j * σ ^ (n + 1)) ∧
+      (∑' n : ℕ, ((n + 1 : ℕ) : ℝ) ^ j * σ ^ (n + 1)) ≤
+        (j.factorial : ℝ) / (1 - σ) ^ (j + 1) :=
+  RhAstraSynthesis.geometric_power_moment j hσ hσ1
+
 end Signatures
 
 section Examples
+
+/-- A nonzero second moment at ratio `1/2`; the bound is `2! * 2^3 = 16`. -/
+example :
+    Summable (fun n : ℕ => ((n + 1 : ℕ) : ℝ) ^ 2 * (1 / 2 : ℝ) ^ (n + 1)) ∧
+      (∑' n : ℕ, ((n + 1 : ℕ) : ℝ) ^ 2 * (1 / 2 : ℝ) ^ (n + 1)) ≤ 16 := by
+  have h := geometric_power_moment_bound 2 (σ := (1 / 2 : ℝ))
+    (by norm_num) (by norm_num)
+  norm_num at h ⊢
+  exact h
+
+/-- Order zero starts at one: its value at ratio `1/2` is one, not two. -/
+example : (∑' n : ℕ, ((n + 1 : ℕ) : ℝ) ^ 0 * (1 / 2 : ℝ) ^ (n + 1)) = 1 := by
+  have h := RhAstraSynthesis.geometric_power_moment_zero
+    (σ := (1 / 2 : ℝ)) (by norm_num) (by norm_num)
+  norm_num at h ⊢
+  exact h
 
 /-- Nonconstant sampled witness with a nonzero highest derivative:
 `P(t) = t^2`, `B = 1`, `L = 2`, `m = s = 2`, at the midpoint `1/8`. -/
@@ -250,6 +275,8 @@ example :
 end Examples
 
 #print axioms reciprocal_interval_factorial_bound
+#print axioms geometric_power_moment_bound
+#print axioms RhAstraSynthesis.geometric_power_moment_zero
 #print axioms reciprocal_sample_exponential_bound
 #print axioms reciprocal_sample_factorial_bound
 #print axioms bernstein_van_der_corput_schaake
