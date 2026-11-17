@@ -110,7 +110,7 @@ theorem reciprocalCoefficientProfile_differentiableOn_of_uniform
     apply nhdsWithin_le_nhds
     exact Filter.mem_of_superset
       ((isOpen_lt continuous_norm continuous_const).mem_nhds hur)
-      (fun v hv => hv.le)
+      (fun v (hv : ‖v‖ < r) => (show ‖v‖ ≤ r from hv.le))
   apply hlocal.differentiableOn
     (Filter.Eventually.of_forall fun N => ?_) (isOpen_lt continuous_norm continuous_const)
   exact DifferentiableOn.fun_sum fun n _ =>
