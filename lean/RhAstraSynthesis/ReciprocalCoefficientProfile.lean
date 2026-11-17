@@ -9,6 +9,8 @@ The positive-index series converges uniformly on every closed subdisk, with
 one radius parameter controlling every Taylor order.
 -/
 
+noncomputable section
+
 namespace RhAstraSynthesis
 
 /-- The real normalized derivative is cast only after division by `s!`. -/
@@ -24,8 +26,8 @@ lemma norm_reciprocalProfileTerm (P : ℕ → Polynomial ℝ) (s n : ℕ) (u : �
     ‖reciprocalProfileTerm P s n u‖ =
       |((Polynomial.derivative^[s]) (P (n + 1))).eval 0| /
         (s.factorial : ℝ) * ‖u‖ ^ (n + 1) := by
-  simp [reciprocalProfileTerm, norm_mul, norm_pow, Complex.norm_real,
-    Real.norm_eq_abs, abs_div, abs_of_nonneg (Nat.cast_nonneg (s.factorial))]
+  simp only [reciprocalProfileTerm, norm_mul, norm_pow, Complex.norm_real,
+    Real.norm_eq_abs, abs_div, abs_of_nonneg (show (0 : ℝ) ≤ s.factorial by positivity)]
 
 lemma reciprocalProfileTerm_le (P : ℕ → Polynomial ℝ) (s n : ℕ)
     {r : ℝ} {u : ℂ} (hu : ‖u‖ ≤ r) :
