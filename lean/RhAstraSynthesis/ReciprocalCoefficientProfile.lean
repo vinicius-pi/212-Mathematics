@@ -1,5 +1,6 @@
 import RhAstraSynthesis.ReciprocalGevreyMajorant
 import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.Complex.LocallyUniformLimit
 import Mathlib.Analysis.Normed.Group.FunctionSeries
 
 /-!
@@ -88,6 +89,49 @@ theorem polynomial_reciprocal_profiles_all_radii
   obtain ⟨L, hL, hσ, hall⟩ := polynomial_reciprocal_family_gevrey_all_radii
     P hC hR hdegree hsample r hr hrR
   exact ⟨L, hL, hσ, fun s => reciprocalProfile_of_summable P s (hall s).1 (hall s).2⟩
+
+/-- Closed-subdisk uniform convergence suffices for holomorphy; no claim is
+made about convergence on the boundary of the outer disk. -/
+theorem reciprocalCoefficientProfile_differentiableOn_of_uniform
+    (P : ℕ → Polynomial ℝ) (s : ℕ) {R : ℝ}
+    (huniform : ∀ r : ℝ, 0 ≤ r → r < R →
+      TendstoUniformlyOn
+        (fun N u => ∑ n ∈ Finset.range N, reciprocalProfileTerm P s n u)
+        (reciprocalCoefficientProfile P s) Filter.atTop {u : ℂ | ‖u‖ ≤ r}) :
+    DifferentiableOn ℂ (reciprocalCoefficientProfile P s) {u : ℂ | ‖u‖ < R} := by
+  have hlocal : TendstoLocallyUniformlyOn
+      (fun N u => ∑ n ∈ Finset.range N, reciprocalProfileTerm P s n u)
+      (reciprocalCoefficientProfile P s) Filter.atTop {u : ℂ | ‖u‖ < R} := by
+    apply tendstoLocallyUniformlyOn_of_forall_exists_nhds
+    intro u hu
+    obtain ⟨r, hur, hrR⟩ := exists_between hu
+    refine ⟨{v : ℂ | ‖v‖ ≤ r}, ?_, huniform r ((norm_nonneg u).trans hur.le) hrR⟩
+    apply nhdsWithin_le_nhds
+    exact Filter.mem_of_superset
+      ((isOpen_lt continuous_norm continuous_const).mem_nhds hur)
+      (fun v hv => hv.le)
+  apply hlocal.differentiableOn
+    (Filter.Eventually.of_forall fun N => ?_) (isOpen_lt continuous_norm continuous_const)
+  exact DifferentiableOn.fun_sum fun n _ =>
+    (show Differentiable ℂ (reciprocalProfileTerm P s n) from
+      (differentiable_id.pow (n + 1)).const_mul _).differentiableOn
+
+/-- Every Taylor-order profile is holomorphic throughout the open radius-`R`
+disk under the same reciprocal sample hypotheses as the radial majorant. -/
+theorem polynomial_reciprocal_profiles_holomorphic
+    (P : ℕ → Polynomial ℝ) {C R : ℝ}
+    (hC : 0 < C) (hR : 0 < R)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m) :
+    ∀ s : ℕ, DifferentiableOn ℂ (reciprocalCoefficientProfile P s)
+      {u : ℂ | ‖u‖ < R} := by
+  intro s
+  apply reciprocalCoefficientProfile_differentiableOn_of_uniform
+  intro r hr hrR
+  obtain ⟨L, hL, hσ, hall⟩ :=
+    polynomial_reciprocal_profiles_all_radii P hC hR hdegree hsample r hr hrR
+  exact (hall s).2
 
 @[simp] theorem reciprocalCoefficientProfile_zero (P : ℕ → Polynomial ℝ) (s : ℕ) :
     reciprocalCoefficientProfile P s 0 = 0 := by

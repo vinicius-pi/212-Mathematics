@@ -49,6 +49,7 @@ abbrev markovAffineTransfer := @RhAstraSynthesis.markov_affine_interval_bound_tr
 abbrev gevreyFactorialBound := @RhAstraSynthesis.factorial_three_div_two_le_eight_factorial
 abbrev reciprocalGevreyMajorant := @RhAstraSynthesis.cubic_geometric_gevrey_majorant
 abbrev reciprocalComplexProfiles := @RhAstraSynthesis.polynomial_reciprocal_profiles_all_radii
+abbrev reciprocalProfilesHolomorphic := @RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic
 abbrev cubicSharpnessBound := @RhAstraSynthesis.reciprocalSharpnessWitness_cubic_lower_bound
 abbrev fractionalRemezEnvelope := @RhAstraSynthesis.fractional_remez_chebyshev_envelope
 abbrev sqrtSharpnessDerivative := @RhAstraSynthesis.sqrtSharpnessWitness_derivative_at_zero
@@ -93,6 +94,7 @@ abbrev negMinorNotPosSemidef := @RhAstraSynthesis.not_posSemidef_of_neg_two_by_t
 #print axioms gevreyFactorialBound
 #print axioms reciprocalGevreyMajorant
 #print axioms reciprocalComplexProfiles
+#print axioms reciprocalProfilesHolomorphic
 #print axioms cubicSharpnessBound
 #print axioms fractionalRemezEnvelope
 #print axioms sqrtSharpnessDerivative

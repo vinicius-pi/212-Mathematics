@@ -213,7 +213,26 @@ The complete explicit signature is in `ReciprocalCoefficientProfile`. -/
 abbrev reciprocal_complex_profiles :=
   @RhAstraSynthesis.polynomial_reciprocal_profiles_all_radii
 
+/-- Open-disk holomorphy of every reciprocal coefficient profile. -/
+abbrev reciprocal_profiles_holomorphic :=
+  @RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic
+
 section Examples
+
+/-- The nonconstant family `P_m = X` has a nonzero first-order coefficient
+at every positive index; its first-order profile is holomorphic on the unit disk. -/
+example : DifferentiableOn ℂ
+    (reciprocalCoefficientProfile (fun _ => (Polynomial.X : Polynomial ℝ)) 1)
+    {u : ℂ | ‖u‖ < 1} := by
+  apply reciprocal_profiles_holomorphic
+    (fun _ => (Polynomial.X : Polynomial ℝ)) (C := 1) (R := 1)
+    (by norm_num) (by norm_num)
+    (fun m hm => by simpa using Nat.succ_le_of_lt hm)
+    (fun m hm k hk => by
+      have hkreal : (1 : ℝ) ≤ k := by exact_mod_cast Nat.succ_le_of_lt hk
+      simp only [Polynomial.eval_X, div_one, one_pow, mul_one]
+      rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
+      exact (div_le_one (by positivity)).2 hkreal)
 
 /-- Every profile vanishes at the origin, including order zero. -/
 example (P : ℕ → Polynomial ℝ) : reciprocalCoefficientProfile P 0 0 = 0 := by
@@ -403,6 +422,7 @@ end Examples
 
 #print axioms exists_reciprocal_gevrey_parameter
 #print axioms reciprocal_complex_profiles
+#print axioms reciprocal_profiles_holomorphic
 #print axioms polynomial_reciprocal_family_gevrey_all_radii
 #print axioms reciprocal_polynomial_family_gevrey
 #print axioms RhAstraSynthesis.polynomial_reciprocal_family_pointwise

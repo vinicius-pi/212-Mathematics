@@ -357,6 +357,7 @@ the fractional-grid and full remainder target below remains open.
 \begin{theorem}[Complex reciprocal coefficient profiles on closed subdisks]
 \label{thm:reciprocal-complex-profiles}
 \lean{RhAstraSynthesis.reciprocalCoefficientProfile, RhAstraSynthesis.polynomial_reciprocal_profiles_all_radii}
+\leanok
 \uses{thm:reciprocal-family-all-radii}
 Under the reciprocal family degree and sample hypotheses, define
 \[
@@ -375,9 +376,27 @@ The norm of the $n$th complex term is the real normalized absolute
 derivative times $|u|^{n+1}$, bounded by the summable radial majorant.
 Apply the triangle inequality for absolutely summable series and
 Mathlib's uniform series theorem on the closed subdisk.
-The new Lean proofs are written but not yet compiled or axiom-audited;
-this statement is not marked kernel-checked. Holomorphy on the open disk,
-the full Taylor remainder theorem, and the fractional-grid target remain open.
+These convergence declarations were compiled and axiom-audited at commit
+\texttt{0235439} (CI run \texttt{43993607022}, zero compiler warnings).
+The full Taylor remainder theorem and the fractional-grid target remain open.
+\end{proof}
+
+\begin{theorem}[Holomorphy of reciprocal coefficient profiles]
+\label{thm:reciprocal-profile-holomorphy}
+\lean{RhAstraSynthesis.reciprocalCoefficientProfile_differentiableOn_of_uniform, RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic}
+\uses{thm:reciprocal-complex-profiles}
+Under the same degree and reciprocal sample hypotheses, for every $s\ge0$,
+the function $F_s$ is complex differentiable on $\{u:|u|<R\}$.
+\end{theorem}
+\begin{proof}
+At each $u$ choose $|u|<r<R$. The closed radius-$r$ disk is a
+neighborhood of $u$ on which the polynomial partial sums converge uniformly.
+Thus convergence is locally uniform on the open radius-$R$ disk.
+Apply Mathlib's locally uniform limit theorem for holomorphic functions.
+The Lean proof and the nonconstant witness $P_m(t)=t$, $s=1$, $R=1$
+are written but await parent CI compilation and axiom audit; this new
+statement is not yet marked kernel-checked. No outer-boundary convergence,
+full Taylor remainder, or fractional-grid conclusion is asserted.
 \end{proof}
 
 
