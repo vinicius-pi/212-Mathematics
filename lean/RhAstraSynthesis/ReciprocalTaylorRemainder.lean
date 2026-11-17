@@ -185,7 +185,6 @@ theorem polynomial_reciprocal_large_degree_remainder_bound
         conv_lhs => rw [he, pow_add]
         rw [div_pow, one_pow]
         field_simp [ne_of_gt hnreal]
-        <;> ring
       _ ≤ ((Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
           (((8 * (L : ℝ)) ^ s * (m : ℝ) ^ (3 * s)) / ((2 * s).factorial : ℝ))) *
             ((L : ℝ) * (m : ℝ)) ^ (p - s) := by

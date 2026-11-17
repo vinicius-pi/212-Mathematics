@@ -113,7 +113,6 @@ theorem polynomial_reciprocal_family_remainder_gevrey
         rw [← hw]
         dsimp [m]
         field_simp [ne_of_gt hnpos]
-        <;> ring
       change a k ≤ _ at hb'
       rw [heq] at hb'
       have ht0 : 0 ≤ T k := by dsimp [T]; positivity
@@ -155,13 +154,13 @@ theorem polynomial_reciprocal_family_remainder_gevrey
     apply bS.trans
     change C / d * (64 * (L : ℝ) / d ^ 3) ^ p * _ ≤ H
     dsimp [H]
-    gcongr <;> norm_num
+    gcongr
+    norm_num
   have hbaseT : (L : ℝ) / d ≤ 72 * (L : ℝ) / d ^ 3 := by
     have hLp : 0 ≤ (L : ℝ) := Nat.cast_nonneg L
     calc
       _ = ((L : ℝ) * d ^ 2) / d ^ 3 := by
         field_simp [ne_of_gt hd]
-        <;> ring
       _ ≤ _ := div_le_div_of_nonneg_right
         (by nlinarith [mul_nonneg hLp (sub_nonneg.mpr hd2)]) (by positivity)
   have hbaseU : 8 * (L : ℝ) * ((1 + 8 / d ^ 2) / d) ≤
@@ -170,7 +169,6 @@ theorem polynomial_reciprocal_family_remainder_gevrey
     calc
       _ = (8 * (L : ℝ) * (d ^ 2 + 8)) / d ^ 3 := by
         field_simp [ne_of_gt hd]
-        <;> ring
       _ ≤ _ := div_le_div_of_nonneg_right
         (by nlinarith [mul_nonneg hLp (sub_nonneg.mpr hd2)]) (by positivity)
   have bT : (∑' k, T k) ≤ H := by
@@ -205,7 +203,6 @@ theorem polynomial_reciprocal_family_remainder_gevrey
           r ^ (k + 1) := by
     dsimp [a]
     field_simp [ne_of_gt hnpos]
-    <;> ring
   refine ⟨(ha.div_const ((n : ℝ) ^ p)).congr heq, ?_⟩
   simp_rw [← heq]
   rw [tsum_div_const]

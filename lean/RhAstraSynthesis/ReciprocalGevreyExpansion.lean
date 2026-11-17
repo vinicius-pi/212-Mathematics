@@ -15,7 +15,7 @@ namespace RhAstraSynthesis
 
 /-- Sampled series, indexed by positive polynomial degree. -/
 def reciprocalSampledFunction (P : ℕ → Polynomial ℝ) (n : ℕ) (u : ℂ) : ℂ :=
-  1 + ∑' k : ℕ, ((P (k + 1)).eval (1 / (n : ℝ)) : ℂ) * u ^ (k + 1)
+  1 + ∑' k : ℕ, (((P (k + 1)).eval (1 / (n : ℝ)) : ℝ) : ℂ) * u ^ (k + 1)
 
 /-- Truncation with the degree-zero constant written explicitly. -/
 def reciprocalProfileExpansion (P : ℕ → Polynomial ℝ) (n p : ℕ) (u : ℂ) : ℂ :=
@@ -29,7 +29,7 @@ theorem reciprocal_sampled_summable
     (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
       |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m) :
     Summable (fun k : ℕ =>
-      ‖((P (k + 1)).eval (1 / (n : ℝ)) : ℂ) * u ^ (k + 1)‖) := by
+      ‖(((P (k + 1)).eval (1 / (n : ℝ)) : ℝ) : ℂ) * u ^ (k + 1)‖) := by
   have hratio : ‖u‖ / R < 1 := (div_lt_one hR).2 hu
   have hg := (geometric_power_moment 0 (div_nonneg (norm_nonneg u) hR.le) hratio).1
   simp only [pow_zero, one_mul] at hg
@@ -49,7 +49,7 @@ all coefficient-profile series converge. The two explicit constants cancel. -/
 theorem reciprocal_complex_remainder_identity
     (P : ℕ → Polynomial ℝ) (n p : ℕ) (u : ℂ)
     (hsample : Summable (fun k : ℕ =>
-      ((P (k + 1)).eval (1 / (n : ℝ)) : ℂ) * u ^ (k + 1)))
+      (((P (k + 1)).eval (1 / (n : ℝ)) : ℝ) : ℂ) * u ^ (k + 1)))
     (hprofile : ∀ s, Summable (fun k => reciprocalProfileTerm P s k u)) :
     reciprocalSampledFunction P n u - reciprocalProfileExpansion P n p u =
       ∑' k : ℕ, (((P (k + 1)).eval (1 / (n : ℝ)) -
@@ -66,13 +66,13 @@ theorem reciprocal_complex_remainder_identity
     rw [Summable.tsum_finsetSum hf]
     simp only [tsum_mul_right, reciprocalCoefficientProfile]
   calc
-    _ = (∑' k : ℕ, ((P (k + 1)).eval (1 / (n : ℝ)) : ℂ) * u ^ (k + 1)) -
+    _ = (∑' k : ℕ, (((P (k + 1)).eval (1 / (n : ℝ)) : ℝ) : ℂ) * u ^ (k + 1)) -
         (∑' k : ℕ, ∑ s ∈ Finset.range p,
           reciprocalProfileTerm P s k u * ((1 / (n : ℝ) : ℝ) : ℂ) ^ s) := by
       rw [hexchange]
       unfold reciprocalSampledFunction reciprocalProfileExpansion
       ring
-    _ = ∑' k : ℕ, (((P (k + 1)).eval (1 / (n : ℝ)) : ℂ) * u ^ (k + 1) -
+    _ = ∑' k : ℕ, ((((P (k + 1)).eval (1 / (n : ℝ)) : ℝ) : ℂ) * u ^ (k + 1) -
         ∑ s ∈ Finset.range p,
           reciprocalProfileTerm P s k u * ((1 / (n : ℝ) : ℝ) : ℂ) ^ s) :=
       (hsample.tsum_sub hfinite).symm
@@ -100,7 +100,7 @@ theorem polynomial_reciprocal_gevrey_expansion
       (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 ∧
       ∀ n p : ℕ, 0 < n → 0 < p → ∀ u : ℂ, ‖u‖ ≤ r →
         Summable (fun k : ℕ =>
-          ‖((P (k + 1)).eval (1 / (n : ℝ)) : ℂ) * u ^ (k + 1)‖) ∧
+          ‖(((P (k + 1)).eval (1 / (n : ℝ)) : ℝ) : ℂ) * u ^ (k + 1)‖) ∧
         reciprocalSampledFunction P n u - reciprocalProfileExpansion P n p u =
           (∑' k : ℕ, (((P (k + 1)).eval (1 / (n : ℝ)) -
             ∑ s ∈ Finset.range p, (P (k + 1)).coeff s * (1 / (n : ℝ)) ^ s : ℝ) : ℂ) *
