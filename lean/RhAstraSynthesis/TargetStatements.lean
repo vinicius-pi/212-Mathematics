@@ -297,7 +297,7 @@ section Examples
 
 /-- A finite-support nonconstant family, so its full complex remainder is
 nonzero, not merely its real polynomial remainder. -/
-def reciprocalExpansionWitness (m : ℕ) : Polynomial ℝ :=
+noncomputable def reciprocalExpansionWitness (m : ℕ) : Polynomial ℝ :=
   if m = 1 then Polynomial.X else 0
 
 theorem reciprocalExpansionWitness_hypotheses :
@@ -313,7 +313,7 @@ theorem reciprocalExpansionWitness_hypotheses :
   · intro m hm k hk
     by_cases hm1 : m = 1
     · have hkreal : (1 : ℝ) ≤ k := by exact_mod_cast Nat.succ_le_of_lt hk
-      simp only [reciprocalExpansionWitness, if_pos hm1, Polynomial.eval_X,
+      simp only [reciprocalExpansionWitness, ite_eq_left hm1, Polynomial.eval_X,
         div_one, one_pow, mul_one]
       rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
       exact (div_le_one (by positivity)).2 hkreal
@@ -325,12 +325,13 @@ theorem reciprocalExpansionWitness_nonzero :
       reciprocalProfileExpansion reciprocalExpansionWitness 2 1 (Complex.I / 2) =
         Complex.I / 4 ∧ (Complex.I / 4 : ℂ) ≠ 0 := by
   have hz : reciprocalCoefficientProfile reciprocalExpansionWitness 0 (Complex.I / 2) = 0 := by
-    apply tsum_eq_zero
-    intro k
-    simp only [reciprocalProfileTerm, reciprocal_normalized_derivative_coeff]
-    by_cases hk : k + 1 = 1 <;> simp [reciprocalExpansionWitness, hk]
+    have hterm (k : ℕ) : reciprocalProfileTerm reciprocalExpansionWitness 0 k
+        (Complex.I / 2) = 0 := by
+      simp only [reciprocalProfileTerm, reciprocal_normalized_derivative_coeff]
+      by_cases hk : k + 1 = 1 <;> simp [reciprocalExpansionWitness, hk]
+    simp only [reciprocalCoefficientProfile, hterm, tsum_zero]
   have hs := hasSum_single (f := fun k : ℕ =>
-    ((reciprocalExpansionWitness (k + 1)).eval (1 / (2 : ℝ)) : ℂ) *
+    (((reciprocalExpansionWitness (k + 1)).eval (1 / (2 : ℝ)) : ℝ) : ℂ) *
       (Complex.I / 2) ^ (k + 1)) 0 (fun k hk => by
         have hk1 : k + 1 ≠ 1 := by omega
         simp [reciprocalExpansionWitness, hk1])
