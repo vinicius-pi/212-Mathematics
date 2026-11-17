@@ -15,7 +15,9 @@ open Set Polynomial
 
 private lemma reciprocal_polynomial_contDiff (P : Polynomial ℝ) (s : WithTop ℕ∞) :
     ContDiff ℝ s (fun x : ℝ => P.eval x) := by
-  simpa using P.contDiff_aeval s
+  induction P using Polynomial.induction_on' with
+  | add P Q hP hQ => simpa using hP.add hQ
+  | monomial n a => simpa using contDiff_const.mul (contDiff_id.pow n)
 
 /-- Analytic and algebraic iterated derivatives agree. -/
 lemma reciprocal_iteratedDeriv_eval (P : Polynomial ℝ) (s : ℕ) :
@@ -31,7 +33,9 @@ lemma reciprocal_iteratedDeriv_eval (P : Polynomial ℝ) (s : ℕ) :
 /-- The normalized derivatives used by the profiles really are coefficients. -/
 lemma reciprocal_normalized_derivative_coeff (P : Polynomial ℝ) (s : ℕ) :
     ((Polynomial.derivative^[s]) P).eval 0 / (s.factorial : ℝ) = P.coeff s := by
-  rw [Polynomial.eval_zero, Polynomial.coeff_iterate_derivative]
+  have hz : ((Polynomial.derivative^[s]) P).eval 0 =
+      ((Polynomial.derivative^[s]) P).coeff 0 := by simp
+  rw [hz, Polynomial.coeff_iterate_derivative]
   simp only [zero_add, Nat.descFactorial_self, nsmul_eq_mul]
   exact mul_div_cancel_left₀ _ (by positivity : (s.factorial : ℝ) ≠ 0)
 
@@ -76,7 +80,7 @@ theorem reciprocal_polynomial_lagrange (P : Polynomial ℝ) (p : ℕ)
   refine ⟨y, hy, ?_⟩
   calc
     _ = _ := heq
-    _ = _ := by ring
+    _ = _ := by simp only [Nat.succ_eq_add_one]; ring
 
 /-- Above the degree the finite Taylor remainder vanishes identically. -/
 theorem reciprocal_taylor_remainder_zero (P : Polynomial ℝ) (m p : ℕ)
