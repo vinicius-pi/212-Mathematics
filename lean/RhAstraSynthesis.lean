@@ -13,6 +13,7 @@ import RhAstraSynthesis.GevreyMomentFactorial
 import RhAstraSynthesis.ReciprocalGevreyMajorant
 import RhAstraSynthesis.ReciprocalCoefficientProfile
 import RhAstraSynthesis.ReciprocalTaylorRemainder
+import RhAstraSynthesis.ReciprocalRemainderSeries
 import RhAstraSynthesis.MarkovAffineTransport
 import RhAstraSynthesis.MarkovChebyshevEndpoint
 import RhAstraSynthesis.MarkovChebyshevGeneral

@@ -15,6 +15,37 @@ open MeasureTheory Set
 
 section Signatures
 
+/-- Absolute real remainder series only; not the complex profile identity. -/
+theorem reciprocal_absolute_remainder_series
+    (P : ℕ → Polynomial ℝ) (L n p : ℕ) {C R r : ℝ}
+    (hC : 0 < C) (hR : 0 < R) (hr : 0 ≤ r) (hL : 0 < L)
+    (hn : 0 < n) (hp : 0 < p)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m)
+    (hσ : (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1) :
+    Summable (fun k : ℕ =>
+      |(P (k + 1)).eval (1 / (n : ℝ)) -
+        (∑ s ∈ Finset.range p, (P (k + 1)).coeff s * (1 / (n : ℝ)) ^ s)| *
+          r ^ (k + 1)) ∧
+    (∑' k : ℕ, |(P (k + 1)).eval (1 / (n : ℝ)) -
+      (∑ s ∈ Finset.range p, (P (k + 1)).coeff s * (1 / (n : ℝ)) ^ s)| *
+        r ^ (k + 1)) ≤
+      3 * C / (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+        (72 * (L : ℝ) /
+          (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ p *
+            (p.factorial : ℝ) / (n : ℝ) ^ p :=
+  polynomial_reciprocal_family_remainder_gevrey P L n p hC hR hr hL hn hp
+    hdegree hsample hσ
+
+/-- A positive weighted remainder term, not a zero-degree or zero-radius probe. -/
+example : |(Polynomial.X ^ 2 : Polynomial ℝ).eval (1 / 4) -
+    (∑ s ∈ Finset.range 2,
+      (Polynomial.X ^ 2 : Polynomial ℝ).coeff s * (1 / 4 : ℝ) ^ s)| *
+        (1 / 2 : ℝ) ^ 2 = 1 / 64 := by
+  rw [reciprocal_taylor_nonzero_witness]
+  norm_num
+
 /-- Finite small-degree bridge only; the full family remainder remains open. -/
 theorem reciprocal_taylor_remainder
     (P : Polynomial ℝ) (B : ℝ) (L m n p : ℕ)

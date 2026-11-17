@@ -353,6 +353,39 @@ only for reciprocal coefficient series. The declaration awaits CI compilation;
 the fractional-grid and full remainder target below remains open.
 \end{proof}
 
+\begin{theorem}[Absolute weighted real reciprocal remainder series]
+\label{thm:reciprocal-absolute-remainder-series}
+\lean{RhAstraSynthesis.polynomial_reciprocal_family_remainder_gevrey}
+\uses{thm:reciprocal-family-gevrey, lem:reciprocal-taylor-remainder}
+Let $C,R>0$, $r\ge0$, and $L\ge1$ be a natural number. Suppose
+$\deg P_m\le m$ and $|P_m(1/k)|\le C R^{-m}$ for every $m,k\ge1$.
+Set $\sigma=(r/R)e^{2/\sqrt L}<1$ and $d=1-\sigma$.
+For every pair of positive integers $n,p$, the real series
+\[
+ \sum_{m\ge1}r^m\left|P_m(1/n)-
+   \sum_{s=0}^{p-1}([X^s]P_m)n^{-s}\right|
+\]
+is summable and is at most
+\[
+ \frac{3C}{d}\left(\frac{72L}{d^3}\right)^p\frac{p!}{n^p}.
+\]
+\end{theorem}
+\begin{proof}
+Scale each remainder by $n^p$. For $Lm\le n$, use the finite
+Lagrange bound and the cubic geometric moment. For $n<Lm$, use the
+sample at $1/n$ and the finite coefficient triangle bound, retaining
+$m^{p+2s}/(2s)!$. Dominate globally by the sum of both positive
+majorants; there is no partition of a conditionally convergent series.
+The mixed moments are summable for each $s<p$, so Mathlib's finite
+sum/tsum interchange applies. The three resulting bases are
+$64L/d^3$, $L/d$, and $8L(1+8/d^2)/d$, each at most $72L/d^3$
+because $0<d\le1$.
+This is a separate real absolute-series result. Identifying the complex
+sampled family series minus its finite coefficient-profile expansion
+with the complex sum of polynomial remainders remains a separate obligation;
+the fractional-grid target is unchanged.
+\end{proof}
+
 \section{Open Analytic Extensions}
 \begin{theorem}[Complex reciprocal coefficient profiles on closed subdisks]
 \label{thm:reciprocal-complex-profiles}

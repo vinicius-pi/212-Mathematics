@@ -102,6 +102,41 @@ class ReciprocalTaylorRemainderProbes(unittest.TestCase):
                 self.assertLessEqual(8**p * finite * factorial(p),
                                      Q(1, 1) / d * (72 / d**3)**p * factorial(p))
 
+    def test_infinite_nonzero_weighted_family_and_global_majorant(self):
+        # P_m = 2^(-m) X^m satisfies the original hypotheses with C=1,R=2.
+        # The exact infinite remainder is a geometric tail, not a truncation.
+        L, R, radius = 16, Q(2), Q(1, 2)
+        with localcontext() as ctx:
+            ctx.prec = 70
+            sigma = dec(radius / R) * (Decimal(2) / Decimal(L).sqrt()).exp()
+            self.assertLess(sigma, 1)
+            d = 1 - sigma
+            for n in (1, 16, 32, 80):
+                for p in range(1, 7):
+                    q = radius / (R * n)
+                    exact = q**p / (1 - q)
+                    self.assertGreater(exact, 0)
+                    partial = sum((q**m for m in range(p, 41)), Q(0))
+                    self.assertEqual(exact - partial, q**41 / (1 - q))
+                    bound = (Decimal(3) / d * (Decimal(72 * L) / d**3)**p
+                             * Decimal(factorial(p)) / Decimal(n**p))
+                    self.assertLessEqual(dec(exact), bound)
+                    for m in range(1, 21):
+                        coeffs = [Q(0)] * m + [R**(-m)]
+                        lhs = dec(n**p * abs(remainder(coeffs, p, Q(1, n))) * radius**m)
+                        small = (Decimal((8 * L)**p * m**(3*p))
+                                 / Decimal(factorial(2*p)) * sigma**m)
+                        sample = Decimal(L**p * m**p) * sigma**m
+                        mixed = Decimal(L**p) * sum(
+                            (Decimal(8**s * m**(p + 2*s)) / Decimal(factorial(2*s))
+                             * sigma**m for s in range(p)), Decimal(0))
+                        self.assertLessEqual(lhs, small + sample + mixed)
+                        self.assertLessEqual(lhs, small if L*m <= n else sample + mixed)
+            # Radius-only base comparisons used by the Lean composition.
+            self.assertLessEqual(Decimal(L) / d, Decimal(72*L) / d**3)
+            self.assertLessEqual(Decimal(8*L) * (1 + 8/d**2) / d,
+                                 Decimal(72*L) / d**3)
+
     def test_lagrange_factorial_not_vector_bound_factorial(self):
         # For X^p the normalized p-th derivative is exactly 1, and the
         # remainder is x^p. Using the vector mean bound loses a factor p.
