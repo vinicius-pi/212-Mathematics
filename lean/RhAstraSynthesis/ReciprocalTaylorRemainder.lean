@@ -183,6 +183,7 @@ theorem polynomial_reciprocal_large_degree_remainder_bound
       _ = |P.coeff s| * (n : ℝ) ^ (p - s) := by
         rw [abs_mul, abs_of_nonneg (by positivity : (0 : ℝ) ≤ (1 / (n : ℝ)) ^ s)]
         conv_lhs => rw [he, pow_add]
+        rw [div_pow, one_pow]
         field_simp [ne_of_gt hnreal]
         <;> ring
       _ ≤ ((Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B) *
@@ -206,7 +207,7 @@ theorem polynomial_reciprocal_large_degree_remainder_bound
     _ ≤ (n : ℝ) ^ p * (|P.eval (1 / (n : ℝ))| +
         ∑ s ∈ Finset.range p, |P.coeff s * (1 / (n : ℝ)) ^ s|) := by
       gcongr
-      exact (abs_sub _ _).trans (add_le_add_left (abs_sum_le_sum_abs _ _) _)
+      exact (abs_sub _ _).trans (add_le_add_left (Finset.abs_sum_le_sum_abs _ _) _)
     _ = (n : ℝ) ^ p * |P.eval (1 / (n : ℝ))| +
         ∑ s ∈ Finset.range p, (n : ℝ) ^ p * |P.coeff s * (1 / (n : ℝ)) ^ s| := by
       rw [mul_add, Finset.mul_sum]

@@ -71,17 +71,19 @@ theorem cubic_geometric_gevrey_majorant
 order zero. The recurrence avoids dividing by `1-a`. -/
 lemma finite_geometric_sum_le_add_one_pow (a : ℝ) (ha : 0 ≤ a) (p : ℕ) :
     (∑ s ∈ Finset.range p, a ^ s) ≤ (1 + a) ^ p := by
+  have hrec (q : ℕ) : (∑ s ∈ Finset.range (q + 1), a ^ s) =
+      1 + a * ∑ s ∈ Finset.range q, a ^ s := by
+    induction q with
+    | zero => simp
+    | succ q hq =>
+      rw [Finset.sum_range_succ]
+      conv_rhs => rw [Finset.sum_range_succ]
+      rw [hq, pow_succ]
+      ring
   induction p with
   | zero => simp
   | succ p ih =>
-    have hrec : (∑ s ∈ Finset.range (p + 1), a ^ s) =
-        1 + a * ∑ s ∈ Finset.range p, a ^ s := by
-      induction p with
-      | zero => simp
-      | succ p hp =>
-        rw [Finset.sum_range_succ, hp, Finset.sum_range_succ, pow_succ]
-        ring
-    rw [hrec, pow_succ]
+    rw [hrec p, pow_succ]
     have hone : (1 : ℝ) ≤ (1 + a) ^ p := one_le_pow₀ (by linarith)
     nlinarith [mul_le_mul_of_nonneg_left ih ha]
 
