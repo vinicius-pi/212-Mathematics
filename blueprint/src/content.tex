@@ -384,6 +384,7 @@ The full Taylor remainder theorem and the fractional-grid target remain open.
 \begin{theorem}[Holomorphy of reciprocal coefficient profiles]
 \label{thm:reciprocal-profile-holomorphy}
 \lean{RhAstraSynthesis.reciprocalCoefficientProfile_differentiableOn_of_uniform, RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic}
+\leanok
 \uses{thm:reciprocal-complex-profiles}
 Under the same degree and reciprocal sample hypotheses, for every $s\ge0$,
 the function $F_s$ is complex differentiable on $\{u:|u|<R\}$.
@@ -394,9 +395,36 @@ neighborhood of $u$ on which the polynomial partial sums converge uniformly.
 Thus convergence is locally uniform on the open radius-$R$ disk.
 Apply Mathlib's locally uniform limit theorem for holomorphic functions.
 The Lean proof and the nonconstant witness $P_m(t)=t$, $s=1$, $R=1$
-are written but await parent CI compilation and axiom audit; this new
-statement is not yet marked kernel-checked. No outer-boundary convergence,
-full Taylor remainder, or fractional-grid conclusion is asserted.
+were checked at commit \texttt{eeee831} (CI run \texttt{43996597124}).
+No outer-boundary convergence, full Taylor remainder, or fractional-grid
+conclusion is asserted.
+\end{proof}
+
+\begin{lemma}[Finite small-degree reciprocal Taylor remainder]
+\label{lem:reciprocal-taylor-remainder}
+\lean{RhAstraSynthesis.reciprocal_normalized_derivative_coeff, RhAstraSynthesis.reciprocal_polynomial_lagrange, RhAstraSynthesis.reciprocal_taylor_remainder_zero, RhAstraSynthesis.polynomial_reciprocal_taylor_remainder_bound}
+\uses{lem:reciprocal-interval-factorial, thm:remez-exp-markov}
+Let $L,m,n,p$ be positive integers, $Lm\le n$, $B>0$, and
+$P\in\mathbb R[X]$ have degree at most $m$. Suppose
+$|P(1/k)|\le B$ for every positive integer $k$. Then
+\[
+ \bigl|P(1/n)-\sum_{s=0}^{p-1}P_s n^{-s}\bigr|
+ \le \frac{e^{2m/\sqrt L} B(8L)^p m^{3p}}{(2p)!n^p},
+ \qquad P_s=[X^s]P.
+\]
+For $p>m$ the remainder is exactly zero.
+\end{lemma}
+\begin{proof}
+Apply the real Lagrange Taylor theorem on $[0,1/n]$ with order $p-1$.
+The analytic iterated derivative equals the algebraic polynomial derivative;
+at zero its quotient by $s!$ equals $P_s$. Thus for some $0<y<1/n$
+the remainder is $P^{(p)}(y)/(p!n^p)$.
+If $p\le m$, then $y\in[0,(Lm)^{-1}]$ and the sampled uniform
+factorial bound gives the displayed inequality, without losing a factor $p$.
+If $p>m$, the derivative vanishes. For $P=X^2$, $L=m=p=2$, $n=4$,
+the remainder is $1/16$, not zero.
+These new Lean declarations are uncompiled; this finite lemma does not
+close the infinite-family or fractional-grid remainder proposition below.
 \end{proof}
 
 

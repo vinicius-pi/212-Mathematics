@@ -12,6 +12,7 @@ import RhAstraSynthesis.MarkovFactorialNormalization
 import RhAstraSynthesis.GevreyMomentFactorial
 import RhAstraSynthesis.ReciprocalGevreyMajorant
 import RhAstraSynthesis.ReciprocalCoefficientProfile
+import RhAstraSynthesis.ReciprocalTaylorRemainder
 import RhAstraSynthesis.MarkovAffineTransport
 import RhAstraSynthesis.MarkovChebyshevEndpoint
 import RhAstraSynthesis.MarkovChebyshevGeneral
@@ -53,7 +54,7 @@ import RhAstraSynthesis.MainTheorems
 import RhAstraSynthesis.TargetStatements
 
 /-!
-  Root module for `RhAstraSynthesis`, importing all 44 submodules
+  Root module for `RhAstraSynthesis`, importing the mathematical submodules
   (see `RhAstraSynthesis.MainTheorems` and `RhAstraSynthesis.TargetStatements`
   for the headline theorem index and concrete examples):
 

@@ -15,6 +15,20 @@ open MeasureTheory Set
 
 section Signatures
 
+/-- Finite small-degree bridge only; the full family remainder remains open. -/
+theorem reciprocal_taylor_remainder
+    (P : Polynomial ℝ) (B : ℝ) (L m n p : ℕ)
+    (hB : 0 < B) (hL : 0 < L) (hm : 0 < m) (hn : 0 < n) (hp : 0 < p)
+    (hsmall : L * m ≤ n) (hdegree : P.natDegree ≤ m)
+    (hsample : ∀ k : ℕ, 0 < k → |P.eval (1 / (k : ℝ))| ≤ B) :
+    |P.eval (1 / (n : ℝ)) -
+      (∑ s ∈ Finset.range p, P.coeff s * (1 / (n : ℝ)) ^ s)| ≤
+      Real.exp (2 * (m : ℝ) / Real.sqrt (L : ℝ)) * B *
+        (8 * (L : ℝ)) ^ p * (m : ℝ) ^ (3 * p) /
+          (((2 * p).factorial : ℝ) * (n : ℝ) ^ p) :=
+  RhAstraSynthesis.polynomial_reciprocal_taylor_remainder_bound
+    P B L m n p hB hL hm hn hp hsmall hdegree hsample
+
 theorem bernstein_van_der_corput_schaake
     (P : Polynomial ℝ) (n : ℕ) {B : ℝ} (hB : 0 ≤ B)
     (hdeg : P.natDegree ≤ n)
@@ -218,6 +232,13 @@ abbrev reciprocal_profiles_holomorphic :=
   @RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic
 
 section Examples
+
+/-- Nonzero second-order remainder at the small-degree boundary. -/
+example :
+    (Polynomial.X ^ 2 : Polynomial ℝ).eval (1 / 4) -
+      (∑ s ∈ Finset.range 2,
+        (Polynomial.X ^ 2 : Polynomial ℝ).coeff s * (1 / 4 : ℝ) ^ s) = 1 / 16 :=
+  RhAstraSynthesis.reciprocal_taylor_nonzero_witness
 
 /-- The nonconstant family `P_m = X` has a nonzero first-order coefficient
 at every positive index; its first-order profile is holomorphic on the unit disk. -/
@@ -431,6 +452,7 @@ end Examples
 #print axioms RhAstraSynthesis.geometric_power_moment_zero
 #print axioms reciprocal_sample_exponential_bound
 #print axioms reciprocal_sample_factorial_bound
+#print axioms reciprocal_taylor_remainder
 #print axioms bernstein_van_der_corput_schaake
 #print axioms markov_interior_derivative
 #print axioms reciprocal_good_set_measure
