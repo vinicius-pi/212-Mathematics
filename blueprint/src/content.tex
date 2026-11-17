@@ -380,10 +380,47 @@ The mixed moments are summable for each $s<p$, so Mathlib's finite
 sum/tsum interchange applies. The three resulting bases are
 $64L/d^3$, $L/d$, and $8L(1+8/d^2)/d$, each at most $72L/d^3$
 because $0<d\le1$.
-This is a separate real absolute-series result. Identifying the complex
-sampled family series minus its finite coefficient-profile expansion
-with the complex sum of polynomial remainders remains a separate obligation;
+This is a separate real absolute-series result. The complex identification
+and the full reciprocal expansion are stated separately below;
 the fractional-grid target is unchanged.
+\end{proof}
+
+\begin{theorem}[Full reciprocal Gevrey-1 expansion on closed subdisks]
+\label{thm:reciprocal-full-gevrey-expansion}
+\lean{RhAstraSynthesis.reciprocal_sampled_summable, RhAstraSynthesis.reciprocal_complex_remainder_identity, RhAstraSynthesis.polynomial_reciprocal_gevrey_expansion}
+\uses{thm:reciprocal-absolute-remainder-series, lem:reciprocal-all-radii-parameter, thm:reciprocal-complex-profiles, thm:reciprocal-profile-holomorphy}
+Suppose $C,R>0$, $\deg P_m\le m$, and
+$|P_m(1/k)|\le CR^{-m}$ for every $m,k\ge1$. Define
+\[
+ q_n(u)=1+\sum_{m\ge1}P_m(1/n)u^m,\qquad
+ F_s(u)=\sum_{m\ge1}([X^s]P_m)u^m.
+\]
+The sampled series is absolutely convergent for every $n\ge1$ and $|u|<R$.
+The full profiles are $A_0=1+F_0$ and $A_s=F_s$ for $s>0$;
+each is holomorphic on the open disk. For every $0\le r<R$ choose one
+natural $L>0$ with $d=1-(r/R)e^{2/\sqrt L}>0$. Simultaneously for
+all $n,p\ge1$ and $|u|\le r$, the complex remainder series is absolutely
+convergent and
+\[
+ q_n(u)-(1+\sum_{s<p}F_s(u)n^{-s})
+ =\sum_{m\ge1}(P_m(1/n)-\sum_{s<p}([X^s]P_m)n^{-s})u^m,
+\]
+\[
+ |q_n(u)-(1+\sum_{s<p}F_s(u)n^{-s})|
+ \le \frac{3C}{d}(\frac{72L}{d^3})^p\frac{p!}{n^p}.
+\]
+For $p\ge1$ the parenthesized expression equals $\sum_{s<p}A_s(u)n^{-s}$.
+\end{theorem}
+\begin{proof}
+The sample majorant is $C(|u|/R)^m$. Normalize the polynomial derivatives
+at zero to coefficients and interchange the finite Taylor sum with the
+absolutely convergent profile series. The explicit constants cancel exactly.
+The norm of each complex remainder term is at most the corresponding radial
+absolute real remainder; apply the absolute remainder-series bound.
+Choose $L$ before $n,p,u$ using the all-radii parameter lemma.
+The family $P_1=X$, $P_m=0$ for $m\ne1$ has remainder $i/4$ at
+$n=2$, $p=1$, $u=i/2$. This separate theorem treats only reciprocal samples,
+not the original $n^{-\alpha}$ generalization.
 \end{proof}
 
 \section{Open Analytic Extensions}

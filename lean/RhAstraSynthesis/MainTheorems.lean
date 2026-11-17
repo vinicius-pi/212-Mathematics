@@ -6,6 +6,7 @@ import RhAstraSynthesis.ReciprocalGevreyMajorant
 import RhAstraSynthesis.ReciprocalCoefficientProfile
 import RhAstraSynthesis.ReciprocalTaylorRemainder
 import RhAstraSynthesis.ReciprocalRemainderSeries
+import RhAstraSynthesis.ReciprocalGevreyExpansion
 import RhAstraSynthesis.ActualCoprimeConvolution
 import RhAstraSynthesis.CoprimeKernelSummability
 import RhAstraSynthesis.CoprimeEulerMoment
@@ -54,6 +55,7 @@ abbrev reciprocalComplexProfiles := @RhAstraSynthesis.polynomial_reciprocal_prof
 abbrev reciprocalProfilesHolomorphic := @RhAstraSynthesis.polynomial_reciprocal_profiles_holomorphic
 abbrev reciprocalTaylorRemainder := @RhAstraSynthesis.polynomial_reciprocal_taylor_remainder_bound
 abbrev reciprocalAbsoluteRemainderSeries := @RhAstraSynthesis.polynomial_reciprocal_family_remainder_gevrey
+abbrev reciprocalGevreyExpansion := @RhAstraSynthesis.polynomial_reciprocal_gevrey_expansion
 abbrev cubicSharpnessBound := @RhAstraSynthesis.reciprocalSharpnessWitness_cubic_lower_bound
 abbrev fractionalRemezEnvelope := @RhAstraSynthesis.fractional_remez_chebyshev_envelope
 abbrev sqrtSharpnessDerivative := @RhAstraSynthesis.sqrtSharpnessWitness_derivative_at_zero

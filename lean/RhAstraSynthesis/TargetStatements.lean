@@ -13,6 +13,28 @@ namespace RhAstraSynthesis.TargetStatements
 
 open MeasureTheory Set
 
+/-- Closed-subdisk Gevrey-1 remainder for reciprocal samples. The explicit
+constant in the sampled function cancels the explicit constant in the expansion.
+The parameter depends only on the radius, before `n`, `p`, and `u`. -/
+theorem reciprocal_gevrey_expansion
+    (P : ℕ → Polynomial ℝ) {C R : ℝ}
+    (hC : 0 < C) (hR : 0 < R)
+    (hdegree : ∀ m, 0 < m → (P m).natDegree ≤ m)
+    (hsample : ∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(P m).eval (1 / (k : ℝ))| ≤ C * (1 / R) ^ m) :
+    ∀ r : ℝ, 0 ≤ r → r < R → ∃ L : ℕ, 0 < L ∧
+      (r / R) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 ∧
+      ∀ n p : ℕ, 0 < n → 0 < p → ∀ u : ℂ, ‖u‖ ≤ r →
+        ‖reciprocalSampledFunction P n u - reciprocalProfileExpansion P n p u‖ ≤
+          3 * C / (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+            (72 * (L : ℝ) /
+              (1 - (r / R) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ p *
+                (p.factorial : ℝ) / (n : ℝ) ^ p := by
+  intro r hr hrR
+  obtain ⟨L, hL, hσ, hall⟩ :=
+    polynomial_reciprocal_gevrey_expansion P hC hR hdegree hsample r hr hrR
+  exact ⟨L, hL, hσ, fun n p hn hp u hu => (hall n p hn hp u hu).2.2⟩
+
 section Signatures
 
 /-- Absolute real remainder series only; not the complex profile identity. -/
@@ -273,6 +295,65 @@ abbrev reciprocal_profiles_holomorphic :=
 
 section Examples
 
+/-- A finite-support nonconstant family, so its full complex remainder is
+nonzero, not merely its real polynomial remainder. -/
+def reciprocalExpansionWitness (m : ℕ) : Polynomial ℝ :=
+  if m = 1 then Polynomial.X else 0
+
+theorem reciprocalExpansionWitness_hypotheses :
+    (∀ m, 0 < m → (reciprocalExpansionWitness m).natDegree ≤ m) ∧
+    (∀ m, 0 < m → ∀ k : ℕ, 0 < k →
+      |(reciprocalExpansionWitness m).eval (1 / (k : ℝ))| ≤
+        (1 : ℝ) * (1 / 1) ^ m) := by
+  constructor
+  · intro m hm
+    by_cases hm1 : m = 1
+    · simp [reciprocalExpansionWitness, hm1]
+    · simp [reciprocalExpansionWitness, hm1]
+  · intro m hm k hk
+    by_cases hm1 : m = 1
+    · have hkreal : (1 : ℝ) ≤ k := by exact_mod_cast Nat.succ_le_of_lt hk
+      simp only [reciprocalExpansionWitness, if_pos hm1, Polynomial.eval_X,
+        div_one, one_pow, mul_one]
+      rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / (k : ℝ))]
+      exact (div_le_one (by positivity)).2 hkreal
+    · simp [reciprocalExpansionWitness, hm1]
+
+/-- At `n = 2`, `p = 1`, `u = I/2`, the remainder equals `I/4`. -/
+theorem reciprocalExpansionWitness_nonzero :
+    reciprocalSampledFunction reciprocalExpansionWitness 2 (Complex.I / 2) -
+      reciprocalProfileExpansion reciprocalExpansionWitness 2 1 (Complex.I / 2) =
+        Complex.I / 4 ∧ (Complex.I / 4 : ℂ) ≠ 0 := by
+  have hz : reciprocalCoefficientProfile reciprocalExpansionWitness 0 (Complex.I / 2) = 0 := by
+    apply tsum_eq_zero
+    intro k
+    simp only [reciprocalProfileTerm, reciprocal_normalized_derivative_coeff]
+    by_cases hk : k + 1 = 1 <;> simp [reciprocalExpansionWitness, hk]
+  have hs := hasSum_single (f := fun k : ℕ =>
+    ((reciprocalExpansionWitness (k + 1)).eval (1 / (2 : ℝ)) : ℂ) *
+      (Complex.I / 2) ^ (k + 1)) 0 (fun k hk => by
+        have hk1 : k + 1 ≠ 1 := by omega
+        simp [reciprocalExpansionWitness, hk1])
+  constructor
+  · simp only [reciprocalProfileExpansion, Finset.sum_range_one, hz, zero_mul, add_zero]
+    rw [reciprocalSampledFunction, hs.tsum_eq]
+    norm_num [reciprocalExpansionWitness] <;> ring
+  · norm_num
+
+/-- The nonzero family satisfies the complete uniform remainder theorem. -/
+example : ∃ L : ℕ, 0 < L ∧
+    ((1 / 2 : ℝ) / 1) * Real.exp (2 / Real.sqrt (L : ℝ)) < 1 ∧
+    ∀ n p : ℕ, 0 < n → 0 < p → ∀ u : ℂ, ‖u‖ ≤ (1 / 2 : ℝ) →
+      ‖reciprocalSampledFunction reciprocalExpansionWitness n u -
+        reciprocalProfileExpansion reciprocalExpansionWitness n p u‖ ≤
+        3 * (1 : ℝ) / (1 - ((1 / 2 : ℝ) / 1) * Real.exp (2 / Real.sqrt (L : ℝ))) *
+          (72 * (L : ℝ) /
+            (1 - ((1 / 2 : ℝ) / 1) * Real.exp (2 / Real.sqrt (L : ℝ))) ^ 3) ^ p *
+              (p.factorial : ℝ) / (n : ℝ) ^ p :=
+  reciprocal_gevrey_expansion reciprocalExpansionWitness (by norm_num) (by norm_num)
+    reciprocalExpansionWitness_hypotheses.1 reciprocalExpansionWitness_hypotheses.2
+    (1 / 2) (by norm_num) (by norm_num)
+
 /-- Large-degree side immediately below `Lm=4`, with a nonzero remainder. -/
 example :
     (3 : ℝ) ^ 2 * |(Polynomial.X ^ 2 : Polynomial ℝ).eval (1 / 3) -
@@ -501,6 +582,10 @@ example :
 end Examples
 
 #print axioms reciprocal_large_degree_remainder
+#print axioms reciprocal_gevrey_expansion
+#print axioms RhAstraSynthesis.reciprocal_sampled_summable
+#print axioms RhAstraSynthesis.reciprocal_complex_remainder_identity
+#print axioms reciprocalExpansionWitness_nonzero
 #print axioms reciprocal_mixed_geometric_moment
 #print axioms exists_reciprocal_gevrey_parameter
 #print axioms reciprocal_complex_profiles
