@@ -328,16 +328,17 @@ theorem reciprocalExpansionWitness_nonzero :
     have hterm (k : ℕ) : reciprocalProfileTerm reciprocalExpansionWitness 0 k
         (Complex.I / 2) = 0 := by
       simp only [reciprocalProfileTerm, reciprocal_normalized_derivative_coeff]
-      by_cases hk : k + 1 = 1 <;> simp [reciprocalExpansionWitness, hk]
+      by_cases hk : k = 0 <;> simp [reciprocalExpansionWitness, hk]
     simp only [reciprocalCoefficientProfile, hterm, tsum_zero]
   have hs := hasSum_single (f := fun k : ℕ =>
     (((reciprocalExpansionWitness (k + 1)).eval (1 / (2 : ℝ)) : ℝ) : ℂ) *
       (Complex.I / 2) ^ (k + 1)) 0 (fun k hk => by
-        have hk1 : k + 1 ≠ 1 := by omega
-        simp [reciprocalExpansionWitness, hk1])
+        simp [reciprocalExpansionWitness, hk])
   constructor
   · simp only [reciprocalProfileExpansion, Finset.sum_range_one, hz, zero_mul, add_zero]
-    rw [reciprocalSampledFunction, hs.tsum_eq]
+    rw [reciprocalSampledFunction]
+    norm_num only [Nat.cast_ofNat]
+    rw [hs.tsum_eq]
     norm_num [reciprocalExpansionWitness] <;> ring
   · norm_num
 
