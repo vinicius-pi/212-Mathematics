@@ -104,6 +104,7 @@ theorem reciprocalCoefficientProfile_differentiableOn_of_uniform
       (reciprocalCoefficientProfile P s) Filter.atTop {u : ℂ | ‖u‖ < R} := by
     apply tendstoLocallyUniformlyOn_of_forall_exists_nhds
     intro u hu
+    change ‖u‖ < R at hu
     obtain ⟨r, hur, hrR⟩ := exists_between hu
     refine ⟨{v : ℂ | ‖v‖ ≤ r}, ?_, huniform r ((norm_nonneg u).trans hur.le) hrR⟩
     apply nhdsWithin_le_nhds
