@@ -41,7 +41,7 @@ lemma reciprocal_normalized_derivative_coeff (P : Polynomial ℝ) (s : ℕ) :
       | monomial n a =>
         by_cases hn : n = 0
         · simp [hn]
-        · simp [hn, Ne.symm hn]
+        · simp [Polynomial.coeff_monomial, hn]
     exact hzero _
   rw [hz, Polynomial.coeff_iterate_derivative]
   simp only [zero_add, Nat.descFactorial_self, nsmul_eq_mul]
