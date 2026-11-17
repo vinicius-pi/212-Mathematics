@@ -798,7 +798,7 @@ theorem polynomial_reciprocal_remez_exponential_bound
         1 / ((L : ℝ) * (m : ℝ) + (m : ℝ)) := by
     field_simp [hLreal.ne', hmreal.ne', (mul_pos hLreal hmreal).ne',
       (add_pos (mul_pos hLreal hmreal) hmreal).ne']
-    <;> ring
+    ring
   intro x hx
   exact remez_exponential_inequality P m (by positivity) hLreal hB.le hdegree hEm
     (fun _ ht => ht.1) (hnormalize.symm ▸ hmeasure) (fun _ ht => ht.2) hx

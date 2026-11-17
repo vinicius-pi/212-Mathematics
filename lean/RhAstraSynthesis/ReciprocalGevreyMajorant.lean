@@ -45,7 +45,7 @@ theorem cubic_geometric_gevrey_majorant
     _ = (C / (1 - σ) * (8 * L / (1 - σ) ^ 3) ^ s) *
         ((Nat.factorial (3 * s) : ℝ) / ((2 * s).factorial : ℝ)) := by
       dsimp [K]
-      rw [div_pow, pow_mul, pow_succ]
+      rw [div_pow, pow_succ, pow_mul]
       ring
     _ ≤ (C / (1 - σ) * (8 * L / (1 - σ) ^ 3) ^ s) *
         ((8 : ℝ) ^ s * (s.factorial : ℝ)) :=
