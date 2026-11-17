@@ -274,6 +274,30 @@ is a strict contraction inside $\RePart(w) \in [7/4, 11/4]$, yielding a zero $s_
 For $t \ge 1$ and $\omega \in \R$, Selberg parity pseudo-densities $1 + t^{-1/4}\cos(\omega\log t)$ are everywhere non-negative. An off-axis zero $z$ ($\RePart z > 1/2$) induces a positive $H^2(\C_{1/2}^+)$ model-space projection defect $(2\RePart z - 1)/|z|^2 > 0$, and any symmetric matrix with a negative $2 \times 2$ principal minor fails \texttt{Matrix.PosSemidef}.
 \end{theorem}
 
+\begin{lemma}[Fixed-order cubic geometric Gevrey majorant]
+\label{lem:cubic-geometric-gevrey}
+\lean{RhAstraSynthesis.cubic_geometric_gevrey_majorant}
+Let $s\in\N$, $C,L\ge0$, $0\le\sigma<1$, and $a_n\ge0$ satisfy
+\[
+a_n\le \frac{C(8L)^s}{(2s)!}(n+1)^{3s}\sigma^{n+1}
+\qquad(n\ge0).
+\]
+Then $\sum_{n\ge0}a_n$ converges and
+\[
+\sum_{n\ge0}a_n\le
+\frac{C}{1-\sigma}\left(\frac{64L}{(1-\sigma)^3}\right)^s s!.
+\]
+\end{lemma}
+\begin{proof}
+Use the positive-index geometric moment bound at order $3s$, then
+$(3s)!/(2s)!\le8^s s!$. This includes $s=0$ and $\sigma=0$.
+The new Lean declaration is uncompiled, awaiting CI. This is an abstract
+fixed-order summation bridge, not yet the polynomial-family specialization:
+for that application one must normalize the weighted derivative estimate
+with $\sigma=(r/R)\exp(2/\sqrt L)$, and discharge orders above the degree
+by vanishing. No fractional-grid or remainder assertion is made here.
+\end{proof}
+
 \section{Open Analytic Extensions}
 
 \begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]

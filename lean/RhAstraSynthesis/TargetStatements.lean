@@ -148,6 +148,19 @@ theorem geometric_power_moment_bound (j : ℕ) {σ : ℝ}
         (j.factorial : ℝ) / (1 - σ) ^ (j + 1) :=
   RhAstraSynthesis.geometric_power_moment j hσ hσ1
 
+/-- Fixed-order analytic bridge; the pointwise cubic geometric estimate is
+an input, not a polynomial-family or remainder conclusion. -/
+theorem reciprocal_gevrey_majorant
+    (a : ℕ → ℝ) (s : ℕ) {C L σ : ℝ}
+    (hC : 0 ≤ C) (hL : 0 ≤ L) (hσ : 0 ≤ σ) (hσ1 : σ < 1)
+    (ha : ∀ n, 0 ≤ a n)
+    (hbound : ∀ n, a n ≤
+      (C * (8 * L) ^ s / ((2 * s).factorial : ℝ)) *
+        (((n + 1 : ℕ) : ℝ) ^ (3 * s) * σ ^ (n + 1))) :
+    Summable a ∧ (∑' n, a n) ≤
+      C / (1 - σ) * (64 * L / (1 - σ) ^ 3) ^ s * (s.factorial : ℝ) :=
+  RhAstraSynthesis.cubic_geometric_gevrey_majorant a s hC hL hσ hσ1 ha hbound
+
 end Signatures
 
 section Examples

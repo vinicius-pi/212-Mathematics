@@ -89,6 +89,29 @@ def eval_poly(coeffs: list[Fraction], x: Fraction) -> Fraction:
 
 
 class MathematicalProbesTests(unittest.TestCase):
+    def test_cubic_geometric_gevrey_majorant(self):
+        # Exact infinite moments, not a truncated-series convergence test.
+        # P_j(q)/(1-q)^(j+1) is the full geometric power moment.
+        polynomial = [Fraction(1)]
+        for j in range(19):
+            if j % 3 == 0:
+                s = j // 3
+                for sigma in (Fraction(0), Fraction(1, 2), Fraction(9, 10)):
+                    moment = eval_poly(polynomial, sigma) / (1 - sigma) ** (j + 1)
+                    if j == 0:
+                        moment -= 1  # Positive-index convention at order zero.
+                    for C in (Fraction(0), Fraction(3, 2)):
+                        for L in (Fraction(0), Fraction(1), Fraction(5)):
+                            exact_sum = C * (8 * L) ** s / factorial(2 * s) * moment
+                            bound = C / (1 - sigma) * (64 * L / (1 - sigma) ** 3) ** s * factorial(s)
+                            self.assertGreaterEqual(exact_sum, 0)
+                            self.assertLessEqual(exact_sum, bound)
+            nxt = [Fraction(0)] * (len(polynomial) + 1)
+            for k, coefficient in enumerate(polynomial):
+                nxt[k] += k * coefficient
+                nxt[k + 1] += (j + 1 - k) * coefficient
+            polynomial = nxt
+
     def test_geometric_power_moment_uniform_bound(self):
         # Apply (sigma d/dsigma)^j to 1/(1-sigma), using exact rational
         # generating functions P_j(sigma)/(1-sigma)^(j+1). Remove m=0
