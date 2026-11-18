@@ -1,6 +1,6 @@
 # Architecture & Module Inventory
 
-`RhAstraSynthesis` (`leanprover/lean4:v4.34.0`, `mathlib@5ed2965256430c3649e86755f9576b54eca72435`) imports 49 submodules in four groups (23, 12, 12, and 2), as enumerated in [`RhAstraSynthesis.lean`](../lean/RhAstraSynthesis.lean), and is indexed through [`MainTheorems.lean`](../lean/RhAstraSynthesis/MainTheorems.lean) and [`TargetStatements.lean`](../lean/RhAstraSynthesis/TargetStatements.lean).
+`Mathematics212` (`leanprover/lean4:v4.34.0`, `mathlib@5ed2965256430c3649e86755f9576b54eca72435`) imports 49 submodules in four groups (23, 12, 12, and 2), as enumerated in [`Mathematics212.lean`](../lean/Mathematics212.lean), and is indexed through [`MainTheorems.lean`](../lean/Mathematics212/MainTheorems.lean) and [`TargetStatements.lean`](../lean/Mathematics212/TargetStatements.lean).
 
 ## 1. Polynomial Approximation, Bernstein & Markov–Remez Bounds (23 modules)
 

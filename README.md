@@ -1,21 +1,21 @@
-# 212-Mathematics (`RhAstraSynthesis`)
+# 212-Mathematics (`Mathematics212`)
 
-Lean 4 formalization (`leanprover/lean4:v4.34.0`, `mathlib@5ed2965256430c3649e86755f9576b54eca72435`) of polynomial extremal and Remez–Markov inequalities, coprime Möbius convolutions, and Mellin multiplier bounds, together with a Rocq `9.0` formalization of the finite rational signed-square envelope.
+Lean 4 formalization (`leanprover/lean4:v4.34.0`, `mathlib@5ed2965256430c3649e86755f9576b54eca72435`) of polynomial extremal and Remez–Markov inequalities, coprime Möbius convolutions, and Mellin multiplier bounds, together with a Rocq `9.0` formalization of the finite rational signed-square envelope. The v0.1 centerpiece follows the chain **measurable Remez → reciprocal-sample control → derivative bounds → coefficient profiles → reciprocal Gevrey-1 expansion**.
 
-All 49 Lean submodules build without `sorry`, custom axioms, `native_decide`, or `Lean.ofReduceBool` under `lake build` and `leanchecker`, using only `[propext, Classical.choice, Quot.sound]`. Self-contained signatures and concrete examples live in [`TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean); theorem dependencies and proofs are summarized in the [Blueprint PDF](blueprint/src/print.pdf) ([`content.tex`](blueprint/src/content.tex)).
+All 49 Lean submodules build without `sorry`, custom axioms, `native_decide`, or `Lean.ofReduceBool` under `lake build` and `leanchecker`, using only `[propext, Classical.choice, Quot.sound]`. Self-contained signatures and concrete examples live in [`TargetStatements.lean`](lean/Mathematics212/TargetStatements.lean); theorem dependencies and proofs are summarized in the [Blueprint PDF](blueprint/src/print.pdf) ([`content.tex`](blueprint/src/content.tex)).
 
 ## Headline Theorems
 
 ### 1. Polynomial Approximation, Bernstein & Markov–Remez Bounds
 
-| Mathematical Result | Lean Declaration (`RhAstraSynthesis.MainTheorems`) | Core Hypothesis / Bound |
+| Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
 | :--- | :--- | :--- |
 | Bernstein / Van der Corput–Schaake inequality | `bernsteinVanDerCorputSchaake` | $n^2 P(\cos\theta)^2 + (P'(\cos\theta)\sin\theta)^2 \le n^2 B^2$ ($\deg P \le n$) |
 | Markov interior derivative inequality (1889) | `markovInteriorDerivative` | $\forall x \in [-1, 1],\; \lvert P'(x)\rvert \le n^2 B$ |
 | Iterated interior Markov inequality | `markovIterateInteriorBound` | $\forall x \in [-1, 1],\; \lvert P^{(s)}(x)\rvert \le B \prod_{j < s}(n - j)^2$ |
 | Interior interval transport | `markovInteriorIntervalTransfer` | $\lvert P^{(s)}(t)\rvert \le (2Lm)^s B \prod_{j < s}(m - j)^2$ on $[0, (Lm)^{-1}]$ |
 | Exterior Chebyshev growth & endpoint Markov | `chebyshevExteriorBound`, `reciprocalEndpointMarkov` | $\lvert P(x)\rvert \le B\,T_m(\lvert x\rvert)$ ($\lvert x\rvert \ge 1$); $\lvert P^{(s)}(0)\rvert/s! \le M(4L)^s m^{3s}/(2s)!$ |
-| Reciprocal-grid good-set measure | `reciprocalGoodMeasure` | $\lvert P(1/n)\rvert \le B \;(\forall n \ge 1) \implies \operatorname{meas}(\{t \in [0, 1/k] : \lvert P(t)\rvert \le B\}) \ge \frac{1}{k+m}$ |
+| Reciprocal-grid good-set measure | `reciprocalGoodMeasure` | $\lvert P(1/n)\rvert \le B \;(\forall n \ge 1) \implies \mathrm{meas}(\{t \in [0, 1/k] : \lvert P(t)\rvert \le B\}) \ge \frac{1}{k+m}$ |
 | Remez–Chebyshev exponential envelope | `remezChebyshevEnvelope` | $T_m(2(Lm)^{-1}/e - 1) \le \exp(2m/\sqrt{L})$ |
 | Measurable equioscillation Remez & Markov derivative | `remezInequality`, `remezExponentialInequality`, `remezMarkovInteriorBound` | $\lvert P(x)\rvert \le T_n(2(b-a)/\lvert E\rvert - 1) B$; $\lvert P^{(s)}(x)\rvert \le \bigl(\frac{2}{b-a}\bigr)^s \bigl(\prod_{j<s}(n-j)^2\bigr) T_n(2(b-a)/\lvert E\rvert-1) B$ |
 | Affine Markov scaling & Gevrey factorial | `markovAffineTransfer`, `gevreyFactorialBound` | Factor $(2k)^s$ on $[0, 1/k]$; $(3k)!/(2k)! \le 8^k k!$ |
@@ -52,7 +52,7 @@ See the [proof dependency map](docs/RECIPROCAL_GEVREY_PROOF.md).
 
 ### 2. Multiplicative Convolutions, Euler Products & Arithmetic Identities
 
-| Mathematical Result | Lean Declaration (`RhAstraSynthesis.MainTheorems`) | Core Hypothesis / Bound |
+| Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
 | :--- | :--- | :--- |
 | Actual coprime Möbius factorization | `coprimeMobiusFactorization` | $f(n)\mathbf{1}_{(n,d)=1} = (\mu * g_d)(n)$, $g_d$ multiplicative |
 | Infinite Euler product on $s > 1/2$ | `coprimeKernelEulerProduct` | $d \ne 0$, $s > 1/2 \implies \sum_{n \ge 1} g_d(n)n^{-s} = \prod_p \sum_k g_d(p^k)p^{-ks}$ |
@@ -63,21 +63,21 @@ See the [proof dependency map](docs/RECIPROCAL_GEVREY_PROOF.md).
 
 ### 3. Mellin Multipliers, Stieltjes Tails & Integral Obstructions
 
-| Mathematical Result | Lean Declaration (`RhAstraSynthesis.MainTheorems`) | Core Hypothesis / Bound |
+| Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
 | :--- | :--- | :--- |
-| Critical-strip tent Mellin non-vanishing | `tentMellinNonvanishing` | $0 < \operatorname{Re}(s) < 1 \implies \int_1^2 \tau(u)u^{s-1}\,\mathrm{d}u \ne 0$ |
-| Prime-power Mellin–$\zeta'/\zeta$ identity | `primePowerMellinZeta` | $\operatorname{Re}(s) > 1$ dilated $-\zeta'(s)/\zeta(s)$ identity |
-| Sharp critical-line tent gap | `tentHalfLineGap` | $\operatorname{Re}(s) = 1/2 \implies \lvert\mathrm{num}_\tau(s)\rvert \ge \sqrt{3} - 1 - 1/\sqrt{2} > 0$ |
-| Non-outer off-axis tent zeros | `tentOffAxisZeros` | Infinitely many zeros of $\mathrm{num}_\tau$ in $2 < \operatorname{Re}(s) < 4$ |
+| Critical-strip tent Mellin non-vanishing | `tentMellinNonvanishing` | $0 < \mathrm{Re}(s) < 1 \implies \int_1^2 \tau(u)u^{s-1}\,\mathrm{d}u \ne 0$ |
+| Prime-power Mellin–$\zeta'/\zeta$ identity | `primePowerMellinZeta` | $\mathrm{Re}(s) > 1$ dilated $-\zeta'(s)/\zeta(s)$ identity |
+| Sharp critical-line tent gap | `tentHalfLineGap` | $\mathrm{Re}(s) = 1/2 \implies \lvert\mathrm{num}_\tau(s)\rvert \ge \sqrt{3} - 1 - 1/\sqrt{2} > 0$ |
+| Non-outer off-axis tent zeros | `tentOffAxisZeros` | Infinitely many zeros of $\mathrm{num}_\tau$ in $2 < \mathrm{Re}(s) < 4$ |
 | Floor-kernel $O(K^{-\gamma})$ transfer | `floorKernelErrorBound` | $\lvert G(t)\rvert \le C t^{-\gamma}$ ($0 < \gamma < 1$) Lebesgue error bound |
 | Abel summation & polylogarithmic $L^1$ tails | `abelSummationInv`, `logDecayIntegrableTail` | $\lvert G(t)\rvert \le C(\log t)^{-1-\delta} \implies G(t)/t \in L^1([2,\infty))$ |
 | Parity pseudo-density & Hardy/Pick obstructions | `parityPseudoDensityNonneg`, `modelSpaceDefectLowerBound`, `negMinorNotPosSemidef` | $1 + t^{-1/4}\cos(\omega\log t) \ge 0$; model-space defect $> 0$; $2\times 2$ minor refutation |
 
 ## Repository Layout
 
-- [`lean/RhAstraSynthesis.lean`](lean/RhAstraSynthesis.lean) — Root module (`49` submodules).
-- [`lean/RhAstraSynthesis/MainTheorems.lean`](lean/RhAstraSynthesis/MainTheorems.lean) — Theorem index with `#print axioms` checks.
-- [`lean/RhAstraSynthesis/TargetStatements.lean`](lean/RhAstraSynthesis/TargetStatements.lean) — Self-contained theorem signatures and concrete examples.
+- [`lean/Mathematics212.lean`](lean/Mathematics212.lean) — Root module (`49` submodules).
+- [`lean/Mathematics212/MainTheorems.lean`](lean/Mathematics212/MainTheorems.lean) — Theorem index with `#print axioms` checks.
+- [`lean/Mathematics212/TargetStatements.lean`](lean/Mathematics212/TargetStatements.lean) — Self-contained theorem signatures and concrete examples.
 - [`rocq/`](rocq/) — Rocq `9.0` finite rational signed-square envelope and sharpness counterexample (`rocqchk`).
 - [`blueprint/src/content.tex`](blueprint/src/content.tex) — LaTeX blueprint linking theorems to Lean declarations ([PDF](blueprint/src/print.pdf)).
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Module inventory.
@@ -92,10 +92,14 @@ python3 -m unittest discover -s tests -p "test_*.py" -v
 ```bash
 cd lean
 lake exe cache get
-lake build RhAstraSynthesis
-lake env leanchecker RhAstraSynthesis
+lake build Mathematics212
+lake env leanchecker Mathematics212
 ```
 
 ```bash
 python3 rocq/verify_rocq.py   # requires Docker image rocq/rocq-prover:9.0
 ```
+
+## Provenance & Scope
+
+Portions of the Lean 4 and Rocq 9.0 formalizations, tests, and documentation were developed with AI assistance and verified mechanically by `lake build`, `leanchecker`, `rocqchk`, and the Python test suite. Formal verification establishes kernel-checked derivations from the pinned Mathlib and Rocq foundations; it does not replace independent mathematical peer review.
