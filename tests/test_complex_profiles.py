@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 class ComplexProfileContracts(unittest.TestCase):
     def test_actual_uniform_series_and_absolute_convergence(self):
-        src = (ROOT / 'lean/RhAstraSynthesis/ReciprocalCoefficientProfile.lean').read_text(encoding='utf-8')
+        src = (ROOT / 'lean/Mathematics212/ReciprocalCoefficientProfile.lean').read_text(encoding='utf-8')
         for token in ('tendstoUniformlyOn_tsum_nat hs', 'norm_tsum_le_tsum_norm hn',
                       'Summable (fun n => ‖reciprocalProfileTerm P s n u‖)',
                       'polynomial_reciprocal_family_gevrey_all_radii',
@@ -66,7 +66,7 @@ class ComplexProfileContracts(unittest.TestCase):
             self.assertEqual(norm_sq(power), 1)
 
     def test_holomorphy_interface_and_blueprint_dependency(self):
-        src = (ROOT / 'lean/RhAstraSynthesis/ReciprocalCoefficientProfile.lean').read_text(encoding='utf-8')
+        src = (ROOT / 'lean/Mathematics212/ReciprocalCoefficientProfile.lean').read_text(encoding='utf-8')
         self.assertIn('DifferentiableOn ℂ (reciprocalCoefficientProfile P s)', src)
         self.assertIn('hlocal.differentiableOn', src)
         tex = (ROOT / 'blueprint/src/content.tex').read_text(encoding='utf-8')

@@ -43,21 +43,21 @@ class PolynomialFamilyTests(unittest.TestCase):
                     self.assertLessEqual(q / (1 - q), bound)
 
     def test_all_radii_contract(self):
-        source = (ROOT / 'lean/RhAstraSynthesis/ReciprocalGevreyMajorant.lean').read_text()
-        targets = (ROOT / 'lean/RhAstraSynthesis/TargetStatements.lean').read_text()
+        source = (ROOT / 'lean/Mathematics212/ReciprocalGevreyMajorant.lean').read_text()
+        targets = (ROOT / 'lean/Mathematics212/TargetStatements.lean').read_text()
         blueprint = (ROOT / 'blueprint/src/content.tex').read_text()
         for name in ('exists_reciprocal_gevrey_parameter',
                      'polynomial_reciprocal_family_gevrey_all_radii'):
             self.assertIn('theorem ' + name, source)
             self.assertIn('theorem ' + name, targets)
             self.assertIn('#print axioms ' + name, targets)
-            self.assertIn('RhAstraSynthesis.' + name, blueprint)
+            self.assertIn('Mathematics212.' + name, blueprint)
         self.assertIn('∀ r : ℝ, 0 ≤ r → r < R → ∃ L : ℕ', source)
         self.assertIn('< 1 ∧ ∀ s : ℕ', source)
         self.assertIn(r'\label{thm:open-gevrey-alpha}', blueprint)
 
     def test_family_interface_and_imports(self):
-        source = (ROOT / 'lean/RhAstraSynthesis/ReciprocalGevreyMajorant.lean').read_text()
+        source = (ROOT / 'lean/Mathematics212/ReciprocalGevreyMajorant.lean').read_text()
         for name in ('reciprocal_exponential_weight', 'polynomial_reciprocal_family_pointwise',
                      'polynomial_reciprocal_family_gevrey'):
             self.assertIn('theorem ' + name, source)
@@ -67,7 +67,7 @@ class PolynomialFamilyTests(unittest.TestCase):
         graph = {}
         for p in base.rglob('*.lean'):
             graph['.'.join(p.relative_to(base).with_suffix('').parts)] = re.findall(
-                r'^import (RhAstraSynthesis(?:\.\w+)*)', p.read_text(), re.M)
+                r'^import (Mathematics212(?:\.\w+)*)', p.read_text(), re.M)
         done, active = set(), set()
         def visit(n):
             self.assertNotIn(n, active, 'import cycle')

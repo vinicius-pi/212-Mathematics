@@ -1,9 +1,9 @@
-name = "RhAstraSynthesis"
+name = "Mathematics212"
 version = "0.1.0"
-defaultTargets = ["RhAstraSynthesis"]
+defaultTargets = ["Mathematics212"]
 
 [[lean_lib]]
-name = "RhAstraSynthesis"
+name = "Mathematics212"
 
 [[require]]
 name = "mathlib"

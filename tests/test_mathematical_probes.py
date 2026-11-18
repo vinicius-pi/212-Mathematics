@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact rational and high-precision boundary/counterexample probes for RhAstraSynthesis.
+"""Exact rational and high-precision boundary/counterexample probes for Mathematics212.
 
 These probes independently verify boundary cases and counterexamples (e.g., why d != 0,
 r_2 = 2/3, negative affine slopes, and the cubic sharpness witness are tight). They do
