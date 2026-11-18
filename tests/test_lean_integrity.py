@@ -145,7 +145,14 @@ class LeanIntegrityTests(unittest.TestCase):
             self.assertIn(author, pdf_text, f"Bibliography author {author!r} missing from print.pdf")
 
         tex = BLUEPRINT_TEX.read_text(encoding="utf-8")
-        self.assertNotIn("\night)", tex, "Corrupted 'ight)' macro found in blueprint/src/content.tex")
+        self.assertIsNone(
+            re.search(r"[\r\n]ight\)", tex),
+            "Corrupted newline+'ight)' macro (damaged \\right)) found in blueprint/src/content.tex",
+        )
+        self.assertIsNone(
+            re.search(r"[\r\n]ef\{", tex),
+            "Corrupted newline+'ef{' macro (damaged \\ref{...}) found in blueprint/src/content.tex",
+        )
 
         norm_pdf = re.sub(r"\s+", "", pdf_text)
         tags = [entry.strip() for m in re.finditer(r"\\lean\{([^}]+)\}", tex) for entry in m.group(1).split(",")]
