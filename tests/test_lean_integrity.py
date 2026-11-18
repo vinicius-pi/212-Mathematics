@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pathlib
 import re
+import shutil
+import subprocess
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -11,6 +13,7 @@ LEAN_DIR = ROOT / "lean"
 SRC_DIR = LEAN_DIR / "Mathematics212"
 ROOT_LEAN = LEAN_DIR / "Mathematics212.lean"
 BLUEPRINT_TEX = ROOT / "blueprint" / "src" / "content.tex"
+BLUEPRINT_PDF = ROOT / "blueprint" / "src" / "print.pdf"
 README_MD = ROOT / "README.md"
 ARCH_MD = ROOT / "docs" / "ARCHITECTURE.md"
 
@@ -39,6 +42,40 @@ def strip_lean_comments(text: str) -> str:
     text = re.sub(r"/-.*?-/", "", text, flags=re.DOTALL)
     text = re.sub(r"--[^\n]*", "", text)
     return text
+
+
+def collect_qualified_lean_declarations(lean_files: list[pathlib.Path]) -> set[str]:
+    decls: set[str] = set()
+    decl_re = re.compile(
+        r"^(?:@\[[^\]]*\]\s*)*(?:noncomputable\s+|protected\s+|scoped\s+)*"
+        r"(?:theorem|lemma|def|abbrev|structure|inductive)\s+([A-Za-z0-9_.]+)"
+    )
+    for path in lean_files:
+        stack: list[tuple[str, list[str]]] = []
+        for raw_line in strip_lean_comments(path.read_text(encoding="utf-8")).splitlines():
+            s = raw_line.strip()
+            m_ns = re.match(r"^namespace\s+([A-Za-z0-9_.]+)$", s)
+            if m_ns:
+                stack.append(("ns", m_ns.group(1).split(".")))
+                continue
+            m_sec = re.match(r"^section(?:\s+([A-Za-z0-9_.]+))?$", s)
+            if m_sec:
+                sec_name = m_sec.group(1)
+                stack.append(("sec", sec_name.split(".") if sec_name else []))
+                continue
+            if re.match(r"^end(?:\s+([A-Za-z0-9_.]+))?$", s):
+                if stack:
+                    stack.pop()
+                continue
+            if re.match(r"^(?:@\[[^\]]*\]\s*)*private\b", s):
+                continue
+            m_decl = decl_re.match(s)
+            if m_decl:
+                ns_parts = [part for kind, parts in stack if kind == "ns" for part in parts]
+                name = m_decl.group(1)
+                full = ".".join([*ns_parts, name]) if ns_parts else name
+                decls.add(full)
+    return decls
 
 
 class LeanIntegrityTests(unittest.TestCase):
@@ -76,16 +113,39 @@ class LeanIntegrityTests(unittest.TestCase):
                 tags.append(entry.strip())
         self.assertTrue(tags, "Expected at least one \\lean{...} tag in blueprint/src/content.tex")
 
-        lean_corpus = "\n".join(
-            strip_lean_comments(p.read_text(encoding="utf-8"))
-            for p in [ROOT_LEAN, *SRC_DIR.glob("*.lean")]
+        qualified_decls = collect_qualified_lean_declarations([ROOT_LEAN, *sorted(SRC_DIR.glob("*.lean"))])
+        missing = [tag for tag in tags if tag not in qualified_decls]
+        self.assertEqual(missing, [], f"Blueprint \\lean tags missing from qualified Lean declarations: {missing}")
+
+    def test_blueprint_pdf_synchronized(self):
+        self.assertTrue(BLUEPRINT_PDF.exists(), "Missing blueprint/src/print.pdf")
+        self.assertGreater(BLUEPRINT_PDF.stat().st_size, 0, "Empty blueprint/src/print.pdf")
+        pdftotext = shutil.which("pdftotext")
+        assert pdftotext is not None, "pdftotext is required to verify blueprint/src/print.pdf synchronization"
+        proc = subprocess.run(
+            [pdftotext, "-enc", "UTF-8", str(BLUEPRINT_PDF), "-"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
         )
-        missing = []
-        for tag in tags:
-            leaf = tag.split(".")[-1]
-            if not re.search(rf"\b(?:theorem|lemma|def|abbrev)\s+{re.escape(leaf)}\b", lean_corpus):
-                missing.append(tag)
-        self.assertEqual(missing, [], f"Blueprint \\lean tags missing from Lean sources: {missing}")
+        pdf_text = proc.stdout
+        self.assertIn("212-mathematics blueprint", pdf_text.lower())
+        legacy_pkg = "RhAstra" + "Synthesis"
+        self.assertNotIn(legacy_pkg, pdf_text, f"Legacy identifier {legacy_pkg} found in print.pdf")
+        self.assertIsNone(
+            re.search(r"rh-" + r"astra", pdf_text, flags=re.IGNORECASE),
+            "Legacy repo name found in print.pdf",
+        )
+        self.assertNotIn("??", pdf_text, "Unresolved LaTeX reference or citation ('??') found in print.pdf")
+        for author in ("Báez-Duarte", "Markov", "Titchmarsh", "van der Corput"):
+            self.assertIn(author, pdf_text, f"Bibliography author {author!r} missing from print.pdf")
+
+        norm_pdf = re.sub(r"\s+", "", pdf_text)
+        tex = BLUEPRINT_TEX.read_text(encoding="utf-8")
+        tags = [entry.strip() for m in re.finditer(r"\\lean\{([^}]+)\}", tex) for entry in m.group(1).split(",")]
+        missing_in_pdf = [tag for tag in tags if tag not in norm_pdf]
+        self.assertEqual(missing_in_pdf, [], f"Blueprint \\lean tags out of sync with print.pdf: {missing_in_pdf}")
 
     def test_public_docs_style(self):
         for doc in (README_MD, ARCH_MD):

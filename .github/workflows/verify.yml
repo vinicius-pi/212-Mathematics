@@ -29,6 +29,13 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Ensure pdftotext (poppler-utils) for blueprint PDF sync check
+        run: |
+          if ! command -v pdftotext >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq poppler-utils
+          fi
+
       - name: Run mathematical boundary probes & Lean/blueprint integrity audit
         run: python3 -m unittest discover -s tests -p "test_*.py" -v
 

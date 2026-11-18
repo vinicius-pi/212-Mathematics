@@ -68,7 +68,9 @@ example : |(Polynomial.X ^ 2 : Polynomial ℝ).eval (1 / 4) -
   rw [reciprocal_taylor_nonzero_witness]
   norm_num
 
-/-- Finite small-degree bridge only; the full family remainder remains open. -/
+/-- Finite small-degree (`L * m ≤ n`) remainder bound; the complete family
+remainder is established in `reciprocal_family_remainder_gevrey`
+(`Mathematics212.polynomial_reciprocal_family_remainder_gevrey`). -/
 theorem reciprocal_taylor_remainder
     (P : Polynomial ℝ) (B : ℝ) (L m n p : ℕ)
     (hB : 0 < B) (hL : 0 < L) (hm : 0 < m) (hn : 0 < n) (hp : 0 < p)
