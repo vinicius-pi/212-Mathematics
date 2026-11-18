@@ -38,10 +38,13 @@
 \DeclareMathOperator{\ImPart}{Im}
 
 \title[212-Mathematics Blueprint]{212-Mathematics Blueprint: Polynomial Extremal Bounds, Coprime Convolutions, and Zeta Multipliers}
-\author{Vinicius M. Pimenta}
-\date{November 16, 2026}
+\author{Vinícius Marques Pimenta}
+\date{November 18, 2026}
 
 \begin{document}
+\begin{abstract}
+We present the formalization blueprint for \texttt{Mathematics212}, a Lean~4 (\texttt{v4.34.0}) and Rocq~\texttt{9.0} development covering three interconnected pillars: (i) Markov--Bernstein polynomial inequalities and discrete reciprocal-grid bounds; (ii) a measurable equioscillation Remez inequality driving an all-radii reciprocal Gevrey-1 asymptotic expansion with holomorphic coefficient profiles; and (iii) coprime M\"obius convolutions, local Euler-factor bounds, and Mellin multiplier identities and analytic obstructions. All 49 Lean submodules build without \texttt{sorry} or custom axioms, verified by \texttt{lake build}, \texttt{leanchecker}, and \texttt{rocqchk}.
+\end{abstract}
 \maketitle
 \tableofcontents
 \input{content}

@@ -100,6 +100,8 @@ lake env leanchecker Mathematics212
 python3 rocq/verify_rocq.py   # requires Docker image rocq/rocq-prover:9.0
 ```
 
-## Provenance & Scope
+## Author, Provenance & Scope
+
+**Author:** Vinícius Marques Pimenta
 
 Portions of the Lean 4 and Rocq 9.0 formalizations, tests, and documentation were developed with AI assistance and verified mechanically by `lake build`, `leanchecker`, `rocqchk`, and the Python test suite. Formal verification establishes kernel-checked derivations from the pinned Mathlib and Rocq foundations; it does not replace independent mathematical peer review.

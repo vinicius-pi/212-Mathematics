@@ -138,11 +138,16 @@ class LeanIntegrityTests(unittest.TestCase):
             "Legacy repo name found in print.pdf",
         )
         self.assertNotIn("??", pdf_text, "Unresolved LaTeX reference or citation ('??') found in print.pdf")
+        self.assertIn("marques pimenta", pdf_text.lower(), "Canonical author 'Vinícius Marques Pimenta' missing from print.pdf")
+        for phrase in ("length-weighted average", "occupied gaps"):
+            self.assertIn(phrase, pdf_text, f"Expected proof clarification {phrase!r} missing from print.pdf")
         for author in ("Báez-Duarte", "Markov", "Titchmarsh", "van der Corput"):
             self.assertIn(author, pdf_text, f"Bibliography author {author!r} missing from print.pdf")
 
-        norm_pdf = re.sub(r"\s+", "", pdf_text)
         tex = BLUEPRINT_TEX.read_text(encoding="utf-8")
+        self.assertNotIn("\night)", tex, "Corrupted 'ight)' macro found in blueprint/src/content.tex")
+
+        norm_pdf = re.sub(r"\s+", "", pdf_text)
         tags = [entry.strip() for m in re.finditer(r"\\lean\{([^}]+)\}", tex) for entry in m.group(1).split(",")]
         missing_in_pdf = [tag for tag in tags if tag not in norm_pdf]
         self.assertEqual(missing_in_pdf, [], f"Blueprint \\lean tags out of sync with print.pdf: {missing_in_pdf}")

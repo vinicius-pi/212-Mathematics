@@ -287,6 +287,8 @@ is a strict contraction inside $\RePart(w) \in [7/4, 11/4]$, yielding a zero $s_
 For $t \ge 1$ and $\omega \in \R$, Selberg parity pseudo-densities $1 + t^{-1/4}\cos(\omega\log t)$ are everywhere non-negative. An off-axis zero $z$ ($\RePart z > 1/2$) induces a positive $H^2(\C_{1/2}^+)$ model-space projection defect $(2\RePart z - 1)/|z|^2 > 0$, and any symmetric matrix with a negative $2 \times 2$ principal minor fails \texttt{Matrix.PosSemidef}.
 \end{theorem}
 
+\section{Reciprocal Gevrey-1 Asymptotic Expansion and Holomorphic Profiles}
+
 \begin{lemma}[Fixed-order cubic geometric Gevrey majorant]
 \label{lem:cubic-geometric-gevrey}
 \lean{Mathematics212.cubic_geometric_gevrey_majorant}
@@ -566,5 +568,19 @@ Feed the Prime Number Theorem ($\sum \mu(n)/n = 0$) and unconditional Vinogradov
 \label{thm:open-blaschke}
 \uses{thm:tent-obstructions, thm:parity-pick}
 \notready
-Construct the Blaschke product of the off-axis zeros from Theorem~\ref{thm:tent-obstructions} and apply Theorem~\ref{thm:parity-pick} to finite-dimensional Pick and Stieltjes--Hankel matrices arising from modular theta deformations $\Xi_H = \Xi M_H$.
+Construct the Blaschke product of the off-axis zeros from Theorem~
+ef{thm:tent-obstructions} and apply Theorem~
+ef{thm:parity-pick} to finite-dimensional Pick and Stieltjes--Hankel matrices arising from modular theta deformations $\Xi_H = \Xi M_H$.
 \end{proposition}
+
+\section{Contributions, Reproducibility, and AI-Use Disclosure}
+
+\begin{remark}[Taxonomy of contributions]
+\label{rem:taxonomy}
+This repository distinguishes three layers: (a) \emph{classical theorems} from the literature (Markov's interior inequality~\cite{markov1889}, Bernstein--van der Corput--Schaake~\cite{vandercorput1935}, Remez/Bojanov node selection, Vaughan's identity, B\'aez--Duarte's criterion~\cite{baez2003}, and Titchmarsh's Mellin/Euler identities~\cite{titchmarsh1986}); (b) \emph{original formalization engineering} in Lean~4 (\texttt{v4.34.0}) and Rocq~\texttt{9.0}, including the mechanization of Lebesgue measurable Remez via compact inner regularity and cumulative measure nodes, reciprocal-grid Rolle gap counting, uniform holomorphy on open disks via closed-subdisk majorants, \texttt{\_root\_.CommRing} isolation, and executable non-vacuity witnesses in \texttt{TargetStatements.lean}; and (c) \emph{quantitative synthesis and constructive certificates}, including the all-radii reciprocal Gevrey-1 remainder bound $(3C/d)(72L/d^3)^p p!/n^p$, sharpness witnesses on $\{1/n\}$ and $\{n^{-1/2}\}$, and contraction fixed-point location of infinitely many off-axis zeros of the tent Mellin multiplier in $2 < \RePart(s) < 4$.
+\end{remark}
+
+\begin{remark}[Reproducibility and AI-use disclosure]
+\label{rem:reproducibility}
+All 49 Lean~4 submodules build without \texttt{sorry}, custom axioms, \texttt{native\_decide}, or \texttt{Lean.ofReduceBool} under \texttt{lake build} and \texttt{leanchecker}, using only \texttt{[propext, Classical.choice, Quot.sound]}; the finite rational signed-square envelope is independently checked in Rocq~\texttt{9.0} (\texttt{rocqchk}). Portions of the Lean~4 and Rocq~\texttt{9.0} formalizations, tests, and documentation were developed with AI assistance and mechanically verified. Formal verification establishes kernel-checked derivations from the pinned Mathlib and Rocq foundations; it does not replace independent mathematical peer review.
+\end{remark}
