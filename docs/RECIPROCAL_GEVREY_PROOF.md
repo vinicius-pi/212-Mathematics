@@ -14,7 +14,24 @@ Writing `q_n(u) = 1 + ∑_{m≥1} P_m(1/n) u^m` and
 ```
 
 The estimate holds simultaneously for all positive `n,p` and all `|u| ≤ r`.
-The full zeroth profile is `1 + F_0`.
+The full zeroth profile is `1 + F_0`; the expansion in `1/n` is asymptotic as
+`n → ∞` at fixed truncation order `p`, while each profile series `F_s(u)`
+converges in `u` on the open disk `|u| < R`.
+
+## Interface distinctions
+
+- `Mathematics212.polynomial_reciprocal_gevrey_expansion` exports the
+  conjunction of sampled absolute summability (`reciprocal_sampled_summable`),
+  the complex remainder identity (`reciprocal_complex_remainder_identity`), and
+  the norm estimate, while proving absolute summability of the complex
+  remainder series internally (`hnorm`).
+- `Mathematics212.TargetStatements.reciprocal_gevrey_expansion` projects only
+  the norm estimate (via `.2.2`).
+- `Mathematics212.polynomial_reciprocal_profiles_all_radii` and
+  `Mathematics212.polynomial_reciprocal_profiles_holomorphic` are companion
+  theorems for uniform convergence on closed subdisks and holomorphy on `|u| < R`.
+- Open Analytic Extensions (see `sec:open-questions` / `Open Mathematical Questions`
+  in the blueprint PDF) remain unformalized targets.
 
 ## Proof chain
 
@@ -36,10 +53,13 @@ The full zeroth profile is `1 + F_0`.
 
 ## Verification
 
-The theorem and its nonzero complex example passed
-[CI run 44012564508](https://github.com/vinicius-pi/212-Mathematics/actions/runs/44012564508)
-at revision `579561b49aeacc6923c2e175cac063559cc2bdc6`.
-The consolidated revision `9b60bb8f60a7a171fdc561ae4ea0b3846f7d4599` passed
-[CI run 44029922271](https://github.com/vinicius-pi/212-Mathematics/actions/runs/44029922271).
-The workflow compiles the package, runs leanchecker, audits axioms and executes
-Python probes alongside the finite rational Rocq verification.
+- Frozen candidate revision `08ec36676a072a6107e9d76a43f268f907ed0734` passed
+  [CI run 44358503398](https://github.com/vinicius-pi/212-Mathematics/actions/runs/44358503398)
+  (`verify` + `verify-rocq`).
+- Historical proof-chain receipts: revision `579561b49aeacc6923c2e175cac063559cc2bdc6`
+  passed [CI run 44012564508](https://github.com/vinicius-pi/212-Mathematics/actions/runs/44012564508);
+  consolidated revision `9b60bb8f60a7a171fdc561ae4ea0b3846f7d4599` passed
+  [CI run 44029922271](https://github.com/vinicius-pi/212-Mathematics/actions/runs/44029922271).
+- The workflow compiles the Lean package, runs `leanchecker`, audits axioms under
+  `Mathematics212`, and executes Python probes alongside the finite rational
+  Rocq verification (`rocq/verify_rocq.py`).
