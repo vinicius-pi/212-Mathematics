@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact rational and high-precision boundary/counterexample probes for RhAstraSynthesis.
+"""Exact rational and high-precision boundary/counterexample probes for Mathematics212.
 
 These probes independently verify boundary cases and counterexamples (e.g., why d != 0,
 r_2 = 2/3, negative affine slopes, and the cubic sharpness witness are tight). They do
@@ -8,7 +8,7 @@ not replace Lean kernel verification (`lake build` + `leanchecker`).
 from decimal import Decimal, localcontext
 from fractions import Fraction
 import cmath
-from math import comb, cos, exp, gcd, log, pi, prod, sin, sqrt
+from math import comb, cos, exp, factorial, gcd, log, pi, prod, sin, sqrt
 import unittest
 
 
@@ -89,6 +89,104 @@ def eval_poly(coeffs: list[Fraction], x: Fraction) -> Fraction:
 
 
 class MathematicalProbesTests(unittest.TestCase):
+    def test_cubic_geometric_gevrey_majorant(self):
+        # Exact infinite moments, not a truncated-series convergence test.
+        # P_j(q)/(1-q)^(j+1) is the full geometric power moment.
+        polynomial = [Fraction(1)]
+        for j in range(19):
+            if j % 3 == 0:
+                s = j // 3
+                for sigma in (Fraction(0), Fraction(1, 2), Fraction(9, 10)):
+                    moment = eval_poly(polynomial, sigma) / (1 - sigma) ** (j + 1)
+                    if j == 0:
+                        moment -= 1  # Positive-index convention at order zero.
+                    for C in (Fraction(0), Fraction(3, 2)):
+                        for L in (Fraction(0), Fraction(1), Fraction(5)):
+                            exact_sum = C * (8 * L) ** s / factorial(2 * s) * moment
+                            bound = C / (1 - sigma) * (64 * L / (1 - sigma) ** 3) ** s * factorial(s)
+                            self.assertGreaterEqual(exact_sum, 0)
+                            self.assertLessEqual(exact_sum, bound)
+            nxt = [Fraction(0)] * (len(polynomial) + 1)
+            for k, coefficient in enumerate(polynomial):
+                nxt[k] += k * coefficient
+                nxt[k + 1] += (j + 1 - k) * coefficient
+            polynomial = nxt
+
+    def test_geometric_power_moment_uniform_bound(self):
+        # Apply (sigma d/dsigma)^j to 1/(1-sigma), using exact rational
+        # generating functions P_j(sigma)/(1-sigma)^(j+1). Remove m=0
+        # only at j=0: this explicitly probes the 0^0 indexing trap.
+        ratios = (Fraction(0), Fraction(1, 1000), Fraction(1, 2),
+                  Fraction(9, 10), Fraction(99, 100), Fraction(999, 1000))
+        polynomial = [Fraction(1)]
+        for j in range(13):
+            for sigma in ratios:
+                with self.subTest(j=j, sigma=sigma):
+                    moment = eval_poly(polynomial, sigma) / (1 - sigma) ** (j + 1)
+                    if j == 0:
+                        moment -= 1
+                        self.assertEqual(moment, sigma / (1 - sigma))
+                    self.assertGreaterEqual(moment, 0)
+                    self.assertLessEqual(moment, factorial(j) / (1 - sigma) ** (j + 1))
+                    if sigma == 0:
+                        self.assertEqual(moment, 0)
+                    if j == 2 and sigma == Fraction(1, 2):
+                        self.assertEqual(moment, 6)
+            # P_{j+1} = sigma * ((1-sigma) P'_j + (j+1) P_j).
+            nxt = [Fraction(0)] * (len(polynomial) + 1)
+            for k, coefficient in enumerate(polynomial):
+                nxt[k] += k * coefficient
+                nxt[k + 1] += (j + 1 - k) * coefficient
+            polynomial = nxt
+        # Exact termwise majorant used in Lean, including j=n=0.
+        for n in range(20):
+            for j in range(13):
+                self.assertLessEqual((n + 1) ** j, factorial(j) * comb(n + j, j))
+
+    def test_reciprocal_sample_remez_factorial_bridge(self):
+        # Exact normalization of the measure lower bound used by full Remez.
+        # P(t)=t^m has |P(1/n)| <= 1 for every n>=1 (not just the probes).
+        # Include s=0 and s=m, endpoints and midpoint, and several L values.
+        for m in range(1, 9):
+            for L in (1, 2, 5, 16):
+                width = Fraction(1, L * m)
+                good_measure_lower = Fraction(1, L * m + m)
+                self.assertEqual(width / (1 + Fraction(1, L)), good_measure_lower)
+                self.assertEqual(2 * width / good_measure_lower - 1, 1 + Fraction(2, L))
+                envelope = exp(2 * m / sqrt(L))
+                for n in range(1, 40):
+                    self.assertLessEqual(Fraction(1, n) ** m, 1)
+                for j in range(9):
+                    x = width * Fraction(j, 8)
+                    self.assertLessEqual(float(x**m), envelope)
+                    for s in range(m + 1):
+                        taylor_coefficient = comb(m, s) * x ** (m - s)
+                        factorial_factor = Fraction((8 * L) ** s * m ** (3 * s), factorial(2 * s))
+                        self.assertLessEqual(float(taylor_coefficient), envelope * float(factorial_factor))
+
+    def test_uniform_reciprocal_factorial_half_segments(self):
+        # Exact rational probes, including order zero, midpoint, both endpoints,
+        # both orientations, and the highest nonzero derivative. Not a Lean check.
+        for m in range(1, 8):
+            for L in (Fraction(1, 3), Fraction(1), Fraction(5, 2)):
+                width = 1 / (L * m)
+                half = width / 2
+                coeffs = chebyshev_T_poly(m)
+                for j in range(9):
+                    x = width * Fraction(j, 8)
+                    a = 1 if x <= half else -1
+                    for k in range(5):
+                        image = x + a * half * Fraction(k, 4)
+                        self.assertLessEqual(0, image)
+                        self.assertLessEqual(image, width)
+                    cur = coeffs
+                    for s in range(m + 1):
+                        # P(t) = T_m(2*L*m*t - 1), uniformly bounded by one.
+                        value = (2 * L * m) ** s * eval_poly(cur, 2 * L * m * x - 1)
+                        bound = (8 * L) ** s * m ** (3 * s) / factorial(2 * s)
+                        self.assertLessEqual(abs(value) / factorial(s), bound)
+                        cur = [i * cur[i] for i in range(1, len(cur))]
+
     def test_cubic_sharpness_witness_and_quadratic_obstruction(self):
         for m in range(1, 8):
             ann = [Fraction(1)]

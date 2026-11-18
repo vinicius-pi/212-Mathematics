@@ -1,24 +1,72 @@
-\section{Chebyshev Extremal Bounds, Interior Markov, and Discrete Grids}
+\section{Introduction and Main Result}
 
-We develop polynomial derivative and extremal estimates on $[-1, 1]$ and discrete reciprocal lattices $\{n^{-\alpha}\}_{n \ge 1}$ ($\alpha \in (0, 1]$). Unless otherwise noted, all theorems below are formalized across 18 modules of \texttt{RhAstraSynthesis} and verified in Lean~4 using only \texttt{[propext, Classical.choice, Quot.sound]}.
+If all we know about a sequence of real polynomials $P_m \in \R[X]$ ($m \ge 1$) is their degree bound $\deg P_m \le m$ and their values at reciprocal integers $|P_m(1/k)| \le C R^{-m}$ ($m, k \ge 1$), what can we say about the sampled generating function
+\[
+  q_n(u) = 1 + \sum_{m \ge 1} P_m(1/n)\, u^m
+\]
+as the sampling index $n \to \infty$? The main result of this paper, Theorem~\ref{thm:reciprocal-full-gevrey-expansion}, shows that $q_n(u)$ admits a Gevrey-1 asymptotic expansion in $1/n$ whose coefficient functions $A_0(u) = 1 + F_0(u)$ and $A_s(u) = F_s(u)$ ($s \ge 1$) are holomorphic on the open disk $|u| < R$, with uniform $p! / n^p$ remainder control on every closed subdisk $|u| \le r < R$ via a single scale parameter $L \ge 1$ chosen before $n$, $p$, and $u$.
+
+\begin{theorem}[Full reciprocal Gevrey-1 expansion on closed subdisks]
+\label{thm:reciprocal-full-gevrey-expansion}
+\lean{Mathematics212.reciprocal_sampled_summable, Mathematics212.reciprocal_complex_remainder_identity, Mathematics212.polynomial_reciprocal_gevrey_expansion}
+\leanok
+\uses{thm:reciprocal-absolute-remainder-series, lem:reciprocal-all-radii-parameter, thm:reciprocal-complex-profiles, thm:reciprocal-profile-holomorphy}
+Let $C, R > 0$. Suppose that for every integer $m \ge 1$, $P_m \in \R[X]$ satisfies $\deg P_m \le m$ and $|P_m(1/k)| \le C R^{-m}$ for every integer $k \ge 1$. Define the sampled series and formal coefficient profiles by
+\[
+  q_n(u) = 1 + \sum_{m \ge 1} P_m(1/n)\, u^m,
+  \qquad
+  F_s(u) = \sum_{m \ge 1} ([X^s]P_m)\, u^m
+  \quad (s \in \N).
+\]
+Then:
+\begin{enumerate}
+  \item For every integer $n \ge 1$ and every $u \in \C$ with $|u| < R$, the sampled series defining $q_n(u)$ converges absolutely.
+  \item For every $s \in \N$, the profile series $F_s(u)$ converges absolutely and uniformly on every closed subdisk $|u| \le r < R$, and the full profiles $A_0(u) = 1 + F_0(u)$ and $A_s(u) = F_s(u)$ ($s \ge 1$) are holomorphic on the open disk $\{u \in \C : |u| < R\}$.
+  \item For every real $0 \le r < R$, there exists one positive integer $L \ge 1$, chosen before $n$, $p$, and $u$, such that $\sigma = (r/R)\exp(2/\sqrt{L}) < 1$. Setting $d = 1 - \sigma \in (0, 1]$, simultaneously for all integers $n, p \ge 1$ and all $u \in \C$ with $|u| \le r$, the complex remainder series converges absolutely, satisfies the identity
+  \[
+    q_n(u) - \left(1 + \sum_{s=0}^{p-1} F_s(u)\,n^{-s}\right)
+    = \sum_{m \ge 1} \left(P_m(1/n) - \sum_{s=0}^{p-1} ([X^s]P_m)\,n^{-s}\right) u^m,
+  \]
+  and obeys the uniform Gevrey-1 remainder estimate
+  \[
+    \left|q_n(u) - \left(1 + \sum_{s=0}^{p-1} F_s(u)\,n^{-s}\right)\right|
+    \le \frac{3C}{d}\left(\frac{72L}{d^3}\right)^p \frac{p!}{n^p}.
+  \]
+\end{enumerate}
+For $p \ge 1$ the parenthesized approximation equals $\sum_{s=0}^{p-1} A_s(u)\,n^{-s}$; in particular, for $p = 1$ it reads $1 + F_0(u) = A_0(u)$.
+\end{theorem}
+
+For each fixed $s \in \N$, the profile series $F_s(u)$ converges in $u$ on $|u| < R$. By contrast, the expansion in $1/n$ is asymptotic as $n \to \infty$ at fixed truncation order $p$: the majorant ratio $(72L/d^3)(p+1)/n$ grows with $p$, so the bound does not assert convergence as $p \to \infty$ at fixed $n$, nor does it extend to the boundary radius $r = R$.
+
+\begin{remark}[Nonzero example and mechanism]
+\label{rem:gevrey-example-roadmap}
+Take $P_1(X) = X$ and $P_m = 0$ for $m \ne 1$, with $C = R = 1$. Then $F_0 = 0$, $F_1(u) = u$, $q_n(u) = 1 + u/n$, and at $n = 2$, $p = 1$, $u = i/2$ ($r = 1/2$) the remainder is $q_2(i/2) - (1 + F_0(i/2)) = i/4 \ne 0$, confirming that the estimate applies to nontrivial complex families.
+
+The mechanism has four steps: (1) any interval $(1/(j+1), 1/j)$ on which $|P_m| > B$ contains a root of $P_m'$, bounding the bad subset of $[0, 1/(Lm)]$ by $m$ gaps (Section~\ref{sec:extremal-remez}); (2) the measurable Remez inequality and interior/endpoint Markov estimates transport the sample bound on $[0, 1/(Lm)]$ to factorial-strength bounds on all derivatives $P_m^{(s)}(x)$ ($x \in [0, (Lm)^{-1}]$) at the cost of a factor $\exp(2m/\sqrt{L})$; (3) for $Lm \le n$, $[0, 1/n] \subseteq [0, (Lm)^{-1}]$ yields a direct Lagrange Taylor remainder, while for $1 \le n \le Lm$ the sample bound and individual coefficient estimates give a complementary mixed-moment bound (Section~\ref{sec:gevrey-proof}); and (4) choosing one $L$ per subradius $r < R$ so that $(r/R)e^{2/\sqrt{L}} < 1$ makes all weighted degree sums converge uniformly, proving Theorem~\ref{thm:reciprocal-full-gevrey-expansion}.
+
+Sections~\ref{sec:extremal-remez}--\ref{sec:gevrey-proof} carry out this proof; Sections~\ref{sec:companion-mobius} and~\ref{sec:companion-mellin} present separate companion formalizations on coprime M\"obius convolutions and tent Mellin multipliers; Section~\ref{sec:open-questions} records open mathematical questions; and Section~\ref{sec:crosswalk-disclosure} gives the formalization crosswalk, literature comparison, reproducibility notes, and AI-use disclosure.
+\end{remark}
+
+\section{Polynomial Extremal, Remez, and Reciprocal-Grid Inequalities}
+\label{sec:extremal-remez}
 
 \subsection{Bernstein--Van der Corput--Schaake and A. A. Markov's Interior Theorem}
 
 \begin{definition}[Markov odd double-factorial denominator]
 \label{def:markov-denom}
-\lean{RhAstraSynthesis.markovOddDenom}
+\lean{Mathematics212.markovOddDenom, Mathematics212.chebyshev_iterate_derivative_eval_one_eq}
 \leanok
 For $s \in \N$, define the odd double-factorial denominator
 \[
 D_s = \prod_{j=0}^{s-1} (2j + 1).
 \]
-At $x = 1$, the $s$-th derivative of the Chebyshev polynomial $T_m$ satisfies
-$T_m^{(s)}(1) = D_s^{-1} \prod_{j=0}^{s-1} (m^2 - j^2)$.
+At $x = 1$, for all $m, s \in \N$, the $s$-th derivative of the Chebyshev polynomial $T_m$ satisfies
+$T_m^{(s)}(1) = D_s^{-1} \prod_{j=0}^{s-1} (m^2 - j^2)$ (which vanishes identically for $s > m$).
 \end{definition}
 
 \begin{lemma}[Near-endpoint Chebyshev--Lagrange sign definiteness]
 \label{lem:lagrange-near-endpoint}
-\lean{RhAstraSynthesis.markov_interior_derivative_abs_le}
+\lean{Mathematics212.markov_interior_derivative_abs_le}
 \leanok
 Let $n \ge 2$ and let $x_i = \cos(i\pi/n)$ ($0 \le i \le n$) be the Chebyshev extrema in $[-1, 1]$, with Lagrange basis polynomials $\ell_i$. For every $x \in [\sqrt{1 - n^{-2}}, 1]$ and every $0 \le i \le n$,
 \[
@@ -27,7 +75,7 @@ Let $n \ge 2$ and let $x_i = \cos(i\pi/n)$ ($0 \le i \le n$) be the Chebyshev ex
 \end{lemma}
 
 \begin{proof}
-Since $1 - x \le \frac{1 - x^2}{1 + x} \le \frac{5}{9} n^{-2}$ on $[\sqrt{1 - n^{-2}}, 1]$ while $1 - x_j = 2\sin^2\!\bigl(\frac{j\pi}{2n}\bigr) \ge 2(j/n)^2$ for $1 \le j \le n$, every gap satisfies $x - x_j \ge (2j^2 - 5/9)n^{-2} > 0$. By \texttt{Chebyshev.zero\_lt\_prod\_node\_sub\_node}, $(-1)^i \prod_{j \ne i}(x_i - x_j) > 0$. The case $i = 0$ is immediate from positivity of all factors $x - x_m$ ($m \ge 1$). For $1 \le i \le n$, extracting the $j = 0$ term ($x_0 = 1$) gives
+The sign estimate is proved within the proof of the cited public bound (see the private lemma \texttt{near\_endpoint\_basis\_deriv\_sign} in \texttt{MarkovInterior.lean}). Since $1 - x = \frac{1 - x^2}{1 + x} \le \frac{5}{9} n^{-2}$ on $[\sqrt{1 - n^{-2}}, 1]$ while $1 - x_j = 2\sin^2\!\bigl(\frac{j\pi}{2n}\bigr) \ge 2(j/n)^2$ for $1 \le j \le n$, every gap with $1 \le j \le n$ satisfies $x - x_j \ge (2j^2 - 5/9)n^{-2} > 0$. By \texttt{Chebyshev.zero\_lt\_prod\_node\_sub\_node}, $(-1)^i \prod_{j \ne i}(x_i - x_j) > 0$. The case $i = 0$ is immediate from non-negativity of all factors $x - x_m$ ($1 \le m \le n$). For $1 \le i \le n$, extracting the $j = 0$ term ($x_0 = 1$) gives
 \[
 \ell_i'(x) \prod_{j \ne i}(x_i - x_j)
 = P_0(x)\!\left(1 - \sum_{\substack{1 \le j \le n \\ j \ne i}} \frac{1 - x}{x - x_j}\right),
@@ -41,9 +89,9 @@ Separating $j = 1$ and telescoping $\sum_{j=2}^n \frac{1}{2j^2 - 5/9} \le \frac{
 completing the sign claim.
 \end{proof}
 
-\begin{theorem}[Bernstein / Van der Corput--Schaake inequality~\cite{vandercorput1935}]
+\begin{theorem}[Bernstein inequality in the form treated by van der Corput and Schaake~\cite{vandercorput1935,vandercorput1936}]
 \label{thm:vandercorput-schaake}
-\lean{RhAstraSynthesis.van_der_corput_schaake}
+\lean{Mathematics212.van_der_corput_schaake}
 \leanok
 For every $P \in \R[X]$ with $\deg P \le n$, $B \ge 0$ such that $|P(t)| \le B$ on $[-1, 1]$, and $\theta \in \R$,
 \[
@@ -52,7 +100,7 @@ n^2 P(\cos\theta)^2 + \bigl(P'(\cos\theta)\sin\theta\bigr)^2 \le n^2 B^2.
 \end{theorem}
 
 \begin{proof}
-Normalizing to $B = 1$ ($n \ge 1$), suppose the left-hand side strictly exceeds $n^2$ at $\theta_0$. Choose $R = \sqrt{P(\cos\theta_0)^2 + (P'(\cos\theta_0)\sin\theta_0 / n)^2} > 1$, set $c = 1/R \in (0, 1)$, and phase-lock $\alpha \in \R$ so that
+If $B = 0$, then $P$ vanishes on $[-1, 1]$ and hence identically, so both sides are zero. If $n = 0$, then $P$ is constant ($P' = 0$) and both sides are zero. Otherwise $B > 0$ and $n \ge 1$; dividing by $B$ reduces to $B = 1$. Suppose the left-hand side strictly exceeds $n^2$ at $\theta_0$. Choose $R_0 = \sqrt{P(\cos\theta_0)^2 + (P'(\cos\theta_0)\sin\theta_0 / n)^2} > 1$, set $c = 1/R_0 \in (0, 1)$, and phase-lock $\alpha \in \R$ so that
 \[
 \cos(n\theta_0 - \alpha) = c P(\cos\theta_0), \qquad
 \sin(n\theta_0 - \alpha) = \frac{c}{n} P'(\cos\theta_0)\sin\theta_0.
@@ -66,7 +114,7 @@ is an algebraic polynomial of degree at most $2n$. The representative $s_* \equi
 
 \begin{theorem}[A. A. Markov's interior derivative inequality~\cite{markov1889}]
 \label{thm:markov-interior}
-\lean{RhAstraSynthesis.markov_interior_derivative_abs_le, RhAstraSynthesis.markov_iterate_derivative_interior_le, RhAstraSynthesis.markov_interior_interval_transfer}
+\lean{Mathematics212.markov_interior_derivative_abs_le, Mathematics212.markov_iterate_derivative_interior_le, Mathematics212.markov_interior_interval_transfer}
 \uses{lem:lagrange-near-endpoint, thm:vandercorput-schaake}
 \leanok
 Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on $[-1, 1]$ ($B \ge 0$). Then for every $x \in [-1, 1]$ and every $s \in \N$,
@@ -83,18 +131,29 @@ The cases $n = 0$ and $n = 1$ are immediate ($2|P'(0)| = |P(1) - P(-1)| \le 2B$)
 
 \subsection{The Measurable Equioscillation Remez Inequality}
 
-\begin{theorem}[Measurable equioscillation Remez inequality]
+\begin{theorem}[Measurable equioscillation Remez inequality~\cite{bojanov1993}]
 \label{thm:remez-inequality}
-\lean{RhAstraSynthesis.remez_inequality}
+\lean{Mathematics212.remez_inequality}
 \leanok
-For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X]$ with $\deg P \le n$, and measurable subset $E \subseteq [a, b]$ of positive Lebesgue measure $|E| > 0$ on which $|P(t)| \le B$ ($B \ge 0$), every $x \in [a, b]$ satisfies
+For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X]$ with $\deg P \le n$, and Borel (or, by the good-superset reduction below, Lebesgue-measurable) subset $E \subseteq [a, b]$ of positive measure $|E| > 0$ on which $|P(t)| \le B$ ($B \ge 0$), every $x \in [a, b]$ satisfies
 \[
 |P(x)| \le T_n\!\left(\frac{2(b - a)}{|E|} - 1\right) B.
 \]
 \end{theorem}
 
 \begin{proof}
-Inner regularity of Lebesgue measure reduces $E$ to a compact subset $K \subseteq E$ with $|K| > 0$ via \texttt{MeasurableSet.exists\_isCompact\_diff\_lt}, and monotone continuity of $T_n$ on $[1, \infty)$ passes to the limit $|K| \uparrow |E|$. For any $x \in (a, b]$, applying the right-endpoint case to $[a, x]$ and $K \cap [a, x]$ (whenever $|K \cap [a, x]| > 0$, using monotonicity of $y \mapsto T_n(y)$) and symmetrically reflecting $t \mapsto -t$ on $[-b, -x]$ when $|K \cap [x, b]| > 0$ reduces the bound on $[a, b]$ to establishing the right-endpoint inequality at $x = b$. For the right-endpoint step on $[a, b]$ with $|K| = e > 0$ and $Y = 2(b-a)/e - 1 \ge 1$: continuity and Lipschitz regularity of $x \mapsto |K \cap [a, x]|$ yield ordered nodes $x_0 < \dots < x_n$ in $K$ satisfying
+If $n=0$, then $P$ is constant and $E$ is nonempty. Assume $n\ge1$.
+Split $[a,b]$ at $x$. The two sides overlap only at $x$, so their good-set measures add to $|E|$.
+The overall density is a length-weighted average of the densities on the sides of positive length.
+Choose a side $I$ with $|E\cap I|/|I|\ge |E|/(b-a)>0$. Then
+\[
+  1\le \frac{2|I|}{|E\cap I|}-1\le \frac{2(b-a)}{|E|}-1.
+\]
+Apply the right-endpoint estimate on $I$, reflecting $t\mapsto -t$ if $I=[x,b]$.
+Monotonicity of $T_n$ on $[1,\infty)$ gives the stated bound.
+It remains to prove the right-endpoint estimate. Relabel the interval $[a,b]$ and its good set $E$.
+The compact good superset $K=\{t\in[a,b]:|P(t)|\le B\}$ contains $E$, so replacing $|E|$ by $e=|K| \ge |E|$ (or even the outer measure $|E|^*$ when $E$ is arbitrary) can only decrease the Chebyshev argument. Note that the Lean formalization takes a Borel set (\texttt{MeasurableSet E}) and immediately passes to the compact superset $K$; the Lebesgue-measurable corollary follows from the same inclusion $E \subseteq K$.
+Put $Y=2(b-a)/e-1$. The continuous cumulative measure $t\mapsto |K\cap[a,t]|$ takes each value from $0$ to $e$ at a point of $K$, yielding ordered nodes $x_0<\dots<x_n$ in $K$ satisfying
 \[
 |K \cap [a, x_k]| = \frac{t_k + 1}{2}\,e, \qquad t_k = -\cos\!\left(\frac{k\pi}{n}\right) \quad (0 \le k \le n).
 \]
@@ -110,7 +169,7 @@ since $(-1)^{n-k}\prod_{i \ne k}(t_k - t_i) > 0$ and $T_n(t_k) = (-1)^{n-k}$.
 
 \begin{theorem}[Exponential Remez and combined Markov interior derivative bound]
 \label{thm:remez-exp-markov}
-\lean{RhAstraSynthesis.remez_exponential_inequality, RhAstraSynthesis.remez_markov_interior_derivative_bound}
+\lean{Mathematics212.remez_exponential_inequality, Mathematics212.remez_markov_interior_derivative_bound}
 \uses{thm:remez-inequality, thm:chebyshev-exp, thm:markov-interior}
 \leanok
 Let $P \in \R[X]$ satisfy $\deg P \le n$ and $|P(t)| \le B$ on a measurable set $E \subseteq [a, b]$ ($a < b$, $B \ge 0$). If $|E| \ge (b - a)/(1 + 1/L)$ for some $L > 0$, then $|P(x)| \le \exp(2n/\sqrt{L})\,B$ for all $x \in [a, b]$. Moreover, whenever $|E| > 0$, every $s \in \N$ and $x \in [a, b]$ satisfy
@@ -127,29 +186,53 @@ The hypothesis $|E| \ge (b-a)/(1+1/L)$ forces $1 \le 2(b-a)/|E| - 1 \le 1 + 2/L$
 
 \begin{theorem}[Exterior Chebyshev growth and endpoint Markov transport]
 \label{thm:markov-general}
-\lean{RhAstraSynthesis.chebyshev_exterior_eval_abs_le, RhAstraSynthesis.markov_endpoint_abs_le, RhAstraSynthesis.markov_reciprocal_endpoint_factorial_bound, RhAstraSynthesis.markov_affine_interval_bound_transfer, RhAstraSynthesis.factorial_three_div_two_le_eight_factorial}
+\lean{Mathematics212.chebyshev_exterior_eval_abs_le, Mathematics212.markov_endpoint_abs_le, Mathematics212.markov_reciprocal_endpoint_factorial_bound, Mathematics212.markov_affine_interval_bound_transfer, Mathematics212.factorial_three_div_two_le_eight_factorial}
 \uses{def:markov-denom}
 \leanok
-Every $P \in \R[X]$ with $\deg P \le m$ and $|P| \le B$ on $[-1, 1]$ satisfies $|P(x)| \le B\,T_m(|x|)$ for $|x| \ge 1$ and $|P^{(s)}(\pm 1)| \le B D_s^{-1}\prod_{j=0}^{s-1}(m^2-j^2)$. Under $|P| \le M$ on $[0, (Lm)^{-1}]$, Taylor coefficients at $0$ obey $|P^{(s)}(0)|/s! \le M\,(4L)^s m^{3s}/(2s)!$, alongside the Gevrey factorial bound $(3k)!/(2k)! \le 8^k k!$.
+Every $P \in \R[X]$ with $\deg P \le m$ and $|P| \le B$ on $[-1, 1]$ satisfies $|P(x)| \le B\,T_m(|x|)$ for $|x| \ge 1$ and $|P^{(s)}(\pm 1)| \le B D_s^{-1}\prod_{j=0}^{s-1}(m^2-j^2)$. Under $|P| \le M$ on $[0, (Lm)^{-1}]$ ($L > 0$, $m \ge 1$), Taylor coefficients at $0$ obey $|P^{(s)}(0)|/s! \le M\,(4L)^s m^{3s}/(2s)!$, alongside the Gevrey factorial bound $(3k)!/(2k)! \le 8^k k!$.
 \end{theorem}
+
+\begin{lemma}[Uniform reciprocal-interval factorial bound]
+\label{lem:reciprocal-interval-factorial}
+\lean{Mathematics212.markov_reciprocal_interval_factorial_bound}
+\leanok
+\uses{thm:markov-general}
+For $L>0$, $m\ge1$, $0\le s\le m$, and $M\ge0$, if
+$\deg P\le m$ and $|P(t)|\le M$ on $[0,(Lm)^{-1}]$, then every
+$x\in[0,(Lm)^{-1}]$ satisfies
+\[
+\frac{|P^{(s)}(x)|}{s!}\le M\frac{(8L)^s m^{3s}}{(2s)!}.
+\]
+\end{lemma}
+\begin{proof}
+Write $h=(2Lm)^{-1}$. If $x\le h$, use $Q(t)=P(x+t)$ on $[0,h]$;
+otherwise use $Q(t)=P(x-t)$. Both segments lie in the original interval.
+Apply the endpoint bound with parameter $2L$ and use
+$|Q^{(s)}(0)|=|P^{(s)}(x)|$. This is a factorial-strength bound with a
+$2^s$ loss.
+\end{proof}
 
 \begin{theorem}[Reciprocal-grid good-set measure and Remez--Chebyshev envelope]
 \label{thm:chebyshev-exp}
-\lean{RhAstraSynthesis.polynomial_reciprocal_good_measure, RhAstraSynthesis.remez_chebyshev_T_le_exp}
+\lean{Mathematics212.polynomial_reciprocal_good_measure, Mathematics212.remez_chebyshev_T_le_exp}
 \leanok
-Let $P \in \R[X]$ satisfy $\deg P \le m$, $B > 0$, $k > 0$, and $|P(1/n)| \le B$ for all $n \ge 1$. Then $E = \{t \in [0, 1/k] : |P(t)| \le B\}$ has measure $|E| \ge 1/(k + m)$. For $(Lm + m)^{-1} \le e \le (Lm)^{-1}$ ($L, m > 0$),
+Let $k\ge1$ and $m\ge0$ be integers. Suppose $P\in\R[X]$ has degree at most $m$, $B>0$, and $|P(1/n)|\le B$ for every integer $n\ge1$. Then $E=\{t\in[0,1/k]:|P(t)|\le B\}$ has measure $|E|\ge1/(k+m)$. For any integer $m\ge1$, real $L>0$, and $(Lm+m)^{-1}\le e\le(Lm)^{-1}$,
 \[
 T_m\!\left(\frac{2(Lm)^{-1}}{e} - 1\right) \le T_m\!\left(1 + \frac{2}{L}\right) \le \exp\!\left(\frac{2m}{\sqrt{L}}\right).
 \]
 \end{theorem}
 
 \begin{proof}
-Between any two bad points in $[0, 1/k]$ where $|P| > B$, the reciprocal lattice leaves at most $m$ occupied intervals (Rolle's theorem produces $m$ distinct zeros of $P'$), and antitone telescoping of gaps $(n(n+1))^{-1}$ keeps $|[0, 1/k] \setminus E| \le 1/k - 1/(k+m)$. Writing $1 + 2/L = \cosh\eta$ yields $2/L = \cosh\eta - 1 \ge \eta^2/2$, so $\eta \le 2/\sqrt{L}$ and $T_m(1+2/L) = \cosh(m\eta) \le e^{m\eta} \le e^{2m/\sqrt{L}}$.
+Call a reciprocal gap occupied if it contains a point where $|P|>B$. Both endpoints satisfy $|P|\le B$, so $P^2$ attains its maximum at an interior point $c$ with $P(c)\ne0$. Thus $2P(c)P'(c)=0$ gives $P'(c)=0$. Distinct gaps give distinct roots. A nonconstant $P$ therefore has at most $\deg P-1$ occupied gaps; a constant $P$ has none. The point $0$ is good by continuity. The bad set is thus covered by at most $m$ gaps with indices $j\ge k$. Their lengths $1/j-1/(j+1)$ decrease with $j$, so their total length is at most the sum of the first $m$, namely $1/k-1/(k+m)$. Writing $1 + 2/L = \cosh\eta$ yields $2/L = \cosh\eta - 1 \ge \eta^2/2$, so $\eta \le 2/\sqrt{L}$ and $T_m(1+2/L) = \cosh(m\eta) \le e^{m\eta} \le e^{2m/\sqrt{L}}$.
 \end{proof}
+
+\begin{remark}[Comparison with discrete Remez bounds]
+Yomdin~\cite{yomdin2009} established Remez-type inequalities for discrete subsets of a fixed interval such as $\{k^{-r}\}$ (including $r = 1$). Here the bound is applied instead on a degree-dependent shrinking interval $[0, (Lm)^{-1}]$ to control degree-weighted holomorphic families; dense-sample interval bounds via Markov's inequality also appear in Chen et al.~\cite[Lemma~4.2]{chen2024}.
+\end{remark}
 
 \begin{definition}[Reciprocal and square-root sharpness witnesses]
 \label{def:sharpness-witnesses}
-\lean{RhAstraSynthesis.reciprocalSharpnessWitness, RhAstraSynthesis.sqrtSharpnessWitness}
+\lean{Mathematics212.reciprocalSharpnessWitness, Mathematics212.sqrtSharpnessWitness}
 \leanok
 For $m \ge 1$, set
 \[
@@ -158,120 +241,371 @@ Q_{m,m}(t) = \left(\prod_{j=1}^m (1 - \sqrt{j}\,t)\right) T_m(1 - 2\sqrt{m}\,t).
 \]
 \end{definition}
 
-\begin{theorem}[Cubic and $n^{-1/2}$ sharpness witnesses and fractional envelopes]
+\begin{theorem}[Cubic and $n^{-1/2}$ witnesses against quadratic derivative bounds, and fractional envelopes]
 \label{thm:fractional-sharpness}
-\lean{RhAstraSynthesis.reciprocalSharpnessWitness_cubic_lower_bound, RhAstraSynthesis.fractional_gap_antitone, RhAstraSynthesis.fractional_remez_chebyshev_envelope, RhAstraSynthesis.sqrtSharpnessWitness_eval_inv_sqrt_abs_le_one, RhAstraSynthesis.sqrtSharpnessWitness_derivative_at_zero}
+\lean{Mathematics212.reciprocalSharpnessWitness_cubic_lower_bound, Mathematics212.fractional_gap_antitone, Mathematics212.fractional_remez_chebyshev_envelope, Mathematics212.sqrtSharpnessWitness_eval_inv_sqrt_abs_le_one, Mathematics212.sqrtSharpnessWitness_derivative_at_zero}
 \uses{thm:chebyshev-exp, def:sharpness-witnesses}
 \leanok
-For all $m \ge 1$, $\deg P_{m,m} \le 2m$, $|P_{m,m}(1/n)| \le 1$ ($n \ge 1$), and $|P_{m,m}'(0)| \ge 2m^3 > m^2$. For $0 < \alpha \le 1$, gaps $n^{-\alpha} - (n+1)^{-\alpha}$ are strictly positive and antitone, and $T_m(2(Lm)^{-\alpha}/e - 1) \le \exp(2m\sqrt{\alpha/L})$. When $\alpha = 1/2$, $\deg Q_{m,m} \le 2m$, $|Q_{m,m}(1/\sqrt{n})| \le 1$ ($n \ge 1$), and $|Q_{m,m}'(0)| = 2m^{5/2} + \sum_{j=1}^m \sqrt{j} \ge 2m^{5/2} > m^2$.
+For all $m \ge 1$, $\deg P_{m,m} \le 2m$, $|P_{m,m}(1/n)| \le 1$ ($n \ge 1$), and $|P_{m,m}'(0)| \ge 2m^3 > m^2$. For $0 < \alpha \le 1$, the gaps $n^{-\alpha} - (n+1)^{-\alpha}$ are strictly positive and antitone for $n \ge 1$. Moreover, let $m \ge 1$ be an integer, $L > 0$, $0 < \alpha \le 1$, and $(Lm + m)^{-\alpha} \le e \le (Lm)^{-\alpha}$; then
+\[
+  T_m\!\left(\frac{2(Lm)^{-\alpha}}{e} - 1\right) \le \exp\!\left(2m\sqrt{\alpha/L}\right).
+\]
+When $\alpha = 1/2$, $\deg Q_{m,m} \le 2m$, $|Q_{m,m}(1/\sqrt{n})| \le 1$ ($n \ge 1$), and $|Q_{m,m}'(0)| = 2m^{5/2} + \sum_{j=1}^m \sqrt{j} \ge 2m^{5/2} > m^2$. Comparing against the quadratic degree bound $(2m)^2 = 4m^2$ gives $|P_{m,m}'(0)| / (2m)^2 \ge m/2$ and $|Q_{m,m}'(0)| / (2m)^2 \ge \sqrt{m}/2$, both unbounded as $m \to \infty$, ruling out any fixed quadratic-in-degree derivative bound on $\{1/n\}$ or $\{n^{-1/2}\}$.
 \end{theorem}
 
-\section{Coprime M\"obius Convolutions, Euler Products, and Tails}
+This witnesses the failure of quadratic derivative bounds; it does not assert optimal leading constants, a matching fractional upper bound, or optimal Gevrey order.
+
+\section{Coefficient Profiles, Remainder Regimes, and Proof of Theorem~\ref{thm:reciprocal-full-gevrey-expansion}}
+\label{sec:gevrey-proof}
+
+\begin{lemma}[Fixed-order cubic geometric Gevrey majorant]
+\label{lem:cubic-geometric-gevrey}
+\lean{Mathematics212.cubic_geometric_gevrey_majorant}
+\leanok
+Let $s\in\N$, $C,L\ge0$, $0\le\sigma<1$, and $a_n\ge0$ satisfy
+\[
+a_n\le \frac{C(8L)^s}{(2s)!}(n+1)^{3s}\sigma^{n+1}
+\qquad(n\ge0).
+\]
+Then $\sum_{n\ge0}a_n$ converges and
+\[
+\sum_{n\ge0}a_n\le
+\frac{C}{1-\sigma}\left(\frac{64L}{(1-\sigma)^3}\right)^s s!.
+\]
+\end{lemma}
+\begin{proof}
+Use the positive-index geometric moment bound $\sum_{n\ge0}(n+1)^k \sigma^{n+1} \le k! / (1-\sigma)^{k+1}$ at order $k = 3s$, then $(3s)!/(2s)!\le8^s s!$. This includes $s=0$ and $\sigma=0$.
+\end{proof}
+
+\begin{theorem}[Reciprocal polynomial-family Gevrey-1 coefficient bound]
+\label{thm:reciprocal-family-gevrey}
+\lean{Mathematics212.polynomial_reciprocal_family_gevrey}
+\leanok
+\uses{lem:cubic-geometric-gevrey, lem:reciprocal-interval-factorial, thm:remez-exp-markov}
+Let $P_m\in\mathbb R[X]$, $C,R>0$, $r\ge0$, and $L\in\mathbb N$ with $L>0$.
+Suppose for every $m\ge1$ that $\deg P_m\le m$ and
+$|P_m(1/k)|\le C R^{-m}$ for every $k\ge1$.
+Put $\sigma=(r/R)\exp(2/\sqrt L)$ and assume $\sigma<1$.
+Then for every $s\in\mathbb N$ the series
+$\sum_{m\ge1}|P_m^{(s)}(0)|r^m/s!$ converges and
+\[
+\sum_{m\ge1}\frac{|P_m^{(s)}(0)|}{s!}r^m
+\le \frac{C}{1-\sigma}
+  \left(\frac{64L}{(1-\sigma)^3}\right)^s s!.
+\]
+\end{theorem}
+\begin{proof}
+For $s\le m$, combining Theorem~\ref{thm:chebyshev-exp}, Theorem~\ref{thm:remez-exp-markov} on $[0, (Lm)^{-1}]$ with $B = C R^{-m}$, and Lemma~\ref{lem:reciprocal-interval-factorial} at $x=0$ gives
+$|P_m^{(s)}(0)|r^m/s!\le C(8L)^s m^{3s}\sigma^m/(2s)!$, using $\exp(2m/\sqrt L)=\exp(2/\sqrt L)^m$.
+For $s>m$ the derivative vanishes. Applying
+Lemma~\ref{lem:cubic-geometric-gevrey} completes the bound (including $s=0$ and $r=0$).
+\end{proof}
+
+\begin{lemma}[Natural parameter at every strict subradius]
+\label{lem:reciprocal-all-radii-parameter}
+\lean{Mathematics212.exists_reciprocal_gevrey_parameter}
+\leanok
+For every $R>0$ and every real $0\le r<R$, there exists a natural
+$L>0$ with $\sigma=(r/R)\exp(2/\sqrt L)<1$.
+\end{lemma}
+\begin{proof}
+If $r=0$, take $L=1$. Otherwise $\log(R/r)>0$; choose a natural
+$N>2/\log(R/r)$ and put $L=N^2$. Then $N>0$ and
+$\exp(2/\sqrt L)<R/r$.
+\end{proof}
+
+\begin{theorem}[All-radii reciprocal Gevrey-1 coefficient series]
+\label{thm:reciprocal-family-all-radii}
+\lean{Mathematics212.polynomial_reciprocal_family_gevrey_all_radii}
+\leanok
+\uses{lem:reciprocal-all-radii-parameter, thm:reciprocal-family-gevrey}
+Under the degree and sample hypotheses of
+Theorem~\ref{thm:reciprocal-family-gevrey}, for every real $0\le r<R$
+there is a natural $L>0$, independent of $s$, such that
+$\sigma=(r/R)\exp(2/\sqrt L)<1$ and, simultaneously for every $s\in\mathbb N$,
+$\sum_{m\ge1}|P_m^{(s)}(0)|r^m/s!$ converges and is bounded by
+$C(1-\sigma)^{-1}(64L/(1-\sigma)^3)^s s!$.
+\end{theorem}
+\begin{proof}
+Choose $L$ by Lemma~\ref{lem:reciprocal-all-radii-parameter} and apply Theorem~\ref{thm:reciprocal-family-gevrey}
+for each $s$. The same $L$ works for every order $s$, including when $r=0$.
+\end{proof}
+
+\begin{theorem}[Complex reciprocal coefficient profiles on closed subdisks]
+\label{thm:reciprocal-complex-profiles}
+\lean{Mathematics212.reciprocalCoefficientProfile, Mathematics212.polynomial_reciprocal_profiles_all_radii}
+\leanok
+\uses{thm:reciprocal-family-all-radii}
+Under the reciprocal family degree and sample hypotheses, define
+\[
+ F_s(u)=\sum_{m\ge1}([X^s]P_m)\,u^{m} = \sum_{n\ge0}\frac{P_{n+1}^{(s)}(0)}{s!}u^{n+1}.
+\]
+For each $0\le r<R$ there is one natural $L>0$, independent of both
+$s$ and $u$, with $d=1-(r/R)\exp(2/\sqrt L)>0$.
+On $|u|\le r$, this series converges absolutely and
+\[
+ |F_s(u)|\le \frac{C}{d}\left(\frac{64L}{d^3}\right)^s s!.
+\]
+Its partial sums converge uniformly on that closed subdisk.
+\end{theorem}
+\begin{proof}
+The norm of the $n$-th complex term is $|P_{n+1}^{(s)}(0)|/s!$ times $|u|^{n+1}$, bounded by the summable radial majorant of Theorem~\ref{thm:reciprocal-family-all-radii}. Applying the triangle inequality and the Weierstrass M-test (Mathlib's uniform series theorem) on $|u| \le r$ yields absolute and uniform convergence.
+\end{proof}
+
+\begin{theorem}[Holomorphy of reciprocal coefficient profiles]
+\label{thm:reciprocal-profile-holomorphy}
+\lean{Mathematics212.reciprocalCoefficientProfile_differentiableOn_of_uniform, Mathematics212.polynomial_reciprocal_profiles_holomorphic}
+\leanok
+\uses{thm:reciprocal-complex-profiles}
+Under the same degree and reciprocal sample hypotheses, for every $s\ge0$,
+the function $F_s$ is complex differentiable on $\{u\in\C:|u|<R\}$ (hence so is $A_0 = 1 + F_0$).
+\end{theorem}
+\begin{proof}
+At each $u$ with $|u| < R$, choose $r$ with $|u|<r<R$. The closed radius-$r$ disk is a
+neighborhood of $u$ on which the polynomial partial sums converge uniformly by Theorem~\ref{thm:reciprocal-complex-profiles}.
+Thus convergence is locally uniform on $\{|u|<R\}$, so the limit is holomorphic.
+The nonconstant witness $P_m(t)=t$, $s=1$, $R=1$ instantiates the theorem.
+\end{proof}
+
+\begin{lemma}[Finite small-degree reciprocal Taylor remainder]
+\label{lem:reciprocal-taylor-remainder}
+\lean{Mathematics212.reciprocal_normalized_derivative_coeff, Mathematics212.reciprocal_polynomial_lagrange, Mathematics212.reciprocal_taylor_remainder_zero, Mathematics212.polynomial_reciprocal_taylor_remainder_bound}
+\leanok
+\uses{lem:reciprocal-interval-factorial, thm:remez-exp-markov}
+Let $L,m,n,p$ be positive integers with $Lm\le n$, $B>0$, and
+$P\in\mathbb R[X]$ have degree at most $m$. Suppose
+$|P(1/k)|\le B$ for every positive integer $k$. Then
+\[
+ \bigl|P(1/n)-\sum_{s=0}^{p-1}P_s n^{-s}\bigr|
+ \le \frac{e^{2m/\sqrt L} B(8L)^p m^{3p}}{(2p)!n^p},
+ \qquad P_s=[X^s]P.
+\]
+For $p>m$ the remainder is exactly zero.
+\end{lemma}
+\begin{proof}
+Because $Lm \le n$, the Taylor segment $[0, 1/n]$ stays inside the controlled interval $[0, (Lm)^{-1}]$. Apply the real Lagrange Taylor theorem on $[0,1/n]$ with order $p-1$.
+The analytic iterated derivative equals the algebraic polynomial derivative, and at zero its quotient by $s!$ equals $P_s$; thus for some $0<y<1/n \le (Lm)^{-1}$ the remainder is $P^{(p)}(y)/(p!n^p)$.
+If $p\le m$, Lemma~\ref{lem:reciprocal-interval-factorial} on $[0, (Lm)^{-1}]$ with $M = e^{2m/\sqrt{L}} B$ gives the displayed inequality without losing a factor $p$.
+If $p>m$, $P^{(p)}$ vanishes identically. For $P=X^2$, $L=m=p=2$, $n=4$,
+the remainder is $1/16$, not zero.
+\end{proof}
+
+\begin{lemma}[Finite large-degree reciprocal remainder and mixed moments]
+\label{lem:reciprocal-large-degree}
+\lean{Mathematics212.reciprocal_coefficient_bound, Mathematics212.polynomial_reciprocal_large_degree_remainder_bound, Mathematics212.factorial_mixed_moment_div_le, Mathematics212.mixed_geometric_gevrey_moment, Mathematics212.finite_mixed_geometric_bound}
+\leanok
+\uses{lem:reciprocal-taylor-remainder, lem:cubic-geometric-gevrey}
+Under the same polynomial and sample hypotheses, let $1\le n\le Lm$
+and $p\ge0$. Then
+\[
+ n^p\left|P(1/n)-\sum_{s<p}P_s n^{-s}\right|
+ \le BL^pm^p+e^{2m/\sqrt L}BL^p
+       \sum_{s<p}\frac{8^s m^{p+2s}}{(2s)!}.
+\]
+For $0\le s\le p$, $(p+2s)!/(2s)!\le8^p p!$.
+If $0\le\sigma<1$, the positive-index mixed moment series converges and
+\[
+ \sum_{m\ge1}\frac{m^{p+2s}\sigma^m}{(2s)!}
+ \le\frac{8^p p!}{(1-\sigma)^{p+2s+1}}.
+\]
+Writing $d=1-\sigma$, the finite Taylor-index sum satisfies
+\[
+ \sum_{s<p}\frac{8^s}{d^{p+2s+1}}
+ \le\frac1d\left(\frac{1+8/d^2}{d}\right)^p.
+\]
+\end{lemma}
+\begin{proof}
+When $n < Lm$, the segment $[0, 1/n]$ need not lie inside $[0, (Lm)^{-1}]$ (with the boundary case $n = Lm$ covered by both lemmas). Multiply the triangle inequality by $n^p$. Bound $|P(1/n)|$ directly by the sample hypothesis $B$ (and $n^p \le (Lm)^p$),
+and for each $s<p$ use $n^{p-s}\le(Lm)^{p-s}$ together with the coefficient estimate
+at zero (for $s>m$ that coefficient is zero, avoiding any Markov bound outside its order range). The mixed factorial bound follows
+from $\binom{p+2s}{p}\le2^{p+2s}\le8^p$. Applying the positive-index geometric
+moment bound at order $p + 2s$ and summing the remaining geometric progression in $8/d^2$ via
+$\sum_{s<p}a^s\le(1+a)^p$ ($a\ge0$, including $p=0$) gives the finite Taylor-index bound.
+\end{proof}
+
+\begin{theorem}[Absolute weighted real reciprocal remainder series]
+\label{thm:reciprocal-absolute-remainder-series}
+\lean{Mathematics212.polynomial_reciprocal_family_remainder_gevrey}
+\leanok
+\uses{thm:reciprocal-family-gevrey, lem:reciprocal-taylor-remainder, lem:reciprocal-large-degree}
+Let $C,R>0$, $r\ge0$, and $L\ge1$ be a natural number. Suppose
+$\deg P_m\le m$ and $|P_m(1/k)|\le C R^{-m}$ for every $m,k\ge1$.
+Set $\sigma=(r/R)e^{2/\sqrt L}<1$ and $d=1-\sigma$.
+For every pair of positive integers $n,p$, the real series
+\[
+ \sum_{m\ge1}r^m\left|P_m(1/n)-
+   \sum_{s=0}^{p-1}([X^s]P_m)n^{-s}\right|
+\]
+converges and is at most
+\[
+ \frac{3C}{d}\left(\frac{72L}{d^3}\right)^p\frac{p!}{n^p}.
+\]
+\end{theorem}
+\begin{proof}
+Scale each remainder by $n^p$. For $Lm\le n$ (where $[0, 1/n] \subseteq [0, (Lm)^{-1}]$), Lemma~\ref{lem:reciprocal-taylor-remainder} supplies the Lagrange bound; for $n<Lm$, Lemma~\ref{lem:reciprocal-large-degree} bounds the sample and truncated coefficients separately. Dominate globally for all $m \ge 1$ by the sum of both positive majorants so there is no partition of a series.
+The mixed moments converge for each $s<p$, allowing finite-sum and series interchange. The three resulting geometric bases are
+$64L/d^3$, $L/d$, and $8L(1+8/d^2)/d$; since $0<d\le1$, each is at most $72L/d^3$, giving total prefactor $(1 + 1 + 1)C/d = 3C/d$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:reciprocal-full-gevrey-expansion}]
+For part~(1), when $n \ge 1$ and $|u| < R$, the sample hypothesis gives $|P_m(1/n) u^m| \le C(|u|/R)^m$, a convergent geometric majorant. Part~(2) is proved in Theorems~\ref{thm:reciprocal-complex-profiles} and~\ref{thm:reciprocal-profile-holomorphy}.
+
+For part~(3), given $0 \le r < R$, choose one integer $L \ge 1$ by Lemma~\ref{lem:reciprocal-all-radii-parameter} (before $n$, $p$, and $u$) so that $\sigma = (r/R)e^{2/\sqrt{L}} < 1$ and $d = 1 - \sigma \in (0, 1]$. For any $n, p \ge 1$ and $|u| \le r$, Theorem~\ref{thm:reciprocal-complex-profiles} ensures that each profile series $F_s(u)$ ($0 \le s < p$) converges absolutely. Normalizing polynomial derivatives at zero to coefficients $[X^s]P_m = P_m^{(s)}(0)/s!$ and interchanging the finite sum over $0 \le s < p$ with the absolutely convergent series over $m \ge 1$, the two constant summands $1$ cancel, giving the remainder identity.
+
+Finally, the norm of each complex remainder term is bounded above by the corresponding radial term $r^m |P_m(1/n) - \sum_{s<p}([X^s]P_m)n^{-s}|$. By Theorem~\ref{thm:reciprocal-absolute-remainder-series}, the complex remainder series converges absolutely (established as \texttt{hnorm} inside the proof of \texttt{polynomial\_reciprocal\_gevrey\_expansion}) and its sum has norm at most $(3C/d)(72L/d^3)^p p! / n^p$.
+\end{proof}
+
+\section{Companion Part I: Coprime M\"obius Convolutions, Euler Products, and Tails}
+\label{sec:companion-mobius}
 
 \begin{definition}[Coprime B\'aez--Duarte kernel]
 \label{def:coprime-kernel}
-\lean{RhAstraSynthesis.actualCoprimeKernel}
+\lean{Mathematics212.actualCoprimeKernel, Mathematics212.actual_coprime_kernel_eq_prime_product}
 \leanok
-Define $\psi(n) = \prod_{p \mid n}(p + 1)$ and $f(n) = \mu(n)\prod_{p \mid n}\frac{p}{p + 1}$ for $n \ge 1$. For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \psi(\gcd(n, d)) / \psi(n)$ for $n \ge 1$.
+Define $\psi(n) = \prod_{p \mid n}(p + 1)$ and $f(n) = \mu(n)\prod_{p \mid n}\frac{p}{p + 1}$ for $n \ge 1$. For $d \in \N$, define $g_d : \N \to \R$ by $g_d(0) = 0$ and $g_d(n) = \sum_{a \mid n,\, \gcd(a, d) = 1} f(a)$ for $n \ge 1$. The implementation defines $g_d$ by this divisor sum; multiplicativity and evaluation on prime powers give $g_d(n) = \psi(\gcd(n, d)) / \psi(n) = \prod_{p \mid n} \bigl(\ind_{p \mid d} + \ind_{p \nmid d}/(p+1)\bigr)$ for $n \ge 1$.
 \end{definition}
 
 \begin{theorem}[Actual coprime M\"obius factorization and $s > 1/2$ Euler product]
 \label{thm:coprime-euler}
-\lean{RhAstraSynthesis.actual_coprime_mobius_factorization, RhAstraSynthesis.actual_coprime_kernel_le_psi_mul_base, RhAstraSynthesis.coprime_kernel_moment_euler_hasProd}
+\lean{Mathematics212.actual_coprime_mobius_factorization, Mathematics212.actual_coprime_kernel_le_psi_mul_base, Mathematics212.coprime_kernel_moment_euler_hasProd}
 \uses{def:coprime-kernel}
 \leanok
-For every $d \in \N$ and $n \ge 1$, $f(n)\ind_{(n,d)=1} = (\mu * g_d)(n)$ with $0 \le g_d(n) \le 1$ multiplicative and $g_d(n) \le \psi(d) g_1(n)$ ($d \ne 0$). For every real $s > 1/2$ and $d \ne 0$, $\sum_{n \ge 1} g_d(n)n^{-s}$ converges to its infinite Euler product.
+For every $d \in \N$ and $n \ge 1$, $f(n)\ind_{(n,d)=1} = (\mu * g_d)(n)$ with $0 \le g_d(n) \le 1$ multiplicative and $g_d(n) \le \psi(d) g_1(n)$ ($d \ne 0$). For every real $s > 1/2$ and $d \ne 0$, $\sum_{n \ge 1} g_d(n)n^{-s}$ converges to its infinite Euler product (the condition $d \ne 0$ is essential, since $g_0(n) = 1$ for all $n \ge 1$).
 \end{theorem}
 
 \begin{theorem}[Modulus-uniform $s = 3/4$ local Euler-factor bound]
 \label{thm:euler-ratio}
-\lean{RhAstraSynthesis.tau_sq_le_choose_three, RhAstraSynthesis.finite_euler_ratio_le_divisor_count}
+\lean{Mathematics212.tau_sq_le_choose_three, Mathematics212.finite_euler_ratio_le_divisor_count}
 \uses{def:coprime-kernel}
 \leanok
-For all $e \in \N$, $(e+1)^2 \le \binom{e+3}{3}$, and for every $d \ne 0$ (including $p = 2$ with $r_2 = 2/3$), $\prod_{p \mid d} (1 - r_p p^{-3/4})^{-1} \le 2^{\omega(d)} \le \tau(d)$.
+For every prime $p$, set $r_p = p / (p + 1)$ (so $r_2 = 2/3$). For all $e \in \N$, $(e+1)^2 \le \binom{e+3}{3}$, and for every $d \ne 0$, $\prod_{p \mid d} (1 - r_p p^{-3/4})^{-1} \le 2^{\omega(d)} \le \tau(d)$.
 \end{theorem}
 
 \begin{proof}
-At $p = 2$, $2^{3/4} > 5/3$ gives $(1 - \frac{2}{3} 2^{-3/4})^{-1} < 2$; for $p \ge 3$, $p^{3/4} > 2$ gives $(1 - p^{-3/4})^{-1} < 2$, and multiplying over $p \mid d$ bounds the product by $2^{\omega(d)} \le \prod_{p^e \parallel d} (e + 1) = \tau(d)$.
+At $p = 2$, $2^{3/4} > 5/3$ gives $(1 - \frac{2}{3} 2^{-3/4})^{-1} < 2$; for $p \ge 3$, $r_p \le 1$ and $p^{3/4} > 2$ give $(1 - r_p p^{-3/4})^{-1} < 2$, and multiplying over $p \mid d$ bounds the product by $2^{\omega(d)} \le \prod_{p^e \parallel d} (e + 1) = \tau(d)$.
 \end{proof}
 
-\begin{theorem}[Harmonic M\"obius bound, Laurent--exponential tail, and Vaughan identity]
+\begin{theorem}[Harmonic M\"obius bound, Laurent--exponential tail, and Vaughan identity~\cite{vaughan1977}]
 \label{thm:mobius-tail}
-\lean{RhAstraSynthesis.moebius_harmonic_abs_le_one, RhAstraSynthesis.mobius_tail_hasDerivAt, RhAstraSynthesis.mobius_tail_polynomial_log_decay, RhAstraSynthesis.actual_vaughan}
+\lean{Mathematics212.moebius_harmonic_abs_le_one, Mathematics212.mobius_tail_hasDerivAt, Mathematics212.mobius_tail_polynomial_log_decay, Mathematics212.actual_vaughan}
 \leanok
-For every $N \ge 1$, $\bigl|\sum_{n=1}^N \mu(n)/n\bigr| \le 1$. For $c > 0$, $z^3 e^{-cz}$ admits an explicit Laurent--exponential antiderivative and satisfies $z^3 e^{-cz} = O_{c,A}(z^{-2A})$ for $z \ge 1$. Finite Dirichlet convolutions satisfy Vaughan's cutoff identity on \texttt{ArithmeticFunction} $\R$.
+For every $N \ge 1$, $\bigl|\sum_{n=1}^N \mu(n)/n\bigr| \le 1$. For $c > 0$, differentiation of $e^{-cz}(2z^3/c + 6z^2/c^2 + 12z/c^3 + 12/c^4)$ gives $-2z^3 e^{-cz}$. For each integer $A \ge 0$, $z^3 e^{-cz} = O_{c,A}(z^{-2A})$ on $z \ge 1$. Finite Dirichlet convolutions satisfy Vaughan's cutoff identity on \texttt{ArithmeticFunction} $\R$.
 \end{theorem}
 
-\section{Mellin Multipliers, Floor-Kernel Transfers, and Analytic Obstructions}
+\section{Companion Part II: Mellin Multipliers, Floor-Kernel Transfers, and Conditional Obstructions}
+\label{sec:companion-mellin}
 
 \begin{definition}[Tent kernel and Mellin multiplier]
 \label{def:tent-mellin}
 \lean{TentMultiplier.numerator, TentMellin.mellin_eq_multiplier}
 \leanok
-Let $\tau : [1, 2] \to \R$ be the symmetric unit-height tent supported on $[1, 2]$ with peak at $u = 4/3$, with Mellin transform
+Set $\tau(u) = 4(1 - u^{-1})$ for $1 \le u \le 4/3$, $\tau(u) = 4/u - 2$ for $4/3 < u \le 2$, and $\tau(u) = 0$ otherwise (a piecewise-affine tent in $1/u$ supported on $[1, 2]$ with peak $\tau(4/3) = 1$). Its Mellin transform
 \[
-M_\tau(s) = \int_1^2 \tau(u) u^{s-1}\dd u = \frac{4\,\mathrm{num}_\tau(s)}{s(s-1)}, \qquad
-\mathrm{num}_\tau(s) = 1 + 2^{s-1} - 2\left(\frac{4}{3}\right)^{s-1}.
+  M_\tau(s) = \int_1^2 \tau(u) u^{s-1}\dd u
+\]
+converges for every $s \in \C$ (including $s = 0, 1$, where the integral is strictly positive). For $s \notin \{0, 1\}$, it equals the displayed quotient
+\[
+  M_\tau(s) = \frac{4\,\mathrm{num}_\tau(s)}{s(s-1)}, \qquad
+  \mathrm{num}_\tau(s) = 1 + 2^{s-1} - 2\left(\frac{4}{3}\right)^{s-1}.
 \]
 \end{definition}
 
 \begin{theorem}[Critical-strip non-vanishing, $\zeta'/\zeta$ identity, and floor-kernel transfer]
 \label{thm:tent-mellin}
-\lean{TentMellin.tent_mellin_ne_zero, PrimePowerMellin.primePower_mellin_zeta, PowerKernelTransfer.kernel_error_bound, PublishedEnergyBridge.finite_energy_exact, RhAstraSynthesis.coprime_signed_square_commRing}
+\lean{TentMellin.tent_mellin_ne_zero, PrimePowerMellin.primePower_mellin_zeta, PowerKernelTransfer.kernel_error_bound, PowerKernelTransfer.exponent_envelope, PublishedEnergyBridge.finite_energy_exact, Mathematics212.coprime_signed_square_commRing}
 \uses{def:tent-mellin}
 \leanok
-On $0 < \RePart(s) < 1$, $M_\tau(s) \ne 0$, and on $\RePart(s) > 1$, $M_\tau$ multiplies $-\zeta'(s)/\zeta(s)$ in the dilated prime-power Mellin identity. If a measurable function $G$ satisfies $|G(t)| \le C t^{-\gamma}$ ($0 < \gamma < 1$), then the Lebesgue floor-kernel remainder is $O(K^{-\gamma})$ with minimax energy envelope $80/89$ at exponent balance $53/89$. Finite B\'aez--Duarte truncated $L^2$ shifts~\cite{baez2003} satisfy $E_{\mathrm{tail}} = E_{\mathrm{trunc}} - 1$.
+On $0 < \RePart(s) < 1$, $M_\tau(s) \ne 0$. On $\RePart(s) > 1$, the Mellin transform of the prime-power sum \texttt{primePower} evaluated at $-s$ equals $M_\tau(s)\bigl(-\zeta'(s)/\zeta(s)\bigr)$ (equivalently, the dilated prime-power kernel evaluates at $s$; no analytic continuation of the prime sum into the critical strip is asserted).
+
+If a measurable function $G : \R \to \R$ satisfies $|G(t)| \le C t^{-\gamma}$ for all $t \ge 1$ ($C \ge 0$, $0 < \gamma < 1$), then for every $K \ge 1$ the Lebesgue floor-kernel remainder satisfies
+\[
+  |\mathrm{kernel}(G, K) - \mathrm{limitIntegral}(G)| \le C\left(\frac{1}{\gamma} + \frac{1}{1-\gamma}\right) K^{-\gamma}.
+\]
+Separately, for every $a \in \R$, $\max\bigl((3+a)/4,\, (26-18a)/17\bigr) \ge 80/89$, with equality at $a = 53/89$. For integers $u, Y \ge 1$, the finite B\'aez--Duarte truncated divisor sums~\cite{baez2003} satisfy the finite integer sum-of-squares identity $E_{\mathrm{tail}} = E_{\mathrm{trunc}} - 1$.
 \end{theorem}
 
 \begin{theorem}[Abel summation and Stieltjes polylogarithmic $L^1$ tail]
 \label{thm:stieltjes-tail}
-\lean{RhAstraSynthesis.abel_summation_inv, RhAstraSynthesis.log_decay_integrable_and_tail_bound}
+\lean{Mathematics212.abel_summation_inv, Mathematics212.log_decay_integrable_and_tail_bound}
 \leanok
-If $a : \N \to \R$ has partial sums $S(n) = \sum_{m=1}^n a(m)$, then $\sum_{n=u+1}^N a(n)/n = \frac{S(N)}{N} - \frac{S(u)}{u} + \sum_{n=u}^{N-1} S(n)\!\left(\frac{1}{n} - \frac{1}{n+1}\right)$. Any measurable $G$ satisfying $|G(t)| \le C(\log t)^{-1-\delta}$ ($\delta > 0$, $C \ge 0$, $t \ge 2$) obeys $G(t)/t \in L^1((K, \infty))$ with $\bigl|\int_K^\infty G(t)\,\dd t/t\bigr| \le C/(\delta (\log K)^\delta)$ for every $K \ge 2$.
+If $a : \N \to \R$ has partial sums $S(n) = \sum_{m=1}^n a(m)$ and $1 \le u \le N$ are integers, then
+\[
+  \sum_{n=u+1}^N \frac{a(n)}{n} = \frac{S(N)}{N} - \frac{S(u)}{u} + \sum_{n=u}^{N-1} S(n)\!\left(\frac{1}{n} - \frac{1}{n+1}\right).
+\]
+Any measurable $G : \R \to \R$ satisfying $|G(t)| \le C(\log t)^{-1-\delta}$ ($\delta > 0$, $C \ge 0$, $t \ge 2$) obeys $G(t)/t \in L^1((K, \infty))$ with $\bigl|\int_K^\infty G(t)\,\dd t/t\bigr| \le C/(\delta (\log K)^\delta)$ for every $K \ge 2$.
 \end{theorem}
 
-\begin{theorem}[Sharp critical-line tent gap and infinitely many non-outer off-axis zeros]
+\begin{theorem}[Critical-line bound and zeros of the tent numerator]
 \label{thm:tent-obstructions}
-\lean{RhAstraSynthesis.tent_numerator_half_line_lower_bound, RhAstraSynthesis.tent_numerator_infinitely_many_off_axis_zeros}
+\lean{Mathematics212.tent_numerator_half_line_lower_bound, Mathematics212.tent_numerator_infinitely_many_off_axis_zeros}
 \uses{def:tent-mellin, thm:tent-mellin}
 \leanok
-On $\RePart(s) = 1/2$, $|\mathrm{num}_\tau(s)| \ge \sqrt{3} - 1 - 1/\sqrt{2} > 0$. Conversely, $\mathrm{num}_\tau$ possesses infinitely many off-axis zeros in the strip $2 < \RePart(s) < 4$ with arbitrarily large imaginary parts, so $M_\tau$ is non-outer in $H^2(\C_{1/2}^+)$.
+On $\RePart(s) = 1/2$, $|\mathrm{num}_\tau(s)| \ge \sqrt{3} - 1 - 1/\sqrt{2} > 0$, and equality holds at $s = 1/2$. Conversely, for every $H > 0$ there exists $s \in \C$ with $2 < \RePart(s) < 4$, $\ImPart(s) > H$, and $\mathrm{num}_\tau(s) = 0$.
 \end{theorem}
 
 \begin{proof}
-Setting $w = s - 1$, the equation $\mathrm{num}_\tau(s) = 1 + 2^w - 2(4/3)^w = 0$ divides by $2^w$ into $(3/2)^w = 2 / (1 + 2^{-w})$. On each closed ball $\overline{B}(c_k, 1/2)$ centered at $c_k = \frac{9}{4} + \frac{2\pi i k}{\log(3/2)}$ ($k \ge 1$), the fixed-point map
+The critical-line lower bound follows from the reverse triangle inequality and evaluates to an equality at $s = 1/2$. For the off-axis zeros, set $w = s - 1$, so $\mathrm{num}_\tau(s) = 1 + 2^w - 2(4/3)^w = 0$ becomes $(3/2)^w = 2 / (1 + 2^{-w})$. Given any height $H \in \R$, choose a lower bound $k_0 \ge 1$ so that $2\pi k_0 / \log(3/2) > H + 1$. A finite-step sweep selects an integer $k \ge k_0$ with fractional part of $k \log 2 / \log(3/2)$ in $[0.495, 0.505]$. On the closed ball $\overline{B}(c_k, 1/2)$ centered at $c_k = \frac{9}{4} + \frac{2\pi i k}{\log(3/2)}$ (which lies inside $\RePart(w) \ge 7/4$), the map
 \[
 F_k(w) = \frac{\log 2 - \log(1 + 2^{-w})}{\log(3/2)} + \frac{2\pi i k}{\log(3/2)}
 \]
-is a strict contraction inside $\RePart(w) \in [7/4, 11/4]$, yielding a zero $s_k = w_k + 1$ with $\RePart(s_k) \in (2, 4)$ for every sufficiently large $k$.
+has Lipschitz constant at most $36/49$ and moves the center by $|F_k(c_k) - c_k| \le 13/98$. Since $13/98 + (36/49)(1/2) = 1/2$, $F_k$ maps $\overline{B}(c_k, 1/2)$ into itself. By Banach's fixed-point theorem, $F_k$ has a unique fixed point $w_k \in \overline{B}(c_k, 1/2)$, giving $s = w_k + 1$ with $2 < \RePart(s) < 4$, $\ImPart(s) > H$, and $\mathrm{num}_\tau(s) = 0$. Since $H > 0$ is arbitrary, the admissible indices are unbounded.
 \end{proof}
 
-\begin{theorem}[Parity pseudo-density, Hardy model-space defect, and $2\times 2$ Pick minors]
+\begin{theorem}[Parity pseudo-density, conditional Hilbert-space defect, and $2\times 2$ minor criterion]
 \label{thm:parity-pick}
-\lean{RhAstraSynthesis.parity_pseudo_density_nonneg, RhAstraSynthesis.model_space_projection_defect_lower_bound, RhAstraSynthesis.not_posSemidef_of_neg_two_by_two_minor}
+\lean{Mathematics212.parity_pseudo_density_nonneg, Mathematics212.model_space_projection_defect_lower_bound, Mathematics212.not_posSemidef_of_neg_two_by_two_minor}
 \leanok
-For $t \ge 1$ and $\omega \in \R$, Selberg parity pseudo-densities $1 + t^{-1/4}\cos(\omega\log t)$ are everywhere non-negative. An off-axis zero $z$ ($\RePart z > 1/2$) induces a positive $H^2(\C_{1/2}^+)$ model-space projection defect $(2\RePart z - 1)/|z|^2 > 0$, and any symmetric matrix with a negative $2 \times 2$ principal minor fails \texttt{Matrix.PosSemidef}.
+For $t \ge 1$ and $\omega \in \R$, $1 + t^{-1/4}\cos(\omega\log t) \ge 0$. Write $D(z) = (2\RePart z - 1)/|z|^2$ for $\RePart z > 1/2$. In a complex inner-product space, if $\|k\| = 1$, $\langle k, h \rangle = 0$, and $|\langle k, g \rangle|^2 = D(z)$, then $\|g - h\|^2 \ge D(z) > 0$. Finally, any real symmetric matrix with a negative principal minor of order two is not positive semidefinite.
 \end{theorem}
 
-\section{Open Analytic Extensions}
+This theorem proves the conditional Hilbert-space inequality and matrix minor criterion abstractly; it does not construct a concrete Hardy subspace, Szeg\H{o} kernel, or negative minor from $M_\tau$ or from a theta deformation.
 
-\begin{proposition}[All-radii Gevrey-$\alpha$ remainder via interior Markov]
+\section{Open Mathematical Questions}
+\label{sec:open-questions}
+
+The targets below remain open and are not claimed as proved or formalized.
+
+\begin{proposition}[Fractional-grid Gevrey-$\alpha$ remainder]
 \label{thm:open-gevrey-alpha}
 \uses{thm:markov-interior, thm:fractional-sharpness, thm:remez-exp-markov}
 \notready
-Combine Theorems~\ref{thm:markov-interior}, \ref{thm:fractional-sharpness}, and~\ref{thm:remez-exp-markov} to deduce uniform Gevrey-$\alpha$ remainder bounds $\Gamma(\alpha p + 1) n^{-\alpha p}$ on arbitrary compact disks $\{|z| \le r\}$ for sequences sampled at $\{n^{-\alpha}\}$ ($\alpha \in (0, 1]$).
+For $0 < \alpha < 1$, does sampling on $\{n^{-\alpha}\}$ under $|P_m(k^{-\alpha})| \le C R^{-m}$ ($\deg P_m \le m$) yield a uniform Gevrey-$\alpha$ remainder bound of order $\Gamma(\alpha p + 1) n^{-\alpha p}$ on every strict closed subdisk $|u| \le r < R$? (The case $\alpha = 1$ is Theorem~\ref{thm:reciprocal-full-gevrey-expansion}.)
 \end{proposition}
 
 \begin{proposition}[Unconditional PNT input and $s=3/4$ Euler-product transfer~\cite{titchmarsh1986}]
 \label{thm:open-pnt-vk}
 \uses{thm:coprime-euler, thm:euler-ratio, thm:stieltjes-tail}
 \notready
-Feed the Prime Number Theorem ($\sum \mu(n)/n = 0$) and unconditional Vinogradov--Korobov decay $M(x) \ll x (\log x)^{-A}$ into Theorems~\ref{thm:coprime-euler}, \ref{thm:euler-ratio}, and~\ref{thm:stieltjes-tail} to conclude $A(d) \le A(1)\tau(d)$ and $\int_1^\infty |G(x)|\,\dd x/x < \infty$.
+Can the Prime Number Theorem ($\sum \mu(n)/n = 0$) and Vinogradov--Korobov decay $M(x) \ll x (\log x)^{-A}$ be formalized and coupled with Theorems~\ref{thm:coprime-euler}, \ref{thm:euler-ratio}, and~\ref{thm:stieltjes-tail} to deduce $A(d) \le A(1)\tau(d)$ for the coprime B\'aez--Duarte mass $A(d)$ and $\int_1^\infty |G(x)|\,\dd x/x < \infty$ for the resulting Stieltjes remainder $G$?
 \end{proposition}
 
-\begin{proposition}[Deformed-theta Blaschke products and Pick/Hankel obstructions]
+\begin{proposition}[Normalized Hardy multiplier, deformed-theta Blaschke products, and Pick/Hankel obstructions]
 \label{thm:open-blaschke}
 \uses{thm:tent-obstructions, thm:parity-pick}
 \notready
-Construct the Blaschke product of the off-axis zeros from Theorem~\ref{thm:tent-obstructions} and apply Theorem~\ref{thm:parity-pick} to finite-dimensional Pick and Stieltjes--Hankel matrices arising from modular theta deformations $\Xi_H = \Xi M_H$.
+For the normalized multiplier $2^{-s} M_\tau(s)$ (which shifts log-support to $[-\log 2, 0]$), does it belong to $H^2(\RePart s > 1/2)$ as a non-outer function? More generally, can one construct Blaschke products from the off-axis zeros of Theorem~\ref{thm:tent-obstructions} and exhibit concrete negative $2\times 2$ principal minors of finite-dimensional Pick or Stieltjes--Hankel matrices arising from modular theta deformations $\Xi_H = \Xi M_H$ so as to satisfy the hypotheses of Theorem~\ref{thm:parity-pick}?
 \end{proposition}
+
+\section{Formalization Crosswalk, Contributions, and Disclosure}
+\label{sec:crosswalk-disclosure}
+
+\begin{remark}[Lean and Rocq interface crosswalk]
+\label{rem:crosswalk}
+The formal development in \texttt{lean/\allowbreak Mathematics212/} uses pinned \texttt{leanprover/lean4:v4.34.0} and Mathlib commit \texttt{5ed29652\allowbreak 56430c36\allowbreak 49e86755\allowbreak f9576b54\allowbreak eca72435}. Across the reciprocal Gevrey-1 declarations:
+\begin{itemize}\raggedright
+  \item \texttt{polynomial\_reciprocal\_gevrey\_expansion} (in namespace \texttt{Mathematics212}) exports the conjunction of absolute summability of the sampled series (\texttt{reciprocal\_sampled\_summable}), the complex remainder identity (\texttt{reciprocal\_complex\_remainder\_identity}), and the uniform norm bound, while establishing absolute summability of the complex remainder terms internally as \texttt{hnorm};
+  \item \texttt{TargetStatements.reciprocal\_gevrey\_expansion} projects only the norm inequality (via \texttt{.2.2}), while \texttt{MainTheorems.lean} provides an index alias;
+  \item \texttt{polynomial\_reciprocal\_profiles\_all\_radii} and \texttt{polynomial\_reciprocal\_profiles\_holomorphic} are companion theorems proving uniform convergence and open-disk holomorphy of each coefficient profile.
+\end{itemize}
+Independently, \texttt{rocq/} (\texttt{RationalEnvelope.v}, \texttt{RationalContract.v}) verifies a finite rational signed-square envelope in Rocq~\texttt{9.0} (\texttt{rocqchk}); Rocq does not cross-check the Lean real/complex analysis. In CI (\texttt{.github/workflows/verify.yml}), the axiom audit checks declarations under the \texttt{Mathematics212} prefix (and transitive dependencies, including \texttt{TentMellin} and \texttt{PrimePowerMellin}).
+\end{remark}
+
+\begin{remark}[Taxonomy of contributions]
+\label{rem:taxonomy}
+We distinguish three layers: (a) \emph{classical mathematical results} formalized here, including Markov's interior inequality~\cite{markov1889}, Bernstein's inequality in the form treated by van der Corput and Schaake~\cite{vandercorput1935,vandercorput1936}, Bojanov's cumulative-measure proof of Remez's inequality~\cite{bojanov1993}, Vaughan's identity~\cite{vaughan1977}, B\'aez-Duarte's criterion~\cite{baez2003}, and Titchmarsh's Mellin/Euler identities~\cite{titchmarsh1986}, alongside related discrete Remez work by Yomdin~\cite{yomdin2009} and Chen et al.~\cite{chen2024}; (b) \emph{formalization engineering}, including cumulative-measure interpolation nodes and compact good-superset reduction for Remez, reciprocal-grid Rolle gap counting, locally uniform convergence on open disks via closed-subdisk majorants, \texttt{\_root\_.CommRing} isolation, and explicit examples in \texttt{TargetStatements.lean}; and (c) \emph{quantitative synthesis}, centering on Theorem~\ref{thm:reciprocal-full-gevrey-expansion}, the $\{1/n\}$ and $\{n^{-1/2}\}$ sharpness witnesses, and the phase-selected strip zeros of $\mathrm{num}_\tau$ in $2 < \RePart(s) < 4$.
+\end{remark}
+
+\begin{remark}[Reproducibility and AI-use disclosure]
+\label{rem:reproducibility}
+All 49 Lean~4 submodules build without \texttt{sorry}, custom axioms, \texttt{native\_decide}, or \texttt{Lean.ofReduceBool} under \texttt{lake build} and \texttt{leanchecker}, using only \texttt{[propext, Classical.choice, Quot.sound]}; the finite rational signed-square envelope is independently checked in Rocq~\texttt{9.0} (\texttt{rocqchk}). AI tools assisted with portions of the formalizations, tests, and exposition. Lean checks the formal declarations, and Rocq independently checks the finite rational envelope. These mechanical checks do not certify the correspondence between the manuscript and the formal statements, nor do they replace independent mathematical peer review.
+\end{remark}

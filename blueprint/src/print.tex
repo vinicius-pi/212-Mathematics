@@ -23,10 +23,10 @@
 \setlength{\emergencystretch}{2em}
 \raggedbottom
 \providecommand{\lean}[1]{\par{\raggedright\noindent\footnotesize\upshape\texttt{Lean:} \leanurl{#1}\par}}
-\providecommand{\leanok}{\par\noindent{\footnotesize\upshape\textbf{[Formalized in Lean 4]}}}
+\providecommand{\leanok}{\par\noindent{\footnotesize\upshape\textbf{[Formalized in Lean 4]}}\par}
 \providecommand{\uses}[1]{\par{\raggedright\noindent\footnotesize\upshape\textit{Uses:} \leanurl{#1}.\par}}
 \providecommand{\proves}[1]{}
-\providecommand{\notready}{\par\noindent{\footnotesize\upshape\textit{[Open target --- not yet formalized in Lean]}}}
+\providecommand{\notready}{\par\noindent{\footnotesize\upshape\textit{[Open target --- not yet formalized in Lean]}}\par}
 
 \newcommand{\dd}{\,\mathrm{d}}
 \newcommand{\R}{\mathbb{R}}
@@ -37,11 +37,14 @@
 \DeclareMathOperator{\RePart}{Re}
 \DeclareMathOperator{\ImPart}{Im}
 
-\title[RhAstraSynthesis Blueprint]{RhAstraSynthesis Blueprint: Polynomial Extremal Bounds, Coprime Convolutions, and Zeta Multipliers}
-\author{Vinicius M. Pimenta}
-\date{November 16, 2026}
+\title[212-Mathematics Blueprint]{A Gevrey-1 Expansion from Reciprocal Samples of Polynomial Families}
+\author{Vinícius Marques Pimenta}
+\date{November 18, 2026}
 
 \begin{document}
+\begin{abstract}
+Let $P_m$ be real polynomials of degree at most $m$, and assume $|P_m(1/k)| \le C R^{-m}$ for all positive integers $m, k$, with $C, R > 0$. We prove that $q_n(u) = 1 + \sum_{m \ge 1} P_m(1/n) u^m$ has a Gevrey-1 asymptotic expansion in $1/n$ as $n \to \infty$, with coefficient functions $A_0(u) = 1 + F_0(u)$ and $A_s(u) = F_s(u)$ ($s \ge 1$) holomorphic on the open disk $|u| < R$. On each closed disk $|u| \le r < R$, the error after $p$ terms (orders $0$ through $p - 1$) is at most $K_r H_r^p p! / n^p$, with explicit constants $K_r = 3C/d$ and $H_r = 72L/d^3$ independent of $n, p, u$. The proof bounds the number of reciprocal-grid gaps on which a polynomial exceeds its sample bound, applies Remez and Markov inequalities on a short interval, and sums the resulting Taylor and degree bounds. The analysis is formalized in Lean~4 (\texttt{v4.34.0}); this archival manuscript (\emph{212-Mathematics Blueprint}) also documents companion formalizations on coprime M\"obius convolutions and tent Mellin multipliers, together with a separate Rocq~\texttt{9.0} verification of a finite rational signed-square envelope.
+\end{abstract}
 \maketitle
 \tableofcontents
 \input{content}
