@@ -94,7 +94,18 @@ For every compact interval $[a, b] \subset \R$ ($a < b$), polynomial $P \in \R[X
 \end{theorem}
 
 \begin{proof}
-Inner regularity of Lebesgue measure reduces $E$ to a compact subset $K \subseteq E$ with $|K| > 0$ via \texttt{MeasurableSet.exists\_isCompact\_diff\_lt}, and monotone continuity of $T_n$ on $[1, \infty)$ passes to the limit $|K| \uparrow |E|$. For any $x \in (a, b]$, applying the right-endpoint case to $[a, x]$ and $K \cap [a, x]$ (whenever $|K \cap [a, x]| > 0$, using monotonicity of $y \mapsto T_n(y)$) and symmetrically reflecting $t \mapsto -t$ on $[-b, -x]$ when $|K \cap [x, b]| > 0$ reduces the bound on $[a, b]$ to establishing the right-endpoint inequality at $x = b$. For the right-endpoint step on $[a, b]$ with $|K| = e > 0$ and $Y = 2(b-a)/e - 1 \ge 1$: continuity and Lipschitz regularity of $x \mapsto |K \cap [a, x]|$ yield ordered nodes $x_0 < \dots < x_n$ in $K$ satisfying
+If $n=0$, then $P$ is constant and $E$ is nonempty. Assume $n\ge1$.
+Split $[a,b]$ at $x$. The two sides overlap only at $x$, so their good-set measures add to $|E|$.
+The overall density is a length-weighted average of the densities on the sides of positive length.
+Choose a side $I$ with $|E\cap I|/|I|\ge |E|/(b-a)>0$. Then
+\[
+  1\le 2|I|/|E\cap I|-1\le 2(b-a)/|E|-1.
+\]
+Apply the right-endpoint estimate on $I$, reflecting $t\mapsto -t$ if $I=[x,b]$.
+Monotonicity of $T_n$ on $[1,\infty)$ gives the stated bound.
+It remains to prove the right-endpoint estimate. Relabel the interval $[a,b]$ and its good set $E$.
+The compact set $K=\{t\in[a,b]:|P(t)|\le B\}$ contains $E$, so using $e=|K|$ can only decrease the Chebyshev argument.
+Put $Y=2(b-a)/e-1$. The continuous cumulative measure $t\mapsto |K\cap[a,t]|$ takes each value from $0$ to $e$ at a point of $K$, yielding ordered nodes $x_0<\dots<x_n$ in $K$ satisfying
 \[
 |K \cap [a, x_k]| = \frac{t_k + 1}{2}\,e, \qquad t_k = -\cos\!\left(\frac{k\pi}{n}\right) \quad (0 \le k \le n).
 \]
@@ -157,14 +168,17 @@ $2^s$ loss.
 \label{thm:chebyshev-exp}
 \lean{Mathematics212.polynomial_reciprocal_good_measure, Mathematics212.remez_chebyshev_T_le_exp}
 \leanok
-Let $P \in \R[X]$ satisfy $\deg P \le m$, $B > 0$, $k > 0$, and $|P(1/n)| \le B$ for all $n \ge 1$. Then $E = \{t \in [0, 1/k] : |P(t)| \le B\}$ has measure $|E| \ge 1/(k + m)$. For $(Lm + m)^{-1} \le e \le (Lm)^{-1}$ ($L, m > 0$),
+Let $k\ge1$ and $m\ge0$ be integers. Suppose $P\in\R[X]$ has degree at most $m$, $B>0$, and $|P(1/n)|\le B$ for every integer $n\ge1$. Then $E=\{t\in[0,1/k]:|P(t)|\le B\}$ has measure $|E|\ge1/(k+m)$. For $m\ge1$, real $L>0$, and $(Lm+m)^{-1}\le e\le(Lm)^{-1}$,
 \[
-T_m\!\left(\frac{2(Lm)^{-1}}{e} - 1\right) \le T_m\!\left(1 + \frac{2}{L}\right) \le \exp\!\left(\frac{2m}{\sqrt{L}}\right).
+T_m\!\left(\frac{2(Lm)^{-1}}{e} - 1
+ight) \le T_m\!\left(1 + \frac{2}{L}
+ight) \le \exp\!\left(\frac{2m}{\sqrt{L}}
+ight).
 \]
 \end{theorem}
 
 \begin{proof}
-Between any two bad points in $[0, 1/k]$ where $|P| > B$, the reciprocal lattice leaves at most $m$ occupied intervals (Rolle's theorem produces $m$ distinct zeros of $P'$), and antitone telescoping of gaps $(n(n+1))^{-1}$ keeps $|[0, 1/k] \setminus E| \le 1/k - 1/(k+m)$. Writing $1 + 2/L = \cosh\eta$ yields $2/L = \cosh\eta - 1 \ge \eta^2/2$, so $\eta \le 2/\sqrt{L}$ and $T_m(1+2/L) = \cosh(m\eta) \le e^{m\eta} \le e^{2m/\sqrt{L}}$.
+Call a reciprocal gap occupied if it contains a point where $|P|>B$. Both endpoints satisfy $|P|\le B$, so $P^2$ attains its maximum at an interior point $c$ with $P(c)\ne0$. Thus $2P(c)P'(c)=0$ gives $P'(c)=0$. Distinct gaps give distinct roots. A nonconstant $P$ therefore has at most $\deg P-1$ occupied gaps; a constant $P$ has none. The point $0$ is good by continuity. The bad set is thus covered by at most $m$ gaps with indices $j\ge k$. Their lengths $1/j-1/(j+1)$ decrease with $j$, so their total length is at most the sum of the first $m$, namely $1/k-1/(k+m)$. Writing $1 + 2/L = \cosh\eta$ yields $2/L = \cosh\eta - 1 \ge \eta^2/2$, so $\eta \le 2/\sqrt{L}$ and $T_m(1+2/L) = \cosh(m\eta) \le e^{m\eta} \le e^{2m/\sqrt{L}}$.
 \end{proof}
 
 \begin{definition}[Reciprocal and square-root sharpness witnesses]
