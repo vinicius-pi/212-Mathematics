@@ -8,9 +8,6 @@ as the sampling index $n \to \infty$? The main result of this paper, Theorem~\re
 
 \begin{theorem}[Full reciprocal Gevrey-1 expansion on closed subdisks]
 \label{thm:reciprocal-full-gevrey-expansion}
-\lean{Mathematics212.reciprocal_sampled_summable, Mathematics212.reciprocal_complex_remainder_identity, Mathematics212.polynomial_reciprocal_gevrey_expansion}
-\leanok
-\uses{thm:reciprocal-absolute-remainder-series, lem:reciprocal-all-radii-parameter, thm:reciprocal-complex-profiles, thm:reciprocal-profile-holomorphy}
 Let $C, R > 0$. Suppose that for every integer $m \ge 1$, $P_m \in \R[X]$ satisfies $\deg P_m \le m$ and $|P_m(1/k)| \le C R^{-m}$ for every integer $k \ge 1$. Define the sampled series and formal coefficient profiles by
 \[
   q_n(u) = 1 + \sum_{m \ge 1} P_m(1/n)\, u^m,
@@ -35,6 +32,9 @@ Then:
 \end{enumerate}
 For $p \ge 1$ the parenthesized approximation equals $\sum_{s=0}^{p-1} A_s(u)\,n^{-s}$; in particular, for $p = 1$ it reads $1 + F_0(u) = A_0(u)$.
 \end{theorem}
+\lean{Mathematics212.reciprocal_sampled_summable, Mathematics212.reciprocal_complex_remainder_identity, Mathematics212.polynomial_reciprocal_gevrey_expansion}
+\leanok
+\uses{thm:reciprocal-absolute-remainder-series, lem:reciprocal-all-radii-parameter, thm:reciprocal-complex-profiles, thm:reciprocal-profile-holomorphy}
 
 For each fixed $s \in \N$, the profile series $F_s(u)$ converges in $u$ on $|u| < R$. By contrast, the expansion in $1/n$ is asymptotic as $n \to \infty$ at fixed truncation order $p$: the majorant ratio $(72L/d^3)(p+1)/n$ grows with $p$, so the bound does not assert convergence as $p \to \infty$ at fixed $n$, nor does it extend to the boundary radius $r = R$.
 
