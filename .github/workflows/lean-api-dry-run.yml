@@ -30,7 +30,7 @@ jobs:
         working-directory: lean
         shell: bash
         env:
-          LEAN_NUM_THREADS: "2"
+          LEAN_NUM_THREADS: "1"
           NAME: Mathematics212
           DOCS_FACETS: Mathematics212:docs
           HOMEPAGE: ${{ runner.temp }}/lean-api-site
