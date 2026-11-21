@@ -11,7 +11,7 @@ permissions:
 jobs:
   api-docs:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -30,6 +30,7 @@ jobs:
         working-directory: lean
         shell: bash
         env:
+          LEAN_NUM_THREADS: "2"
           NAME: Mathematics212
           DOCS_FACETS: Mathematics212:docs
           HOMEPAGE: ${{ runner.temp }}/lean-api-site
@@ -48,6 +49,18 @@ jobs:
             "https://raw.githubusercontent.com/leanprover-community/docgen-action/$DOCGEN_ACTION_REV/scripts/build_docs.sh" \
             --output "$script"
           mkdir -p "$HOMEPAGE"
+          printf 'LEAN_NUM_THREADS=%s\n' "$LEAN_NUM_THREADS"
+          lake --version
+          (
+            while true; do
+              date -u +%FT%TZ
+              free -m
+              ps -eo comm,rss --no-headers | awk '{n[$1]++; rss[$1]+=$2} END {for (c in n) print rss[c], n[c], c}' | sort -nr | head -8
+              sleep 45
+            done
+          ) &
+          monitor=$!
+          trap 'kill "$monitor" 2>/dev/null || true' EXIT
           /usr/bin/time -v bash "$script"
           git -C .lake/packages/doc-gen4 rev-parse HEAD
           git -C .lake/packages/mathlib rev-parse HEAD
@@ -70,9 +83,18 @@ jobs:
               "polynomial_reciprocal_gevrey_expansion",
           ):
               name = "Mathematics212." + short_name
-              path, anchor = index[name]["docLink"].split("#", 1)
+              path, anchor = index[name]["docLink"].removeprefix("./").split("#", 1)
               assert path == "Mathematics212/ReciprocalGevreyExpansion.html", path
               assert anchor == name, anchor
               assert f'id="{anchor}"' in (root / path).read_text(), anchor
               print(f"docs/find/#doc/{name} -> docs/{path}#{anchor}")
           PY
+
+      - name: Preserve verified API output
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: lean-api-site
+          path: ${{ runner.temp }}/lean-api-site/
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 3
