@@ -1,0 +1,78 @@
+name: Lean API documentation dry run
+
+on:
+  push:
+    branches: [docs/lean-api-dry-run]
+    paths: [.github/workflows/lean-api-dry-run.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  api-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: leanprover/lean-action@ba3fdfe5c4476c925da13bf11a005ddb47e47aee
+        with:
+          lake-package-directory: lean
+          use-mathlib-cache: "true"
+          use-github-cache: "false"
+          build: "false"
+          test: "false"
+          lint: "false"
+
+      - name: Build and check Lean API documentation
+        working-directory: lean
+        shell: bash
+        env:
+          NAME: Mathematics212
+          DOCS_FACETS: Mathematics212:docs
+          HOMEPAGE: ${{ runner.temp }}/lean-api-site
+          REFERENCES: ../blueprint/src/references.bib
+          DOCGEN_ACTION_REV: dacc1acc2a3f532cc577266979ba9c36c7593f7c
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          cat lean-toolchain
+          lean --version
+          df -h .
+          nproc
+          free -m
+          script="$RUNNER_TEMP/build_docs.sh"
+          curl --fail --silent --show-error --location --max-time 30 \
+            "https://raw.githubusercontent.com/leanprover-community/docgen-action/$DOCGEN_ACTION_REV/scripts/build_docs.sh" \
+            --output "$script"
+          mkdir -p "$HOMEPAGE"
+          /usr/bin/time -v bash "$script"
+          git -C .lake/packages/doc-gen4 rev-parse HEAD
+          git -C .lake/packages/mathlib rev-parse HEAD
+          git diff --exit-code HEAD -- .
+          du -sh "$HOMEPAGE/docs"
+          df -h .
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["HOMEPAGE"]) / "docs"
+          assert (root / "find/index.html").is_file()
+          assert (root / "find/find.js").is_file()
+          index = json.loads((root / "declarations/declaration-data.bmp").read_text())["declarations"]
+          for short_name in (
+              "reciprocal_sampled_summable",
+              "reciprocal_complex_remainder_identity",
+              "polynomial_reciprocal_gevrey_expansion",
+          ):
+              name = "Mathematics212." + short_name
+              path, anchor = index[name]["docLink"].split("#", 1)
+              assert path == "Mathematics212/ReciprocalGevreyExpansion.html", path
+              assert anchor == name, anchor
+              assert f'id="{anchor}"' in (root / path).read_text(), anchor
+              print(f"docs/find/#doc/{name} -> docs/{path}#{anchor}")
+          PY
