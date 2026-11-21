@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
+      source-revision:
+        type: string
+        required: true
       verified-api-run:
         type: string
         required: true
@@ -31,6 +34,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          ref: ${{ inputs.source-revision || github.sha }}
 
       - name: Set site staging directory
         shell: bash
@@ -40,10 +44,12 @@ jobs:
         if: inputs.verified-api-run != ''
         env:
           GH_TOKEN: ${{ github.token }}
+          SITE_SOURCE: ${{ inputs.source-revision }}
         shell: bash
         run: |
           set -euo pipefail
           [[ "$API_RUN" =~ ^[0-9]+$ ]]
+          [[ "$SITE_SOURCE" =~ ^[0-9a-f]{40}$ && "$(git rev-parse HEAD)" == "$SITE_SOURCE" ]]
           api_sha=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$API_RUN" \
             --jq 'select(.conclusion == "success" and .head_branch == "docs/lean-api-dry-run" and .path == ".github/workflows/lean-api-dry-run.yml") | .head_sha')
           [[ "$api_sha" =~ ^[0-9a-f]{40}$ ]]
