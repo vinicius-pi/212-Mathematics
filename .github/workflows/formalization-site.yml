@@ -1,0 +1,144 @@
+name: Publish formalization site
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      source-revision:
+        type: string
+        required: true
+      verified-api-run:
+        type: string
+        required: true
+  push:
+    branches: [main]
+    paths: ["lean/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: formalization-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    env:
+      API_RUN: ${{ inputs.verified-api-run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.source-revision || github.sha }}
+
+      - name: Set site staging directory
+        shell: bash
+        run: echo "SITE=$RUNNER_TEMP/formalization-site" >> "$GITHUB_ENV"
+
+      - name: Bind previously verified API artifact to this source
+        if: inputs.verified-api-run != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SITE_SOURCE: ${{ inputs.source-revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$API_RUN" =~ ^[0-9]+$ ]]
+          [[ "$SITE_SOURCE" =~ ^[0-9a-f]{40}$ && "$(git rev-parse HEAD)" == "$SITE_SOURCE" ]]
+          api_sha=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$API_RUN" \
+            --jq 'select(.conclusion == "success" and .head_branch == "docs/lean-api-dry-run" and .path == ".github/workflows/lean-api-dry-run.yml") | .head_sha')
+          [[ "$api_sha" =~ ^[0-9a-f]{40}$ ]]
+          git fetch --no-tags origin "$api_sha"
+          git diff --exit-code "$api_sha" HEAD -- lean blueprint/src/references.bib
+          echo "API_SOURCE_SHA=$api_sha" >> "$GITHUB_ENV"
+
+      - name: Download verified API artifact
+        if: inputs.verified-api-run != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.verified-api-run }}
+          name: lean-api-site
+          path: ${{ env.SITE }}
+
+      - uses: leanprover/lean-action@ba3fdfe5c4476c925da13bf11a005ddb47e47aee
+        if: inputs.verified-api-run == ''
+        with:
+          lake-package-directory: lean
+          use-mathlib-cache: "true"
+          use-github-cache: "false"
+          build: "false"
+          test: "false"
+          lint: "false"
+
+      - name: Generate Lean API documentation
+        if: inputs.verified-api-run == ''
+        working-directory: lean
+        shell: bash
+        env:
+          LEAN_NUM_THREADS: "1"
+          NAME: Mathematics212
+          DOCS_FACETS: Mathematics212:docs
+          HOMEPAGE: ${{ env.SITE }}
+          REFERENCES: ../blueprint/src/references.bib
+        run: |
+          set -euo pipefail
+          lean --version
+          mkdir -p "$SITE"
+          script="$RUNNER_TEMP/build_docs.sh"
+          curl --fail --silent --show-error --location --max-time 30 \
+            https://raw.githubusercontent.com/leanprover-community/docgen-action/dacc1acc2a3f532cc577266979ba9c36c7593f7c/scripts/build_docs.sh \
+            --output "$script"
+          /usr/bin/time -v bash "$script"
+          git diff --exit-code HEAD -- .
+          git -C .lake/packages/doc-gen4 rev-parse HEAD
+          git -C .lake/packages/mathlib rev-parse HEAD
+          echo "API_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Build and verify Blueprint and API links
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq texlive-binaries texlive-latex-base texlive-bibtex-extra libgraphviz-dev pkg-config
+          python3 -m venv "$RUNNER_TEMP/blueprint-env"
+          "$RUNNER_TEMP/blueprint-env/bin/python" -m pip install \
+            leanblueprint==0.0.20 plasTeX==3.1 plastexdepgraph==0.0.5 pygraphviz==2.0.4
+          work="$RUNNER_TEMP/blueprint-source"
+          mkdir -p "$work"
+          git archive HEAD blueprint | tar -x -C "$work"
+          (
+            cd "$work/blueprint/src"
+            printf '%s\n' '\citation{*}' '\bibstyle{amsplain}' '\bibdata{references}' > web.aux
+            bibtex web
+            "$RUNNER_TEMP/blueprint-env/bin/plastex" --imager none --vector-imager none \
+              --plugins leanblueprint -c ../plastex.cfg --dir "$SITE/blueprint" web.tex
+          )
+          cp blueprint/site-index.html "$SITE/index.html"
+          python3 blueprint/check_web.py "$SITE"
+          printf '{"blueprint_source":"%s","api_source":"%s"}\n' \
+            "$(git rev-parse HEAD)" "$API_SOURCE_SHA" > "$SITE/build-info.json"
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: ${{ env.SITE }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy checked site
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
