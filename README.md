@@ -4,25 +4,16 @@ Lean 4 formalization (`leanprover/lean4:v4.34.0`, `mathlib@5ed2965256430c3649e86
 
 All 49 Lean submodules build without `sorry`, custom axioms, `native_decide`, or `Lean.ofReduceBool` under `lake build` and `leanchecker`, using only `[propext, Classical.choice, Quot.sound]`. Self-contained signatures and explicit examples live in [`TargetStatements.lean`](lean/Mathematics212/TargetStatements.lean); the reader-facing manuscript and archival blueprint live in the [Blueprint PDF](blueprint/src/print.pdf) ([`content.tex`](blueprint/src/content.tex)).
 
+## Publications
+
+- **Primary paper:** Vinícius Marques Pimenta, *A Gevrey-1 Expansion from Reciprocal Samples of Polynomial Families*, [`aiXiv:2611.01893`](https://aixiv.online/abs/2611.01893) (see also the [Blueprint PDF](blueprint/src/print.pdf)).
+- **Applied companion:** Vinícius Marques Pimenta, *Reciprocal Gevrey-1 Asymptotics, Hybrid Majorants, and Newton Shift Structure for a Second-Difference Logarithmic Recurrence*, [`aiXiv:2611.02366`](https://aixiv.online/abs/2611.02366). The companion paper applies the general reciprocal-grid transfer theorem from `212-Mathematics` (`aiXiv:2611.01893`), and its private application Lean modules import the public `212-Mathematics` library. In relation to this application, the public 212 library supplies the general reciprocal-grid transfer theorem; the recurrence-specific formalizations remain in private application modules.
+
+Suggested reading order: (1) the general reciprocal-grid Gevrey-1 expansion below, (2) its Remez–Markov and Bernstein proof mechanism, (3) the external applied companion [`aiXiv:2611.02366`](https://aixiv.online/abs/2611.02366), (4) the mathematically independent companion formalizations (`Companion Part I`, `Companion Part II`, and the separate Rocq `9.0` envelope), and (5) [Repository Layout](#repository-layout), [Verification](#verification), and [Author, Provenance & Scope](#author-provenance--scope).
+
 ## Headline Theorems
 
-### 1. Polynomial Approximation, Bernstein & Markov–Remez Bounds
-
-| Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
-| :--- | :--- | :--- |
-| Bernstein inequality (van der Corput–Schaake form) | `bernsteinVanDerCorputSchaake` | $n^2 P(\cos\theta)^2 + (P'(\cos\theta)\sin\theta)^2 \le n^2 B^2$ ($\deg P \le n$) |
-| Markov interior derivative inequality (1889) | `markovInteriorDerivative` | $\forall x \in [-1, 1],\; \lvert P'(x)\rvert \le n^2 B$ |
-| Iterated interior Markov inequality | `markovIterateInteriorBound` | $\forall x \in [-1, 1],\; \lvert P^{(s)}(x)\rvert \le B \prod_{j < s}(n - j)^2$ |
-| Interior interval transport | `markovInteriorIntervalTransfer` | $\lvert P^{(s)}(t)\rvert \le (2Lm)^s B \prod_{j < s}(m - j)^2$ on $[0, (Lm)^{-1}]$ |
-| Exterior Chebyshev growth & endpoint Markov | `chebyshevExteriorBound`, `reciprocalEndpointMarkov` | $\lvert P(x)\rvert \le B\,T_m(\lvert x\rvert)$ ($\lvert x\rvert \ge 1$); $\lvert P^{(s)}(0)\rvert/s! \le M(4L)^s m^{3s}/(2s)!$ |
-| Reciprocal-grid good-set measure | `reciprocalGoodMeasure` | $\lvert P(1/n)\rvert \le B \;(\forall n \ge 1) \implies \mathrm{meas}(\{t \in [0, 1/k] : \lvert P(t)\rvert \le B\}) \ge \frac{1}{k+m}$ |
-| Remez–Chebyshev exponential envelope | `remezChebyshevEnvelope` | $m \ge 1,\; L > 0,\; (Lm+m)^{-1} \le e \le (Lm)^{-1} \implies T_m(2(Lm)^{-1}/e - 1) \le \exp(2m/\sqrt{L})$ |
-| Measurable equioscillation Remez & Markov derivative | `remezInequality`, `remezExponentialInequality`, `remezMarkovInteriorBound` | Borel $E \subseteq [a,b]$ (Lebesgue corollary via compact superset): $\lvert P(x)\rvert \le T_n(2(b-a)/\lvert E\rvert - 1) B$; $\lvert P^{(s)}(x)\rvert \le \bigl(\frac{2}{b-a}\bigr)^s \bigl(\prod_{j<s}(n-j)^2\bigr) T_n(2(b-a)/\lvert E\rvert-1) B$ |
-| Affine Markov scaling & Gevrey factorial | `markovAffineTransfer`, `gevreyFactorialBound` | Factor $(2k)^s$ on $[0, 1/k]$; $(3k)!/(2k)! \le 8^k k!$ |
-| Cubic witness against quadratic degree bounds on $\{1/n\}$ | `cubicSharpnessBound` | $\deg P_{m,m} \le 2m$, $\lvert P_{m,m}(1/n)\rvert \le 1$, $\lvert P_{m,m}'(0)\rvert \ge 2m^3$, ratio to $(2m)^2$ is $\ge m/2$ |
-| Fractional $\{n^{-\alpha}\}$ envelope & $n^{-1/2}$ witness | `fractionalRemezEnvelope`, `sqrtSharpnessDerivative` | $m \ge 1,\; L > 0,\; 0 < \alpha \le 1,\; (Lm+m)^{-\alpha} \le e \le (Lm)^{-\alpha} \implies T_m(2(Lm)^{-\alpha}/e - 1) \le \exp(2m\sqrt{\alpha/L})$; $\deg Q_{m,m} \le 2m$, $\lvert Q_{m,m}'(0)\rvert \ge 2m^{5/2}$ |
-
-### Reciprocal Gevrey-1 expansion
+### 1. Reciprocal Gevrey-1 Expansion
 
 For real polynomials `P_m` with degree at most `m` and sample bounds
 `|P_m(1/k)| ≤ C R^(-m)` for all positive `m,k`, where `C,R > 0`, define
@@ -52,7 +43,25 @@ part of `F_0`: the full zeroth profile is `1 + F_0`, and the expansion in
 
 See the [proof dependency map](docs/RECIPROCAL_GEVREY_PROOF.md).
 
-### 2. Companion Part I: Multiplicative Convolutions, Euler Products & Arithmetic Identities
+### 2. Polynomial Approximation, Bernstein & Markov–Remez Proof Mechanism
+
+| Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
+| :--- | :--- | :--- |
+| Bernstein inequality (van der Corput–Schaake form) | `bernsteinVanDerCorputSchaake` | $n^2 P(\cos\theta)^2 + (P'(\cos\theta)\sin\theta)^2 \le n^2 B^2$ ($\deg P \le n$) |
+| Markov interior derivative inequality (1889) | `markovInteriorDerivative` | $\forall x \in [-1, 1],\; \lvert P'(x)\rvert \le n^2 B$ |
+| Iterated interior Markov inequality | `markovIterateInteriorBound` | $\forall x \in [-1, 1],\; \lvert P^{(s)}(x)\rvert \le B \prod_{j < s}(n - j)^2$ |
+| Interior interval transport | `markovInteriorIntervalTransfer` | $\lvert P^{(s)}(t)\rvert \le (2Lm)^s B \prod_{j < s}(m - j)^2$ on $[0, (Lm)^{-1}]$ |
+| Exterior Chebyshev growth & endpoint Markov | `chebyshevExteriorBound`, `reciprocalEndpointMarkov` | $\lvert P(x)\rvert \le B\,T_m(\lvert x\rvert)$ ($\lvert x\rvert \ge 1$); $\lvert P^{(s)}(0)\rvert/s! \le M(4L)^s m^{3s}/(2s)!$ |
+| Reciprocal-grid good-set measure | `reciprocalGoodMeasure` | $\lvert P(1/n)\rvert \le B \;(\forall n \ge 1) \implies \mathrm{meas}(\{t \in [0, 1/k] : \lvert P(t)\rvert \le B\}) \ge \frac{1}{k+m}$ |
+| Remez–Chebyshev exponential envelope | `remezChebyshevEnvelope` | $m \ge 1,\; L > 0,\; (Lm+m)^{-1} \le e \le (Lm)^{-1} \implies T_m(2(Lm)^{-1}/e - 1) \le \exp(2m/\sqrt{L})$ |
+| Measurable equioscillation Remez & Markov derivative | `remezInequality`, `remezExponentialInequality`, `remezMarkovInteriorBound` | Borel $E \subseteq [a,b]$ (Lebesgue corollary via compact superset): $\lvert P(x)\rvert \le T_n(2(b-a)/\lvert E\rvert - 1) B$; $\lvert P^{(s)}(x)\rvert \le \bigl(\frac{2}{b-a}\bigr)^s \bigl(\prod_{j<s}(n-j)^2\bigr) T_n(2(b-a)/\lvert E\rvert-1) B$ |
+| Affine Markov scaling & Gevrey factorial | `markovAffineTransfer`, `gevreyFactorialBound` | Factor $(2k)^s$ on $[0, 1/k]$; $(3k)!/(2k)! \le 8^k k!$ |
+| Cubic witness against quadratic degree bounds on $\{1/n\}$ | `cubicSharpnessBound` | $\deg P_{m,m} \le 2m$, $\lvert P_{m,m}(1/n)\rvert \le 1$, $\lvert P_{m,m}'(0)\rvert \ge 2m^3$, ratio to $(2m)^2$ is $\ge m/2$ |
+| Fractional $\{n^{-\alpha}\}$ envelope & $n^{-1/2}$ witness | `fractionalRemezEnvelope`, `sqrtSharpnessDerivative` | $m \ge 1,\; L > 0,\; 0 < \alpha \le 1,\; (Lm+m)^{-\alpha} \le e \le (Lm)^{-\alpha} \implies T_m(2(Lm)^{-\alpha}/e - 1) \le \exp(2m\sqrt{\alpha/L})$; $\deg Q_{m,m} \le 2m$, $\lvert Q_{m,m}'(0)\rvert \ge 2m^{5/2}$ |
+
+### 3. Companion Part I: Multiplicative Convolutions, Euler Products & Arithmetic Identities
+
+*Mathematically independent of the polynomial Gevrey-1 chain above.*
 
 | Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
 | :--- | :--- | :--- |
@@ -63,7 +72,9 @@ See the [proof dependency map](docs/RECIPROCAL_GEVREY_PROOF.md).
 | Laurent–exponential tail decay | `mobiusTailAntideriv`, `mobiusTailLogDecay` | Derivative gives $-2z^3 e^{-cz}$; for integer $A \ge 0$, $z^3 e^{-cz} = O_{c,A}(z^{-2A})$ on $z \ge 1$ |
 | Vaughan, Baez–Duarte & signed-square identities | `vaughanIdentity`, `finiteEnergyExact`, `coprimeSignedSquare` | Dirichlet Vaughan split; finite sum $E_{\mathrm{tail}} = E_{\mathrm{trunc}} - 1$ ($u,Y \ge 1$); `CommRing` identity |
 
-### 3. Companion Part II: Mellin Multipliers, Stieltjes Tails & Conditional Obstructions
+### 4. Companion Part II: Mellin Multipliers, Stieltjes Tails & Conditional Obstructions
+
+*Mathematically independent of the polynomial Gevrey-1 chain above.*
 
 | Mathematical Result | Lean Declaration (`Mathematics212.MainTheorems`) | Core Hypothesis / Bound |
 | :--- | :--- | :--- |
